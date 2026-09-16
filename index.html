@@ -700,15 +700,26 @@ document.getElementById("menuPage")
 
 document.getElementById("content").innerHTML="";
 
+
+// buka menu dahulu
+document.getElementById("paparBulanKrew").innerHTML =
+"⏳ Semak bulan...";
+
+
+// jalan belakang
+setTimeout(()=>{
+
 ambilBulanAktif();
+
+kiraJadualBaru();
+
+},100);
 
 if(localStorage.getItem("audioAktif")=="YES"){
 
 aktifkanAudio();
 
 }
-
-kiraJadualBaru();
 
 }
 
@@ -1257,6 +1268,29 @@ function lihatJadualKrew(){
 
 document.getElementById("menuPage")
 .classList.add("hide");
+
+document.getElementById("content").innerHTML = `
+
+<div class="banner">
+
+<img src="${BANNER_URL}">
+
+</div>
+
+<div class="card">
+
+<h2>🚑 Jadual Tugasan Saya</h2>
+
+<div class="settingBox">
+
+⏳ Sedang menyemak jadual tugasan...<br>
+Sila tunggu sebentar.
+
+</div>
+
+</div>
+
+`;
 
 fetch(SCRIPT_URL,{
 
@@ -3204,3 +3238,6 @@ if ("serviceWorker" in navigator) {
 </body>
 
 </html>
+
+
+
