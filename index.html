@@ -1,0 +1,3206 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>E-Tuntutan Krew SJAM</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1565c0">
+
+<style>
+
+body{
+font-family:Arial,sans-serif;
+background:#eef5ff;
+margin:0;
+}
+
+.container{
+max-width:430px;
+margin:auto;
+padding:20px;
+}
+
+.banner{
+width:100%;
+margin-bottom:15px;
+border-radius:15px;
+overflow:hidden;
+}
+
+.banner img{
+width:100%;
+display:block;
+}
+
+.card{
+background:white;
+padding:20px;
+margin-top:15px;
+border-radius:20px;
+box-shadow:0 4px 15px #ccc;
+}
+
+h2{
+text-align:center;
+color:#1565c0;
+}
+
+h3{
+color:#1565c0;
+}
+
+input,select{
+width:100%;
+padding:12px;
+margin:6px 0;
+border-radius:10px;
+border:1px solid #ccc;
+box-sizing:border-box;
+}
+
+button{
+width:100%;
+padding:13px;
+margin-top:10px;
+border:none;
+border-radius:15px;
+background:#1565c0;
+color:white;
+font-size:16px;
+cursor:pointer;
+}
+
+.green{
+background:#2e7d32;
+}
+
+.red{
+background:#c62828;
+}
+
+.back{
+background:#555;
+}
+
+.hide{
+display:none;
+}
+
+.menu{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:15px;
+}
+
+.box{
+background:white;
+padding:25px 10px;
+border-radius:20px;
+text-align:center;
+font-size:18px;
+box-shadow:0 4px 12px #ccc;
+cursor:pointer;
+}
+
+.krewBox{
+background:#f5f9ff;
+padding:15px;
+margin-top:10px;
+border-radius:15px;
+border:1px solid #ddd;
+}
+
+.krewCheck{
+background:#f5f9ff;
+padding:10px;
+margin:6px 0;
+border-radius:10px;
+border:1px solid #ddd;
+display:flex;
+align-items:center;
+gap:10px;
+}
+
+.krewCheck input{
+width:auto;
+margin:0;
+}
+
+.settingBox{
+background:#e8f5e9;
+padding:15px;
+border-radius:15px;
+margin-top:15px;
+text-align:center;
+font-size:18px;
+}
+
+.laporanItem{
+padding:10px 0;
+border-bottom:1px solid #ddd;
+line-height:1.5;
+}
+
+.jumlahKategori{
+font-weight:bold;
+margin-top:10px;
+padding:8px 0;
+border-top:1px solid #aaa;
+border-bottom:1px solid #aaa;
+}
+
+.noPrint{
+display:block;
+}
+
+@media print{
+
+@page{
+size:A4;
+margin:10mm;
+}
+
+body{
+background:white;
+font-size:11px;
+}
+
+.container{
+max-width:100%;
+width:100%;
+padding:0;
+}
+
+.noPrint{
+display:none!important;
+}
+
+.reportBanner{
+display:none!important;
+}
+
+.card{
+box-shadow:none;
+border-radius:0;
+}
+
+.printSection{
+break-inside:avoid;
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- LOGIN -->
+
+<div id="loginPage" class="card">
+
+<div class="banner">
+
+<img src="https://lh3.googleusercontent.com/d/1cPsr9IwF9IwydvnbG7JwZzfRPCma5fd3">
+
+</div>
+
+<h2>
+🚑 E-Tuntutan Krew
+</h2>
+
+<input
+id="loginKP"
+placeholder="No KP">
+
+<input
+id="loginPass"
+type="password"
+placeholder="Password">
+
+<button onclick="loginKrew()">
+
+🔐 LOGIN KREW
+
+</button>
+
+<button
+class="green"
+onclick="bukaDaftar()">
+
+📝 DAFTAR KREW BARU
+
+</button>
+
+<button onclick="adminLogin()">
+
+👨‍💼 LOGIN ADMIN
+
+</button>
+
+</div>
+
+<!-- DAFTAR KREW -->
+
+<div id="daftarPage" class="card hide">
+
+<div class="banner">
+
+<img src="https://lh3.googleusercontent.com/d/1cPsr9IwF9IwydvnbG7JwZzfRPCma5fd3">
+
+</div>
+
+<h2>
+📝 Daftar Krew
+</h2>
+
+<input id="nama" placeholder="Nama">
+
+<input id="kp" placeholder="No KP">
+
+<input id="telefon" placeholder="No Telefon">
+
+<input id="password" type="password" placeholder="Password">
+
+<input id="password2" type="password" placeholder="Sahkan Password">
+
+<button onclick="daftarKrew()">
+
+✅ DAFTAR
+
+</button>
+
+<button class="back" onclick="kembaliLogin()">
+
+⬅️ Kembali
+
+</button>
+
+</div>
+
+<!-- MENU KREW -->
+
+<div id="menuPage" class="hide">
+
+<div class="banner">
+
+<img src="https://lh3.googleusercontent.com/d/1cPsr9IwF9IwydvnbG7JwZzfRPCma5fd3">
+
+</div>
+
+<h2>
+🚑 Menu Utama
+</h2>
+
+<h3 style="text-align:center">
+
+SELAMAT DATANG,
+
+<br>
+
+<span id="namaKrew"></span> 👋
+
+</h3>
+
+<div id="bulanKrew" class="settingBox">
+
+📅 Bulan Tuntutan Semasa:
+<br>
+
+<span id="paparBulanKrew">
+-
+</span>
+
+</div>
+
+<p style="text-align:center">
+
+SILA PILIH TUNTUTAN ANDA HARI INI
+
+</p>
+
+<div class="menu">
+
+<div class="box" onclick="bukaBorang('Hari Biasa')">
+
+🟦
+<br>
+Hari Biasa
+<br>
+10%
+
+</div>
+
+<div class="box" onclick="bukaBorang('Malam Jumaat/Sabtu')">
+
+🌙
+<br>
+Malam Jumaat/Sabtu
+<br>
+12%
+
+</div>
+
+<div class="box" onclick="bukaBorang('Cuti Umum')">
+
+🎉
+<br>
+Cuti Umum
+<br>
+14%
+
+</div>
+
+<div class="box" onclick="bukaBorang('Keluar Negeri')">
+
+🌍
+<br>
+Keluar Negeri
+
+</div>
+
+</div>
+
+<button onclick="lihatSejarah()">
+
+📚 Sejarah Saya
+
+</button>
+
+<button onclick="lihatJadualKrew()">
+
+🚑 Jadual Tugasan Saya
+
+<span id="badgeJadual"
+style="
+background:red;
+color:white;
+border-radius:50%;
+padding:3px 8px;
+font-size:14px;
+">
+0
+</span>
+
+</button>
+
+
+<button onclick="aktifkanNotifikasiSJAM()">
+
+🔔 AKTIFKAN NOTIFIKASI SJAM
+
+</button>
+
+<button class="red" onclick="logout()">
+
+🚪 Logout
+
+</button>
+
+</div>
+
+<div id="content"></div>
+
+</div>
+
+<script>
+
+// ==============================
+// BAHAGIAN 2/10
+// JAVASCRIPT SAMBUNGAN
+// ==============================
+
+const SCRIPT_URL =
+"https://script.google.com/macros/s/AKfycbxVa3vay4ol0pH4GgjoZkReRxW--F-mD1J-hUJHUHUQCy1ziMLmRGx9u3vTh0ZW0yKf/exec";
+
+const BANNER_URL =
+"https://lh3.googleusercontent.com/d/1cPsr9IwF9IwydvnbG7JwZzfRPCma5fd3";
+
+let currentUser =
+JSON.parse(localStorage.getItem("krew")) || null;
+
+let jumlahJadualLama = 0;
+
+let adminSession =
+localStorage.getItem("admin") || null;
+
+// ==============================
+// AUTO LOGIN
+// ==============================
+
+window.onload=function(){
+
+let user =
+JSON.parse(localStorage.getItem("krew"));
+
+let admin =
+localStorage.getItem("admin");
+
+if(user){
+
+currentUser=user;
+
+if(localStorage.getItem("audioAktif")=="YES"){
+
+aktifkanAudio();
+
+}
+
+document.getElementById("namaKrew").innerHTML =
+currentUser.nama.toUpperCase();
+
+document.getElementById("loginPage")
+.classList.add("hide");
+
+document.getElementById("daftarPage")
+.classList.add("hide");
+
+document.getElementById("menuPage")
+.classList.remove("hide");
+
+ambilBulanAktif();
+
+kiraJadualBaru();
+
+}
+
+else if(admin){
+
+bukaDashboardAdmin();
+
+}
+
+};
+
+// ==============================
+// AMBIL BULAN AKTIF
+// ==============================
+
+function ambilBulanAktif(){
+
+fetch(SCRIPT_URL,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+action:"bulanAktif"
+
+})
+
+})
+
+.then(r=>r.json())
+
+.then(res=>{
+
+if(res.success){
+
+document.getElementById("paparBulanKrew").innerHTML =
+res.bulan;
+
+}
+
+});
+
+}
+
+// ==============================
+// BUKA DAFTAR
+// ==============================
+
+function bukaDaftar(){
+
+document.getElementById("loginPage")
+.classList.add("hide");
+
+document.getElementById("daftarPage")
+.classList.remove("hide");
+
+}
+
+// ==============================
+// KEMBALI LOGIN
+// ==============================
+
+function kembaliLogin(){
+
+document.getElementById("daftarPage")
+.classList.add("hide");
+
+document.getElementById("loginPage")
+.classList.remove("hide");
+
+}
+
+// ==============================
+// DAFTAR KREW
+// ==============================
+
+function daftarKrew(){
+
+let data={
+
+nama:
+document.getElementById("nama").value.trim(),
+
+kp:
+document.getElementById("kp").value.trim(),
+
+telefon:
+document.getElementById("telefon").value.trim(),
+
+password:
+document.getElementById("password").value
+
+};
+
+let password2 =
+document.getElementById("password2").value;
+
+if(
+!data.nama ||
+!data.kp ||
+!data.telefon ||
+!data.password
+){
+
+alert("❌ Sila lengkapkan semua maklumat.");
+
+return;
+
+}
+
+if(data.password!=password2){
+
+alert("❌ Password tidak sama");
+
+return;
+
+}
+
+fetch(SCRIPT_URL,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+action:"daftar",
+
+data:data
+
+})
+
+})
+
+.then(r=>r.json())
+
+.then(res=>{
+
+if(res.success){
+
+alert(
+"✅ Pendaftaran berjaya\nID Krew: "+res.id
+);
+
+kembaliLogin();
+
+}
+
+else{
+
+alert("❌ Pendaftaran gagal");
+
+}
+
+});
+
+}
+
+// ==============================
+// BAHAGIAN 3/10
+// LOGIN KREW + BORANG TUNTUTAN
+// ==============================
+
+// ==============================
+// LOGIN KREW
+// ==============================
+
+function loginKrew(){
+
+let kpInput =
+document.getElementById("loginKP").value.trim();
+
+let passInput =
+document.getElementById("loginPass").value;
+
+if(!kpInput || !passInput){
+
+alert("❌ Sila masukkan No KP dan Password.");
+
+return;
+
+}
+
+fetch(SCRIPT_URL,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+action:"login",
+
+data:{
+
+kp:kpInput,
+
+password:passInput
+
+}
+
+})
+
+})
+
+.then(r=>r.json())
+
+.then(res=>{
+
+if(res.success){
+
+currentUser=res;
+
+localStorage.removeItem("admin");
+
+localStorage.setItem(
+"krew",
+JSON.stringify(res)
+);
+
+document.getElementById("namaKrew").innerHTML =
+currentUser.nama.toUpperCase();
+
+document.getElementById("loginPage")
+.classList.add("hide");
+
+document.getElementById("daftarPage")
+.classList.add("hide");
+
+document.getElementById("menuPage")
+.classList.remove("hide");
+
+document.getElementById("content").innerHTML="";
+
+ambilBulanAktif();
+
+if(localStorage.getItem("audioAktif")=="YES"){
+
+aktifkanAudio();
+
+}
+
+kiraJadualBaru();
+
+}
+
+else{
+
+alert("❌ No KP atau Password salah");
+
+}
+
+})
+
+.catch(error=>{
+
+console.error(error);
+
+alert(
+"❌ Sistem tidak dapat dihubungi."
+);
+
+});
+
+}
+
+function kadarKrew(){
+
+if(
+currentUser &&
+currentUser.nama.toUpperCase()=="ABDUL HALIM BIN NORDIN"
+){
+
+return {
+hari:"13%",
+malam:"15%",
+cuti:"18%"
+};
+
+}
+
+else{
+
+return {
+hari:"10%",
+malam:"12%",
+cuti:"14%"
+};
+
+}
+
+}
+
+function paparJenis(jenis){
+
+let kadar = kadarKrew();
+
+if(jenis=="Hari Biasa"){
+return "Hari Biasa " + kadar.hari;
+}
+
+if(jenis=="Malam Jumaat/Sabtu"){
+return "Malam Jumaat/Sabtu " + kadar.malam;
+}
+
+if(jenis=="Cuti Umum"){
+return "Cuti Umum " + kadar.cuti;
+}
+
+return jenis;
+
+}
+
+// ==============================
+// BUKA BORANG TUNTUTAN
+// ==============================
+
+function bukaBorang(jenis){
+
+document.getElementById("menuPage")
+.classList.add("hide");
+
+let kadar = kadarKrew();
+
+let jumlahBox="";
+let tambahan="";
+
+if(jenis!="Keluar Negeri"){
+
+jumlahBox=`
+
+<input
+
+id="jumlah"
+
+type="number"
+
+step="0.01"
+
+placeholder="Jumlah RM">
+
+`;
+
+}
+
+if(jenis=="Keluar Negeri"){
+
+tambahan=`
+
+<input
+
+id="destinasi"
+
+placeholder="Destinasi">
+
+<select id="pemandu">
+
+<option value="">
+
+Pemandu Ambulans?
+
+</option>
+
+<option value="YA">
+
+YA
+
+</option>
+
+<option value="TIDAK">
+
+TIDAK
+
+</option>
+
+</select>
+
+`;
+
+}
+
+document.getElementById("content").innerHTML=`
+
+<div class="banner">
+
+<img src="${BANNER_URL}">
+
+</div>
+
+<div class="card">
+
+<h2>
+
+📝 ${paparJenis(jenis)}
+
+</h2>
+
+<div class="settingBox">
+
+📅 Bulan Tuntutan:
+
+<br>
+
+<span id="bulanBorang">
+
+-
+
+</span>
+
+</div>
+
+<input
+
+id="tarikh"
+
+type="date">
+
+<input
+
+id="resit"
+
+placeholder="No Resit">
+
+${jumlahBox}
+
+${tambahan}
+
+<button onclick="hantarTuntutan('${jenis}')">
+
+✅ Sahkan & Hantar
+
+</button>
+
+<button
+
+class="back"
+
+onclick="bukaMenu()">
+
+⬅️ Menu Utama
+
+</button>
+
+</div>
+
+`;
+
+ambilBulanAktifBorang();
+
+}
+
+// ==============================
+// PAPAR BULAN DI BORANG
+// ==============================
+
+function ambilBulanAktifBorang(){
+
+fetch(SCRIPT_URL,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+action:"bulanAktif"
+
+})
+
+})
+
+.then(r=>r.json())
+
+.then(res=>{
+
+if(res.success){
+
+let box =
+document.getElementById("bulanBorang");
+
+if(box){
+
+box.innerHTML=res.bulan;
+
+}
+
+}
+
+});
+
+}
+
+// ==============================
+// BAHAGIAN 4/10
+// HANTAR TUNTUTAN + MENU KREW
+// ==============================
+
+// ==============================
+// KEMBALI MENU KREW
+// ==============================
+
+function bukaMenu(){
+
+document.getElementById("content").innerHTML="";
+
+document.getElementById("loginPage")
+.classList.add("hide");
+
+document.getElementById("daftarPage")
+.classList.add("hide");
+
+document.getElementById("menuPage")
+.classList.remove("hide");
+
+if(currentUser){
+
+document.getElementById("namaKrew").innerHTML =
+currentUser.nama.toUpperCase();
+
+ambilBulanAktif();
+
+kiraJadualBaru();
+
+}
+
+}
+
+function kiraJadualBaru(){
+
+fetch(SCRIPT_URL,{
+method:"POST",
+body:JSON.stringify({
+
+action:"kiraanJadual",
+idKrew:currentUser.id
+
+})
+
+})
+
+.then(r=>r.json())
+
+.then(res=>{
+
+document.getElementById("badgeJadual").innerHTML =
+res.jumlah;
+
+
+if(res.jumlah > jumlahJadualLama){
+
+testSiren();
+
+}
+
+
+jumlahJadualLama = res.jumlah;
+
+});
+
+}
+
+// ==============================
+// HANTAR TUNTUTAN
+// ==============================
+
+function hantarTuntutan(jenis){
+
+let jumlah="";
+
+if(jenis!="Keluar Negeri"){
+
+jumlah =
+document.getElementById("jumlah").value;
+
+}
+
+let data={
+
+idKrew:
+currentUser.id,
+
+nama:
+currentUser.nama,
+
+jenis:
+paparJenis(jenis),
+
+tarikh:
+document.getElementById("tarikh").value,
+
+resit:
+document.getElementById("resit").value,
+
+jumlah:
+jumlah,
+
+destinasi:
+document.getElementById("destinasi")
+?
+document.getElementById("destinasi").value
+:
+"",
+
+pemandu:
+document.getElementById("pemandu")
+?
+document.getElementById("pemandu").value
+:
+""
+
+};
+
+fetch(SCRIPT_URL,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+action:"tuntutan",
+
+data:data
+
+})
+
+})
+
+.then(r=>r.json())
+
+.then(res=>{
+
+if(res.success){
+
+alert("✅ Tuntutan berjaya dihantar");
+
+bukaMenu();
+
+}
+
+else{
+
+alert("❌ Tuntutan gagal dihantar");
+
+}
+
+})
+
+.catch(error=>{
+
+console.error(error);
+
+alert(
+"❌ Sistem tidak dapat dihubungi."
+);
+
+});
+
+}
+
+// ==============================
+// SEJARAH KREW
+// ==============================
+
+function lihatSejarah(){
+
+document.getElementById("menuPage")
+.classList.add("hide");
+
+fetch(SCRIPT_URL,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+action:"sejarah",
+
+idKrew:currentUser.id
+
+})
+
+})
+
+.then(r=>r.json())
+
+.then(data=>{
+
+let html=`
+
+<div class="banner">
+
+<img src="${BANNER_URL}">
+
+</div>
+
+<div class="card">
+
+<h2>
+
+📚 Sejarah Saya
+
+</h2>
+
+`;
+
+data.forEach(x=>{
+
+html+=`
+
+<div class="laporanItem">
+
+<b>
+
+${x.jenis}
+
+</b>
+
+<br>
+
+📅 Tarikh:
+
+${formatTarikh(x.tarikh)}
+
+<br>
+
+🧾 No Resit:
+
+${x.resit}
+
+<br>
+
+${x.jumlah?
+
+"💰 RM "+x.jumlah
+
+:
+
+""
+
+}
+
+<br>
+
+${x.destinasi?
+
+"🗺️ Destinasi: "+x.destinasi
+
+:
+
+""
+
+}
+
+</div>
+
+`;
+
+});
+
+html+=`
+
+<button
+
+class="back"
+
+onclick="bukaMenu()">
+
+⬅️ Menu Utama
+
+</button>
+
+</div>
+
+`;
+
+document.getElementById("content").innerHTML=html;
+
+})
+
+.catch(error=>{
+
+console.error(error);
+
+});
+
+}
+
+// ==============================
+// JADUAL TUGASAN KREW
+// ==============================
+
+function lihatJadualKrew(){
+
+document.getElementById("menuPage")
+.classList.add("hide");
+
+fetch(SCRIPT_URL,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+action:"jadualKrew",
+
+idKrew:currentUser.id
+
+})
+
+})
+
+.then(r=>r.json())
+
+.then(res=>{
+
+let html=`
+
+<div class="banner">
+
+<img src="${BANNER_URL}">
+
+</div>
+
+<div class="card">
+
+<h2>🚑 Jadual Tugasan Saya</h2>
+
+`;
+
+if(!res.data || res.data.length===0){
+
+html+=`
+
+<div class="settingBox">
+
+Tiada tugasan ambulans untuk anda buat masa ini.
+
+</div>
+
+`;
+
+}
+
+else{
+
+res.data.forEach(x=>{
+
+html+=`
+
+<div class="krewBox">
+
+<b>🚑 ${x.kes}</b>
+
+<br>
+
+📅 Tarikh:
+${formatTarikh(x.tarikh)}
+
+<br>
+
+📍 Lokasi:
+${x.lokasi || "-"}
+
+<br>
+
+🏥 Destinasi:
+${x.destinasi || "-"}
+
+<br>
+
+⏰ Masa:
+${x.masa || "-"}
+
+<br>
+
+🚑 Ambulans:
+${x.ambulans || "-"}
+
+<br>
+
+💰 Bayaran:
+RM ${x.bayaran || "-"}
+
+<br>
+
+🍩 Donut & Air:
+${x.makan || "-"}
+
+<br>
+
+👥 Krew Bertugas:
+${x.krewNama || "-"}
+
+<br>
+
+🆘 Krew Backup:
+${x.krewBackup || "-"}
+
+<br>
+
+📌 Status:
+<span style="
+color:${x.status=="TERIMA"?"green":x.status=="TOLAK"?"red":"orange"};
+font-weight:bold;
+">
+${x.status || "BARU"}
+</span>
+
+<br><br>
+
+${
+x.status=="BARU"
+?
+`
+<button 
+class="green"
+onclick="sahkanJadual('${x.idJadual}')">
+
+✅ TERIMA TUGASAN
+
+</button>
+
+<button 
+class="red"
+onclick="tolakJadual('${x.idJadual}')">
+
+❌ TOLAK TUGASAN
+
+</button>
+`
+:
+""
+}
+
+</div>
+
+`;
+
+});
+
+}
+
+html+=`
+
+<button
+class="back"
+onclick="bukaMenu()">
+
+⬅️ Menu Utama
+
+</button>
+
+</div>
+
+`;
+
+document.getElementById("content").innerHTML=html;
+
+})
+
+.catch(error=>{
+
+console.error(error);
+
+alert("❌ Tidak dapat membuka jadual tugasan.");
+
+bukaMenu();
+
+});
+
+}
+
+// ==============================
+// SAHKAN JADUAL TUGASAN KREW
+// ==============================
+
+function sahkanJadual(idJadual){
+
+if(!confirm("Terima tugasan ini?")){
+return;
+}
+
+fetch(SCRIPT_URL,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+action:"sahkanJadual",
+
+idJadual:idJadual,
+
+idKrew:currentUser.id,
+
+namaKrew:currentUser.nama
+
+})
+
+})
+
+.then(r=>r.json())
+
+.then(res=>{
+
+if(res.success){
+
+alert("✅ Tugasan berjaya diterima");
+
+lihatJadualKrew();
+
+}
+
+else{
+
+alert("❌ Gagal sahkan tugasan");
+
+}
+
+})
+
+.catch(error=>{
+
+console.error(error);
+
+alert("❌ Sistem tidak dapat dihubungi");
+
+});
+
+}
+
+// ==============================
+// TOLAK JADUAL TUGASAN KREW
+// ==============================
+
+function tolakJadual(idJadual){
+
+if(!confirm("Tolak tugasan ini?")){
+return;
+}
+
+fetch(SCRIPT_URL,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+action:"tolakJadual",
+
+idJadual:idJadual,
+
+idKrew:currentUser.id,
+
+namaKrew:currentUser.nama
+
+})
+
+})
+
+.then(r=>r.json())
+
+.then(res=>{
+
+if(res.success){
+
+alert("❌ Tugasan berjaya ditolak");
+
+lihatJadualKrew();
+
+}
+
+else{
+
+alert("❌ Gagal menolak tugasan");
+
+}
+
+})
+
+.catch(error=>{
+
+console.error(error);
+
+alert("❌ Sistem tidak dapat dihubungi");
+
+});
+
+}
+
+// ==============================
+// BAHAGIAN 5/10
+// LOGIN ADMIN + DASHBOARD ADMIN
+// ==============================
+
+// ==============================
+// LOGIN ADMIN
+// ==============================
+
+function adminLogin(){
+
+let username =
+prompt("Username Admin");
+
+let password =
+prompt("Password Admin");
+
+fetch(SCRIPT_URL,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+action:"admin",
+
+username:username,
+
+password:password
+
+})
+
+})
+
+.then(r=>r.json())
+
+.then(res=>{
+
+if(res.success){
+
+localStorage.setItem(
+"admin",
+"true"
+);
+
+localStorage.removeItem("krew");
+
+bukaDashboardAdmin();
+
+}
+
+else{
+
+alert("❌ Login Admin gagal");
+
+}
+
+})
+
+.catch(error=>{
+
+console.error(error);
+
+alert(
+"❌ Sistem tidak dapat dihubungi."
+);
+
+});
+
+}
+
+// ==============================
+// DASHBOARD ADMIN
+// ==============================
+
+function bukaDashboardAdmin(){
+
+document.getElementById("loginPage")
+.classList.add("hide");
+
+document.getElementById("daftarPage")
+.classList.add("hide");
+
+document.getElementById("menuPage")
+.classList.add("hide");
+
+document.getElementById("content").innerHTML=`
+
+<div class="banner">
+
+<img src="${BANNER_URL}">
+
+</div>
+
+<div class="card">
+
+<h2>
+
+👨‍💼 Dashboard Admin
+
+</h2>
+
+<div class="settingBox">
+
+📅 Bulan Tuntutan Semasa
+
+<select id="bulanAdmin">
+
+<option value="September 2026">
+September 2026
+</option>
+
+<option value="Oktober 2026">
+Oktober 2026
+</option>
+
+<option value="November 2026">
+November 2026
+</option>
+
+<option value="Disember 2026">
+Disember 2026
+</option>
+
+<option value="Januari 2027">
+Januari 2027
+</option>
+
+<option value="Februari 2027">
+Februari 2027
+</option>
+
+<option value="Mac 2027">
+Mac 2027
+</option>
+
+<option value="April 2027">
+April 2027
+</option>
+
+<option value="Mei 2027">
+Mei 2027
+</option>
+
+<option value="Jun 2027">
+Jun 2027
+</option>
+
+<option value="Julai 2027">
+Julai 2027
+</option>
+
+<option value="Ogos 2027">
+Ogos 2027
+</option>
+
+<option value="September 2027">
+September 2027
+</option>
+
+<option value="Oktober 2027">
+Oktober 2027
+</option>
+
+<option value="November 2027">
+November 2027
+</option>
+
+<option value="Disember 2027">
+Disember 2027
+</option>
+
+</select>
+
+<button
+
+class="green"
+
+onclick="simpanBulanAktif()">
+
+💾 Simpan Bulan
+
+</button>
+
+</div>
+
+<button onclick="paparBulanAdmin()">
+
+🔄 Semak Bulan Aktif
+
+</button>
+
+<button onclick="paparSenaraiKrew()">
+
+👥 Pilih Nama Krew
+
+</button>
+
+<button onclick="bukaJadualAdmin()">
+
+🚑 Buat Jadual Bertugas
+
+</button>
+
+<button onclick="lihatJadualAdmin()">
+
+📋 Lihat Jadual Bertugas
+
+</button>
+
+<button
+
+class="red noPrint"
+
+onclick="logoutAdmin()">
+
+🚪 Logout Admin
+
+</button>
+
+</div>
+
+<div id="adminArea"></div>
+
+`;
+
+paparBulanAdmin();
+
+}
+
+function bukaJadualAdmin(){
+
+jumlahKes = 1;
+
+document.getElementById("adminArea").innerHTML=`
+
+<div class="card">
+
+<h2>🚑 Buat Jadual Bertugas</h2>
+
+<p style="text-align:center">
+Sediakan jadual tugasan ambulans
+</p>
+
+<input
+id="jadualTarikh"
+type="date">
+
+<h3>🚑 KES 1</h3>
+
+<div id="senaraiKes">
+
+<input
+id="namaPesakit1"
+placeholder="Nama Pesakit">
+
+<input
+id="lokasi1"
+placeholder="Lokasi Ambil Pesakit">
+
+<div id="krew1">
+
+<p>
+<b>👥 Pilih Krew Bertugas</b>
+</p>
+
+</div>
+
+<div id="backup1">
+
+<p>
+<b>🆘 Pilih Krew Backup</b>
+</p>
+
+</div>
+
+<input
+id="destinasi1"
+placeholder="Destinasi Hospital">
+
+<input
+id="masa1"
+placeholder="Masa Bertolak">
+
+<input
+id="remark1"
+placeholder="Remark">
+
+<input
+id="ambulans1"
+placeholder="Ambulans">
+
+<input
+id="bayaran1"
+placeholder="Bayaran RM">
+
+<select id="makan1">
+
+<option value="">
+Donat & Air?
+</option>
+
+<option value="ADA">
+ADA
+</option>
+
+<option value="TIADA">
+TIADA
+</option>
+
+</select>
+
+<br>
+
+<button
+onclick="tambahKes()">
+
+➕ Tambah Kes
+
+</button>
+
+<button
+onclick="simpanJadual()">
+
+💾 Simpan Jadual
+
+</button>
+
+<button
+class="back"
+onclick="bukaDashboardAdmin()">
+
+⬅️ Kembali Dashboard
+
+</button>
+
+</div>
+
+`;
+
+ambilKrewJadual();
+
+}
+
+// ==============================
+// AMBIL SENARAI KREW UNTUK DROPDOWN
+// ==============================
+
+function ambilKrewJadual(){
+
+fetch(SCRIPT_URL,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+action:"senaraiKrew"
+
+})
+
+})
+
+.then(r=>r.json())
+
+.then(data=>{
+
+let krewBox =
+document.getElementById("krew1");
+
+let backupBox =
+document.getElementById("backup1");
+
+data.forEach(k=>{
+
+krewBox.innerHTML += `
+
+<div class="krewCheck">
+
+<input
+type="checkbox"
+name="krew1"
+value="${k.id}|${k.nama}">
+
+<span>${k.nama}</span>
+
+</div>
+
+`;
+
+backupBox.innerHTML += `
+
+<div class="krewCheck">
+
+<input
+type="checkbox"
+name="backup1"
+value="${k.id}|${k.nama}">
+
+<span>${k.nama}</span>
+
+</div>
+
+`;
+
+});
+
+});
+
+}
+
+// ==============================
+// LIHAT JADUAL BERTUGAS ADMIN
+// ==============================
+
+function lihatJadualAdmin(){
+
+fetch(SCRIPT_URL,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+action:"lihatJadual"
+
+})
+
+})
+
+.then(r=>r.json())
+
+.then(data=>{
+
+let html=`
+
+<div class="card">
+
+<h2>
+📋 Jadual Bertugas Ambulans
+</h2>
+
+`;
+
+data.data.forEach(x=>{
+
+html+=`
+
+<div class="krewBox">
+
+<b>🚑 ${x.kes}</b>
+
+<br>
+
+📅 Tarikh:
+${formatTarikh(x.tarikh)}
+
+<br>
+
+📍 Lokasi:
+${x.lokasi}
+
+<br>
+
+🏥 Destinasi:
+${x.destinasi}
+
+<br>
+
+⏰ Masa:
+${x.masa}
+
+<br>
+
+🚑 Ambulans:
+${x.ambulans || "-"}
+
+<br>
+
+💰 Bayaran:
+RM ${x.bayaran || "-"}
+
+<br>
+
+🍩 Donut & Air:
+${x.makan || "-"}
+
+<br>
+
+👥 Krew Backup:
+${x.krewBackup || "-"}
+
+<br>
+
+📌 Status:
+${x.status || "BARU"}
+
+<br><br>
+
+</div>
+
+`;
+
+});
+
+html+=`
+
+<button class="back"
+
+onclick="bukaDashboardAdmin()">
+
+⬅️ Dashboard
+
+</button>
+
+</div>
+
+`;
+
+document.getElementById("adminArea").innerHTML=html;
+
+});
+
+}
+
+// ==============================
+// TAMBAH KES BARU
+// ==============================
+
+let jumlahKes = 1;
+
+function tambahKes(){
+
+jumlahKes++;
+
+let html = `
+
+<h3>🚑 KES ${jumlahKes}</h3>
+
+<input
+id="namaPesakit${jumlahKes}"
+placeholder="Nama Pesakit">
+
+<input
+id="lokasi${jumlahKes}"
+placeholder="Lokasi Ambil Pesakit">
+
+<div id="krew${jumlahKes}">
+
+<p>
+<b>👥 Pilih Krew Bertugas</b>
+</p>
+
+</div>
+
+<div id="backup${jumlahKes}">
+
+<p>
+<b>🆘 Pilih Krew Backup</b>
+</p>
+
+</div>
+
+<input
+id="destinasi${jumlahKes}"
+placeholder="Destinasi Hospital">
+
+<input
+id="masa${jumlahKes}"
+placeholder="Masa Bertolak">
+
+<input
+id="remark${jumlahKes}"
+placeholder="Remark">
+
+<input
+id="ambulans${jumlahKes}"
+placeholder="Ambulans">
+
+<input
+id="bayaran${jumlahKes}"
+placeholder="Bayaran RM">
+
+<select id="makan${jumlahKes}">
+
+<option value="">
+Donat & Air?
+</option>
+
+<option value="ADA">
+ADA
+</option>
+
+<option value="TIADA">
+TIADA
+</option>
+
+</select>
+
+`;
+
+document
+.getElementById("senaraiKes")
+.insertAdjacentHTML(
+"beforeend",
+html
+);
+
+ambilKrewJadualKes("krew"+jumlahKes);
+
+}
+
+function ambilKrewJadualKes(idSelect){
+
+fetch(SCRIPT_URL,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+action:"senaraiKrew"
+
+})
+
+})
+
+.then(r=>r.json())
+
+.then(data=>{
+
+let krewBox =
+document.getElementById(idSelect);
+
+// Ambil nombor KES
+// contoh: krew2 → 2
+let nomborKes =
+idSelect.replace("krew","");
+
+let backupBox =
+document.getElementById("backup"+nomborKes);
+
+data.forEach(k=>{
+
+// ==============================
+// KREW BERTUGAS
+// ==============================
+
+krewBox.innerHTML += `
+
+<div class="krewCheck">
+
+<input
+type="checkbox"
+name="krew${nomborKes}"
+value="${k.id}|${k.nama}">
+
+<span>${k.nama}</span>
+
+</div>
+
+`;
+
+// ==============================
+// KREW BACKUP
+// ==============================
+
+backupBox.innerHTML += `
+
+<div class="krewCheck">
+
+<input
+type="checkbox"
+name="backup${nomborKes}"
+value="${k.id}|${k.nama}">
+
+<span>${k.nama}</span>
+
+</div>
+
+`;
+
+});
+
+})
+
+.catch(error=>{
+
+console.error(
+"Ralat ambil senarai krew:",
+error
+);
+
+});
+
+}
+
+// ==============================
+// SIMPAN JADUAL
+// ==============================
+
+function simpanJadual(){
+
+let tarikh =
+document.getElementById("jadualTarikh").value;
+
+for(let i=1; i<=jumlahKes; i++){
+
+let checkbox =
+document.querySelectorAll(
+'input[name="krew'+i+'"]:checked'
+);
+
+let krewTag = [];
+let krewNama = [];
+
+checkbox.forEach(function(k){
+
+let data = k.value.split("|");
+
+krewTag.push(data[0]);
+
+krewNama.push(data[1]);
+
+});
+
+// ==============================
+// AMBIL KREW BACKUP
+// ==============================
+
+let backupCheckbox =
+document.querySelectorAll(
+'input[name="backup'+i+'"]:checked'
+);
+
+let backupTag = [];
+let backupNama = [];
+
+backupCheckbox.forEach(function(k){
+
+let data = k.value.split("|");
+
+backupTag.push(data[0]);
+
+backupNama.push(data[1]);
+
+});
+
+let data={
+
+tarikh: tarikh,
+
+kes: "KES "+i,
+
+lokasi:
+document.getElementById("lokasi"+i).value,
+
+destinasi:
+document.getElementById("destinasi"+i).value,
+
+krew:
+krewTag.join(","),
+
+krewNama:
+krewNama.join(","),
+
+krewBackup:
+backupNama.join(","),
+
+masa:
+document.getElementById("masa"+i).value,
+
+remark:
+document.getElementById("remark"+i).value,
+
+ambulans:
+document.getElementById("ambulans"+i).value,
+
+bayaran:
+document.getElementById("bayaran"+i).value,
+
+makan:
+document.getElementById("makan"+i).value,
+
+};
+
+fetch(SCRIPT_URL,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+action:"simpanJadual",
+
+data:data
+
+})
+
+});
+
+}
+
+alert("✅ Semua jadual berjaya disimpan");
+
+}
+
+// ==============================
+// BAHAGIAN 6/10
+// TETAPAN BULAN AKTIF ADMIN
+// ==============================
+
+// ==============================
+// PAPAR BULAN AKTIF ADMIN
+// ==============================
+
+function paparBulanAdmin(){
+
+fetch(SCRIPT_URL,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+action:"bulanAktif"
+
+})
+
+})
+
+.then(r=>r.json())
+
+.then(res=>{
+
+if(res.success){
+
+let bulan =
+document.getElementById("bulanAdmin");
+
+if(bulan){
+
+bulan.value=res.bulan;
+
+}
+
+}
+
+})
+
+.catch(error=>{
+
+console.error(error);
+
+});
+
+}
+
+// ==============================
+// SIMPAN BULAN AKTIF
+// ==============================
+
+function simpanBulanAktif(){
+
+let bulan =
+
+document.getElementById("bulanAdmin").value;
+
+if(!bulan){
+
+alert("❌ Sila pilih bulan tuntutan.");
+
+return;
+
+}
+
+fetch(SCRIPT_URL,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+action:"setBulanAktif",
+
+bulan:bulan
+
+})
+
+})
+
+.then(r=>r.json())
+
+.then(res=>{
+
+if(res.success){
+
+alert(
+
+"✅ Bulan tuntutan semasa berjaya ditetapkan:\n\n"
+
++
+
+res.bulan
+
+);
+
+}
+
+else{
+
+alert("❌ Gagal simpan bulan.");
+
+}
+
+})
+
+.catch(error=>{
+
+console.error(error);
+
+alert(
+"❌ Tidak dapat simpan tetapan."
+);
+
+});
+
+}
+
+// ==============================
+// SENARAI KREW ADMIN
+// ==============================
+
+function paparSenaraiKrew(){
+
+fetch(SCRIPT_URL,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+action:"senaraiKrew"
+
+})
+
+})
+
+.then(r=>r.json())
+
+.then(data=>{
+
+let html=`
+
+<div class="card">
+
+<h2>
+
+👥 Senarai Krew
+
+</h2>
+
+`;
+
+data.forEach(k=>{
+
+html+=`
+
+<div class="krewBox">
+
+<b>
+
+👤 ${k.nama}
+
+</b>
+
+<br>
+
+ID Krew:
+
+${k.id}
+
+<button onclick="laporanKrew('${k.id}')">
+
+📄 Buka Laporan
+
+</button>
+
+</div>
+
+`;
+
+});
+
+html+=`
+
+<button
+
+class="back"
+
+onclick="bukaDashboardAdmin()">
+
+⬅️ Dashboard
+
+</button>
+
+</div>
+
+`;
+
+document.getElementById("adminArea").innerHTML=html;
+
+})
+
+.catch(error=>{
+
+console.error(error);
+
+});
+
+}
+
+// ==============================
+// BAHAGIAN 7/10
+// LAPORAN KREW ADMIN
+// ==============================
+
+function laporanKrew(idKrew){
+
+fetch(SCRIPT_URL,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+action:"tuntutanKrew",
+
+idKrew:idKrew
+
+})
+
+})
+
+.then(r=>r.json())
+
+.then(data=>{
+
+let html=`
+
+<div class="banner reportBanner">
+
+<img src="${BANNER_URL}">
+
+</div>
+
+<div class="card">
+
+<h2>
+
+📄 Laporan Tuntutan Krew
+
+</h2>
+
+<h3>
+
+👤 ${data.nama}
+
+</h3>
+
+<div class="settingBox">
+
+📅 Bulan Tuntutan:
+
+<br>
+
+${data.bulan || "-"}
+
+</div>
+
+`;
+
+// ==============================
+// HARI BIASA
+// ==============================
+
+html+=`
+
+<div class="printSection">
+
+<h3>
+
+🟦 ${paparJenis("Hari Biasa")}
+
+</h3>
+
+`;
+
+data.hariBiasa.forEach(x=>{
+
+html+=`
+
+<div class="laporanItem">
+
+📅 ${formatTarikh(x.tarikh)}
+
+<br>
+
+🧾 No Resit:
+
+${x.resit}
+
+<br>
+
+💰 RM ${x.jumlah}
+
+</div>
+
+`;
+
+});
+
+html+=`
+
+<div class="jumlahKategori">
+
+Jumlah Terkumpul Hari Biasa:
+
+RM ${data.jumlahHariBiasa}
+
+</div>
+
+</div>
+
+<hr>
+
+`;
+
+// ==============================
+// MALAM
+// ==============================
+
+html+=`
+
+<div class="printSection">
+
+<h3>
+
+🌙 ${paparJenis("Malam Jumaat/Sabtu")}
+
+</h3>
+
+`;
+
+data.malam.forEach(x=>{
+
+html+=`
+
+<div class="laporanItem">
+
+📅 ${formatTarikh(x.tarikh)}
+
+<br>
+
+🧾 No Resit:
+
+${x.resit}
+
+<br>
+
+💰 RM ${x.jumlah}
+
+</div>
+
+`;
+
+});
+
+html+=`
+
+<div class="jumlahKategori">
+
+Jumlah Terkumpul Malam:
+
+RM ${data.jumlahMalam}
+
+</div>
+
+</div>
+
+<hr>
+
+`;
+
+// ==============================
+// CUTI UMUM
+// ==============================
+
+html+=`
+
+<div class="printSection">
+
+<h3>
+
+🎉 ${paparJenis("Cuti Umum")}
+
+</h3>
+
+`;
+
+data.cutiUmum.forEach(x=>{
+
+html+=`
+
+<div class="laporanItem">
+
+📅 ${formatTarikh(x.tarikh)}
+
+<br>
+
+🧾 No Resit:
+
+${x.resit}
+
+<br>
+
+💰 RM ${x.jumlah}
+
+</div>
+
+`;
+
+});
+
+html+=`
+
+<div class="jumlahKategori">
+
+Jumlah Terkumpul Cuti Umum:
+
+RM ${data.jumlahCutiUmum}
+
+</div>
+
+</div>
+
+<hr>
+
+`;
+
+// ==============================
+// BAHAGIAN 8/10
+// SAMBUNGAN LAPORAN KREW ADMIN
+// ==============================
+
+// ==============================
+// KELUAR NEGERI
+// ==============================
+
+html+=`
+
+<div class="printSection">
+
+<h3>
+
+🌍 Keluar Negeri
+
+</h3>
+
+`;
+
+data.keluarNegeri.forEach(x=>{
+
+html+=`
+
+<div class="laporanItem">
+
+📅 ${formatTarikh(x.tarikh)}
+
+<br>
+
+🧾 No Resit:
+
+${x.resit}
+
+<br>
+
+🗺️ Destinasi:
+
+${x.destinasi}
+
+<br>
+
+🚑 Pemandu:
+
+${x.pemandu}
+
+</div>
+
+`;
+
+});
+
+html+=`
+
+</div>
+
+<hr>
+
+<button
+
+class="noPrint"
+
+onclick="window.print()">
+
+🖨️ PRINT LAPORAN
+
+</button>
+
+<button
+
+class="back noPrint"
+
+onclick="bukaDashboardAdmin()">
+
+⬅️ Dashboard
+
+</button>
+
+</div>
+
+`;
+
+document.getElementById("adminArea").innerHTML=html;
+
+})
+
+.catch(error=>{
+
+console.error(error);
+
+alert(
+"❌ Tidak dapat membuka laporan."
+);
+
+});
+
+}
+
+// ==============================
+// BAHAGIAN 9/10
+// LOGOUT + FUNGSI TAMBAHAN SISTEM
+// ==============================
+
+function simpanBulan(){
+
+let bulan =
+document.getElementById("bulanAdmin").value;
+
+fetch(SCRIPT_URL,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+action:"tukarBulan",
+
+bulan:bulan
+
+})
+
+})
+
+.then(r=>r.json())
+
+.then(res=>{
+
+if(res.success){
+
+alert(
+"✅ Bulan berjaya ditukar kepada "+bulan
+);
+
+}
+
+else{
+
+alert("❌ Gagal simpan bulan");
+
+}
+
+});
+
+}
+
+// ==============================
+// LOGOUT ADMIN
+// ==============================
+
+function logoutAdmin(){
+
+localStorage.removeItem("admin");
+
+document.getElementById("content").innerHTML="";
+
+document.getElementById("loginPage")
+.classList.remove("hide");
+
+document.getElementById("daftarPage")
+.classList.add("hide");
+
+document.getElementById("menuPage")
+.classList.add("hide");
+
+alert("✅ Admin Logout");
+
+}
+
+// ==============================
+// LOGOUT KREW
+// ==============================
+
+function logout(){
+
+localStorage.removeItem("krew");
+
+currentUser=null;
+
+location.reload();
+
+}
+
+// ==============================
+// REFRESH BULAN AKTIF
+// ==============================
+
+function refreshBulan(){
+
+ambilBulanAktif();
+
+kiraJadualBaru();
+
+}
+
+// ==============================
+// FORMAT TARIKH
+// ==============================
+
+function formatTarikh(tarikh){
+
+let d = new Date(tarikh);
+
+if(isNaN(d)){
+
+return tarikh;
+
+}
+
+return String(d.getDate()).padStart(2,'0')
+
++
+
+"/"
+
++
+
+String(d.getMonth()+1).padStart(2,'0')
+
++
+
+"/"
+
++
+
+d.getFullYear();
+
+}
+
+// ==============================
+// BAHAGIAN 10/10
+// PENUTUP SCRIPT
+// ==============================
+
+// ==============================
+// SEMAK STATUS BULAN AKTIF
+// ==============================
+
+function semakBulanAktif(){
+
+fetch(SCRIPT_URL,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+action:"bulanAktif"
+
+})
+
+})
+
+.then(r=>r.json())
+
+.then(res=>{
+
+if(res.success){
+
+console.log(
+"Bulan tuntutan semasa:",
+res.bulan
+);
+
+}
+
+})
+
+.catch(error=>{
+
+console.error(
+"Ralat semak bulan:",
+error
+);
+
+});
+
+}
+
+// ==============================
+// AUTO REFRESH BULAN KREW
+// ==============================
+
+setInterval(function(){
+
+if(currentUser){
+
+kiraJadualBaru();
+
+}
+
+},10000);
+
+// 1 minit sekali semak bulan aktif
+// dan kira jadual baru
+
+// ==============================
+// AKTIFKAN AUDIO
+// ==============================
+
+let audioCtxGlobal = null;
+
+
+function aktifkanAudio(){
+
+if(!audioCtxGlobal){
+
+audioCtxGlobal =
+new (window.AudioContext || window.webkitAudioContext)();
+
+}
+
+
+if(audioCtxGlobal.state==="suspended"){
+
+audioCtxGlobal.resume();
+
+}
+
+}
+
+
+
+// ==============================
+// BUTANG AKTIFKAN NOTIFIKASI SJAM
+// ==============================
+
+function aktifkanNotifikasiSJAM(){
+
+aktifkanAudio();
+
+
+// simpan status
+localStorage.setItem(
+"audioAktif",
+"YES"
+);
+
+
+alert("🔔 Notifikasi SJAM telah diaktifkan");
+
+}
+
+
+// ==============================
+// TEST SIREN
+// ==============================
+
+function testSiren(){
+
+let audioCtx = audioCtxGlobal;
+
+
+if(!audioCtx){
+
+return;
+
+}
+
+
+let startTime = audioCtx.currentTime;
+
+
+function beep(time, frequency){
+
+let osc = audioCtx.createOscillator();
+
+let gain = audioCtx.createGain();
+
+
+osc.type = "square";
+
+
+osc.frequency.value = frequency;
+
+
+gain.gain.value = 0.3;
+
+
+osc.connect(gain);
+
+gain.connect(audioCtx.destination);
+
+
+osc.start(time);
+
+osc.stop(time + 0.25);
+
+}
+
+
+for(let i=0;i<20;i++){
+
+let time = startTime + (i * 0.25);
+
+let freq = (i % 2 === 0) ? 900 : 500;
+
+
+beep(time,freq);
+
+}
+
+
+}
+
+</script>
+
+  <script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("service-worker.js");
+}
+</script>
+
+</body>
+
+</html>
