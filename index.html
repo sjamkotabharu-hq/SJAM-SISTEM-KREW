@@ -393,7 +393,6 @@ font-size:14px;
 
 </button>
 
-
 <button onclick="aktifkanNotifikasiSJAM()">
 
 🔔 AKTIFKAN NOTIFIKASI SJAM
@@ -467,9 +466,18 @@ document.getElementById("daftarPage")
 document.getElementById("menuPage")
 .classList.remove("hide");
 
+// Papar menu dahulu
+document.getElementById("paparBulanKrew").innerHTML =
+"⏳ Semak bulan...";
+
+// Ambil data belakang tab
+setTimeout(()=>{
+
 ambilBulanAktif();
 
 kiraJadualBaru();
+
+},100);
 
 }
 
@@ -700,11 +708,9 @@ document.getElementById("menuPage")
 
 document.getElementById("content").innerHTML="";
 
-
 // buka menu dahulu
 document.getElementById("paparBulanKrew").innerHTML =
 "⏳ Semak bulan...";
-
 
 // jalan belakang
 setTimeout(()=>{
@@ -1022,13 +1028,11 @@ idKrew:currentUser.id
 document.getElementById("badgeJadual").innerHTML =
 res.jumlah;
 
-
 if(res.jumlah > jumlahJadualLama){
 
 testSiren();
 
 }
-
 
 jumlahJadualLama = res.jumlah;
 
@@ -3113,7 +3117,7 @@ kiraJadualBaru();
 
 }
 
-},10000);
+},30000);
 
 // 1 minit sekali semak bulan aktif
 // dan kira jadual baru
@@ -3124,7 +3128,6 @@ kiraJadualBaru();
 
 let audioCtxGlobal = null;
 
-
 function aktifkanAudio(){
 
 if(!audioCtxGlobal){
@@ -3134,7 +3137,6 @@ new (window.AudioContext || window.webkitAudioContext)();
 
 }
 
-
 if(audioCtxGlobal.state==="suspended"){
 
 audioCtxGlobal.resume();
@@ -3142,8 +3144,6 @@ audioCtxGlobal.resume();
 }
 
 }
-
-
 
 // ==============================
 // BUTANG AKTIFKAN NOTIFIKASI SJAM
@@ -3153,18 +3153,15 @@ function aktifkanNotifikasiSJAM(){
 
 aktifkanAudio();
 
-
 // simpan status
 localStorage.setItem(
 "audioAktif",
 "YES"
 );
 
-
 alert("🔔 Notifikasi SJAM telah diaktifkan");
 
 }
-
 
 // ==============================
 // TEST SIREN
@@ -3174,16 +3171,13 @@ function testSiren(){
 
 let audioCtx = audioCtxGlobal;
 
-
 if(!audioCtx){
 
 return;
 
 }
 
-
 let startTime = audioCtx.currentTime;
-
 
 function beep(time, frequency){
 
@@ -3191,20 +3185,15 @@ let osc = audioCtx.createOscillator();
 
 let gain = audioCtx.createGain();
 
-
 osc.type = "square";
-
 
 osc.frequency.value = frequency;
 
-
 gain.gain.value = 0.3;
-
 
 osc.connect(gain);
 
 gain.connect(audioCtx.destination);
-
 
 osc.start(time);
 
@@ -3212,24 +3201,21 @@ osc.stop(time + 0.25);
 
 }
 
-
 for(let i=0;i<20;i++){
 
 let time = startTime + (i * 0.25);
 
 let freq = (i % 2 === 0) ? 900 : 500;
 
-
 beep(time,freq);
 
 }
-
 
 }
 
 </script>
 
-  <script>
+<script>
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("service-worker.js");
 }
