@@ -163,7 +163,12 @@ display:block;
 
 @page{
 size:A4;
-margin:10mm;
+margin:8mm;
+}
+
+html,body{
+width:100%;
+height:auto;
 }
 
 body{
@@ -172,26 +177,74 @@ font-size:11px;
 }
 
 .container{
-max-width:100%;
 width:100%;
+max-width:100%;
 padding:0;
-}
-
-.noPrint{
-display:none!important;
-}
-
-.reportBanner{
-display:none!important;
+margin:0;
 }
 
 .card{
 box-shadow:none;
 border-radius:0;
+padding:3px;
+margin:0;
+}
+
+.banner img{
+height:45px;
+object-fit:contain;
+}
+
+.reportBanner{
+display:block!important;
+width:100%;
+margin-bottom:8px;
+}
+
+.reportBanner img{
+width:100%;
+height:auto;
+max-height:70px;
+object-fit:contain;
 }
 
 .printSection{
 break-inside:avoid;
+page-break-inside:avoid;
+}
+
+.laporanItem{
+padding:3px 0;
+line-height:1.25;
+}
+
+.jumlahKategori{
+margin-top:3px;
+padding:3px 0;
+font-size:7px;
+}
+
+h2{
+font-size:11px;
+margin:2px;
+}
+
+h3{
+font-size:8px;
+margin:2px;
+}
+
+hr{
+margin:2px 0;
+}
+
+table{
+font-size:7px;
+}
+
+button,
+.noPrint{
+display:none!important;
 }
 
 }
@@ -1146,6 +1199,38 @@ function lihatSejarah(){
 document.getElementById("menuPage")
 .classList.add("hide");
 
+// PAPAR LOADING SEMENTARA
+document.getElementById("content").innerHTML = `
+
+<div class="banner">
+
+<img src="${BANNER_URL}">
+
+</div>
+
+<div class="card">
+
+<h2>
+📚 Sejarah Saya
+</h2>
+
+<div class="settingBox">
+
+⏳ Sila tunggu...
+<br><br>
+
+Sejarah tuntutan anda sedang disemak.
+
+<br>
+
+Sila tunggu sebentar.
+
+</div>
+
+</div>
+
+`;
+
 fetch(SCRIPT_URL,{
 
 method:"POST",
@@ -2083,6 +2168,13 @@ ${x.status || "BARU"}
 
 <br><br>
 
+<button 
+onclick="editJadual('${x.idJadual}')">
+
+✏️ Edit Jadual / Tukar Krew Backup
+
+</button>
+
 </div>
 
 `;
@@ -2104,6 +2196,234 @@ onclick="bukaDashboardAdmin()">
 `;
 
 document.getElementById("adminArea").innerHTML=html;
+
+});
+
+}
+
+// ==============================
+// EDIT JADUAL ADMIN
+// ==============================
+
+function editJadual(idJadual){
+
+fetch(SCRIPT_URL,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+action:"editJadual",
+
+idJadual:idJadual
+
+})
+
+})
+
+.then(r=>r.json())
+
+.then(res=>{
+
+if(res.success){
+
+let x = res.data;
+
+document.getElementById("adminArea").innerHTML = `
+
+<div class="card">
+
+<h2>✏️ Edit Jadual</h2>
+
+<input id="editId" value="${x.idJadual}" hidden>
+
+<label>📅 Tarikh</label>
+
+<input value="${x.tarikh}" disabled>
+
+<label>🚑 Kes</label>
+
+<input value="${x.kes}" disabled>
+
+<label>📍 Lokasi</label>
+
+<input value="${x.lokasi}" disabled>
+
+<label>🏥 Destinasi</label>
+
+<input value="${x.destinasi}" disabled>
+
+<label>👥 Pilih Krew Backup</label>
+
+<div id="editBackupBox">
+
+Sedang ambil senarai krew...
+
+</div>
+
+<button 
+class="green"
+onclick="simpanEditJadual()">
+
+💾 Simpan Perubahan
+
+</button>
+
+<button 
+class="back"
+onclick="lihatJadualAdmin()">
+
+⬅️ Kembali
+
+</button>
+
+</div>
+
+`;
+
+ambilKrewEdit(x.krewBackup);
+
+}
+
+else{
+
+alert("❌ Data jadual tidak dijumpai");
+
+}
+
+})
+
+.catch(error=>{
+
+console.error(error);
+
+alert("❌ Gagal buka edit");
+
+});
+
+}
+
+function ambilKrewEdit(selected){
+
+fetch(SCRIPT_URL,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+action:"senaraiKrew"
+
+})
+
+})
+
+.then(r=>r.json())
+
+.then(data=>{
+
+let box =
+document.getElementById("editBackupBox");
+
+box.innerHTML="";
+
+data.forEach(k=>{
+
+let checked="";
+
+if(selected && selected.includes(k.nama)){
+
+checked="checked";
+
+}
+
+box.innerHTML += `
+
+<div class="krewCheck">
+
+<input
+
+type="checkbox"
+
+name="editBackup"
+
+value="${k.nama}"
+
+${checked}
+
+>
+
+<span>${k.nama}</span>
+
+</div>
+
+`;
+
+});
+
+});
+
+}
+
+// ==============================
+// SIMPAN EDIT JADUAL ADMIN
+// ==============================
+
+function simpanEditJadual(){
+
+let idJadual =
+document.getElementById("editId").value;
+
+let backup=[];
+
+document.querySelectorAll('input[name="editBackup"]:checked')
+.forEach(function(x){
+backup.push(x.value);
+});
+
+backup = backup.join(",");
+
+fetch(SCRIPT_URL,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+action:"updateJadual",
+
+data:{
+idJadual:idJadual,
+krewBackup:backup
+}
+
+})
+
+})
+
+.then(r=>r.json())
+
+.then(res=>{
+
+if(res.success){
+
+alert("✅ Krew Backup berjaya dikemaskini");
+
+lihatJadualAdmin();
+
+}
+
+else{
+
+alert("❌ Gagal kemaskini");
+
+}
+
+})
+
+.catch(error=>{
+
+console.error(error);
+
+alert("❌ Sistem gagal");
 
 });
 
@@ -2351,6 +2671,9 @@ krewNama.join(","),
 
 krewBackup:
 backupNama.join(","),
+
+backupTag:
+backupTag.join(","),
 
 masa:
 document.getElementById("masa"+i).value,
@@ -2628,14 +2951,6 @@ idKrew:idKrew
 
 let html=`
 
-<div class="banner reportBanner">
-
-<img src="${BANNER_URL}">
-
-</div>
-
-<div class="card">
-
 <h2>
 
 📄 Laporan Tuntutan Krew
@@ -2648,16 +2963,6 @@ let html=`
 
 </h3>
 
-<div class="settingBox">
-
-📅 Bulan Tuntutan:
-
-<br>
-
-${data.bulan || "-"}
-
-</div>
-
 `;
 
 // ==============================
@@ -2669,9 +2974,7 @@ html+=`
 <div class="printSection">
 
 <h3>
-
-🟦 ${paparJenis("Hari Biasa")}
-
+HARI BIASA (${data.kadarHari})
 </h3>
 
 `;
@@ -2725,9 +3028,7 @@ html+=`
 <div class="printSection">
 
 <h3>
-
-🌙 ${paparJenis("Malam Jumaat/Sabtu")}
-
+MALAM JUMAAT/SABTU (${data.kadarMalam})
 </h3>
 
 `;
@@ -2781,9 +3082,7 @@ html+=`
 <div class="printSection">
 
 <h3>
-
-🎉 ${paparJenis("Cuti Umum")}
-
+CUTI UMUM (${data.kadarCuti})
 </h3>
 
 `;
@@ -2842,9 +3141,7 @@ html+=`
 <div class="printSection">
 
 <h3>
-
-🌍 Keluar Negeri
-
+KELUAR NEGERI
 </h3>
 
 `;
@@ -2887,15 +3184,44 @@ html+=`
 
 <hr>
 
-<button
+<div style="text-align:center; margin-top:8px; font-size:7px;">
 
-class="noPrint"
+Tarikh Cetakan:
+${new Date().toLocaleDateString("ms-MY")}
 
-onclick="window.print()">
+<br><br>
+
+<table style="width:100%; text-align:center;">
+
+<tr>
+
+<td>
+_____________________
+<br>
+Tandatangan Admin
+</td>
+
+<td>
+_____________________
+<br>
+Tandatangan Krew
+</td>
+
+</tr>
+
+</table>
+
+</div>
+
+<div class="noPrint">
+
+<button onclick="window.print()">
 
 🖨️ PRINT LAPORAN
 
 </button>
+
+</div>
 
 <button
 
@@ -3224,6 +3550,5 @@ if ("serviceWorker" in navigator) {
 </body>
 
 </html>
-
 
 
