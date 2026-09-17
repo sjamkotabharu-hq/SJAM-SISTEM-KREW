@@ -1,8 +1,9 @@
 {
   "name": "E-Tuntutan Krew SJAM",
   "short_name": "SJAM Krew",
-  "start_url": "./"
-  "display": "standalone",
+  "start_url": "https://sjamkotabharu-hq.github.io/SJAM-SISTEM-KREW/",
+"display": "standalone",
+"orientation": "portrait",
   "background_color": "#eef5ff",
   "theme_color": "#1565c0",
   "icons": [
