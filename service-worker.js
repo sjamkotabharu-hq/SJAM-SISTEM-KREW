@@ -1,33 +1,4 @@
-const CACHE_NAME = "sjam-krew-v2";
-
-
-self.addEventListener("install", event => {
-
-self.skipWaiting();
-
-});
-
-
-self.addEventListener("activate", event => {
-
-event.waitUntil(
-
-caches.keys().then(keys => {
-
-return Promise.all(
-
-keys.map(key => caches.delete(key))
-
-);
-
-})
-
-);
-
-self.clients.claim();
-
-});
-
+// FIREBASE IMPORT
 
 importScripts(
 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js'
@@ -37,6 +8,8 @@ importScripts(
 'https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js'
 );
 
+
+// FIREBASE CONFIG
 
 firebase.initializeApp({
 
@@ -57,6 +30,8 @@ appId: "1:660145662983:web:5da13e032b97842a504ea2"
 
 const messaging = firebase.messaging();
 
+
+// BACKGROUND NOTIFICATION
 
 messaging.onBackgroundMessage((payload)=>{
 
@@ -85,6 +60,45 @@ badge:
 }
 
 );
+
+});
+
+
+// SERVICE WORKER CONTROL
+
+const CACHE_NAME = "sjam-krew-v2";
+
+
+self.addEventListener(
+"install",
+event=>{
+
+self.skipWaiting();
+
+});
+
+
+self.addEventListener(
+"activate",
+event=>{
+
+
+event.waitUntil(
+
+caches.keys().then(keys=>{
+
+return Promise.all(
+
+keys.map(key=>caches.delete(key))
+
+);
+
+})
+
+);
+
+
+self.clients.claim();
 
 
 });
