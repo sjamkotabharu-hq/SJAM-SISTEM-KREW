@@ -444,8 +444,6 @@ font-size:14px;
 0
 </span>
 
-</button>
-
 <button onclick="aktifkanNotifikasiSJAM()">
 
 🔔 AKTIFKAN NOTIFIKASI SJAM
@@ -3479,13 +3477,25 @@ function aktifkanNotifikasiSJAM(){
 
 aktifkanAudio();
 
-// simpan status
 localStorage.setItem(
 "audioAktif",
 "YES"
 );
 
-alert("🔔 Notifikasi SJAM telah diaktifkan");
+
+if(window.aktifkanFCM){
+
+aktifkanFCM();
+
+}
+
+else{
+
+alert(
+"Firebase belum siap dimuatkan"
+);
+
+}
 
 }
 
@@ -3561,7 +3571,10 @@ import { initializeApp }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
 
-import { getMessaging } 
+import { 
+getMessaging,
+getToken
+} 
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js";
 
 
@@ -3592,8 +3605,93 @@ const app = initializeApp(firebaseConfig);
 const messaging = getMessaging(app);
 
 
-console.log("🔥 Firebase SJAM Connected");
 
+window.aktifkanFCM = async function(){
+
+
+try{
+
+
+const permission = await Notification.requestPermission();
+
+
+
+if(permission==="granted"){
+
+
+const token = await getToken(
+messaging,
+{
+
+vapidKey:
+"KEY AWAK"
+
+}
+
+);
+
+
+console.log(
+"FCM TOKEN:",
+token
+);
+
+
+// SIMPAN TOKEN KREW
+fetch(SCRIPT_URL,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+action:"simpanToken",
+
+idKrew:currentUser.id,
+
+nama:currentUser.nama,
+
+token:token
+
+})
+
+});
+
+
+alert(
+"✅ Notifikasi SJAM berjaya diaktifkan"
+);
+
+
+
+}
+
+else{
+
+
+alert(
+"❌ Kebenaran notifikasi ditolak"
+);
+
+
+}
+
+
+}
+
+catch(error){
+
+console.log(error);
+
+alert(error);
+
+}
+
+
+}
+
+
+
+console.log("🔥 Firebase SJAM Connected");
 
 </script>
 
