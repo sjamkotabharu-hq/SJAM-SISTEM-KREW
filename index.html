@@ -3613,14 +3613,23 @@ const app = initializeApp(firebaseConfig);
 
 const messaging = getMessaging(app);
 
+let firebaseRegistration;
+
 navigator.serviceWorker.register(
-"firebase-messaging-sw.js"
+"/SJAM-SISTEM-KREW/firebase-messaging-sw.js",
+{
+scope:"/SJAM-SISTEM-KREW/"
+}
 )
 .then((registration)=>{
+
+firebaseRegistration = registration;
+
 console.log(
 "Firebase SW registered",
 registration
 );
+
 });
 
 
@@ -3642,7 +3651,9 @@ messaging,
 {
 
 vapidKey:
-"BJ7NZaZthzTky8M91T9PXZ6ET-rWixG3RkkONpxGHNT8wPYhuERYe4nsscTZKUCfGx204nZJdF7F84f7odS8iCs"
+"BJ7NZaZthzTky8M91T9PXZ6ET-rWixG3RkkONpxGHNT8wPYhuERYe4nsscTZKUCfGx204nZJdF7F84f7odS8iCs",
+
+serviceWorkerRegistration: firebaseRegistration
 
 }
 
