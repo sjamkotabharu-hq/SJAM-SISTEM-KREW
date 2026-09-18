@@ -17,8 +17,6 @@ importScripts(
 
 firebase.initializeApp({
 
-firebase.initializeApp({
-
 apiKey: "AIzaSyBMsHtZfM8ZTN_nY_G3g4rHr55--r9SpOs",
 
 authDomain: "sjam-e-tuntutan.firebaseapp.com",
