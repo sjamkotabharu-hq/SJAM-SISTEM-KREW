@@ -3552,27 +3552,6 @@ beep(time,freq);
 </script>
 
 
-<!-- SERVICE WORKER -->
-<script>
-
-if ("serviceWorker" in navigator) {
-
-  navigator.serviceWorker.register(
-"service-worker.js"
-)
-.then(registration=>{
-
-console.log(
-"Service Worker Registered",
-registration
-);
-
-});
-}
-
-</script>
-
-
 <!-- FIREBASE SDK -->
 <script type="module">
 
@@ -3605,7 +3584,7 @@ const app = initializeApp(firebaseConfig);
 
 const messaging = getMessaging(app);
 
-let firebaseRegistration;
+let firebaseRegistration = null;
 
 navigator.serviceWorker.register(
 "/SJAM-SISTEM-KREW/firebase-messaging-sw.js",
@@ -3624,8 +3603,24 @@ registration
 
 });
 
-
 window.aktifkanFCM = async function(){
+
+if(!firebaseRegistration){
+
+firebaseRegistration = await navigator.serviceWorker.register(
+"/SJAM-SISTEM-KREW/firebase-messaging-sw.js",
+{
+scope:"/SJAM-SISTEM-KREW/"
+}
+);
+
+console.log(
+"Firebase SW Ready",
+firebaseRegistration
+);
+
+}
+
 
 
 try{
