@@ -57,10 +57,10 @@ body:
 payload.notification.body || "Tugasan baru",
 
 icon:
-"https://lh3.googleusercontent.com/d/1cPsr9IwF9IwydvnbG7JwZzfRPCma5fd3",
+"icon.png",
 
 badge:
-"https://lh3.googleusercontent.com/d/1cPsr9IwF9IwydvnbG7JwZzfRPCma5fd3"
+"icon.png"
 
 }
 
