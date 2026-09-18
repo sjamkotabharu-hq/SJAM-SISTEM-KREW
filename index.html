@@ -1590,6 +1590,10 @@ if(res.success){
 
 alert("✅ Tugasan berjaya diterima");
 
+jumlahJadualLama = 0;
+
+kiraJadualBaru();
+
 lihatJadualKrew();
 
 }
@@ -1647,6 +1651,10 @@ namaKrew:currentUser.nama
 if(res.success){
 
 alert("❌ Tugasan berjaya ditolak");
+
+jumlahJadualLama = 0;
+
+kiraJadualBaru();
 
 lihatJadualKrew();
 
