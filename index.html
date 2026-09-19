@@ -3617,12 +3617,104 @@ function aktifkanFCM(){
 console.log("FCM bermula");
 
 
-messaging.getToken({
+navigator.serviceWorker.register(
+"SJAM-SISTEM-KREW/firebase-messaging-sw.js"
+)
+
+.then((registration)=>{
+
+
+return messaging.getToken({
 
 vapidKey:
-"BJ7NZaZthzTky8M91T9PXZ6ET-rWixG3RkkONpxGHNT8wPYhuERYe4nsscTZKUCfGx2O4nZJdF7F84f7odS8iCs"
+"BJ7NZaZthzTky8M91T9PXZ6ET-rWixG3RkkONpxGHNT8wPYhuERYe4nsscTZKUCfGx2O4nZJdF7F84f7odS8iCs",
+
+serviceWorkerRegistration:
+registration
+
+});
+
 
 })
+
+
+.then((token)=>{
+
+
+if(token){
+
+
+console.log(
+"TOKEN FCM:",
+token
+);
+
+
+
+fetch(SCRIPT_URL,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+action:"simpanToken",
+
+data:{
+
+idKrew:currentUser.id,
+
+nama:currentUser.nama,
+
+token:token
+
+}
+
+})
+
+})
+
+.then(r=>r.json())
+
+.then(res=>{
+
+console.log(
+"Token disimpan:",
+res
+);
+
+
+});
+
+
+}
+
+else{
+
+
+console.log(
+"Tiada token"
+);
+
+
+}
+
+
+})
+
+
+.catch((err)=>{
+
+
+console.error(
+"FCM ERROR:",
+err
+);
+
+
+});
+
+
+}
 
 
 .then((token)=>{
