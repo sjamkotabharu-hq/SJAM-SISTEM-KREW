@@ -3738,8 +3738,31 @@ reg
 
 }
 
+navigator.serviceWorker.addEventListener(
+"message",
+event=>{
+
+
+if(event.data.action=="bukaJadual"){
+
+
+if(currentUser){
+
+
+lihatJadualKrew();
+
+
+}
+
+
+}
+
+
+});
+
 </script>
 
 </body>
 
 </html>
+
