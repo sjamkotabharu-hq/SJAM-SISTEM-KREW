@@ -489,19 +489,23 @@ const BANNER_URL =
 
 const firebaseConfig = {
 
-apiKey: "ISI_FIREBASE_API_KEY",
+apiKey: "AIzaSyBMsHtZfM8ZTN_nY_G3g4rHr55--r9SpOs",
 
-authDomain: "ISI_FIREBASE_AUTHDOMAIN",
+authDomain: "sjam-e-tuntutan.firebaseapp.com",
 
-projectId: "ISI_PROJECT_ID",
+projectId: "sjam-e-tuntutan",
 
-storageBucket: "ISI_STORAGE_BUCKET",
+storageBucket: "sjam-e-tuntutan.firebasestorage.app",
 
-messagingSenderId: "ISI_SENDER_ID",
+messagingSenderId: "660145662983",
 
-appId: "ISI_APP_ID"
+appId: "1:660145662983:web:5da13e032b97842a504ea2"
 
 };
+
+firebase.initializeApp(firebaseConfig);
+
+const messaging = firebase.messaging();
 
 let currentUser =
 JSON.parse(localStorage.getItem("krew")) || null;
@@ -3610,7 +3614,93 @@ alert("🔔 Notifikasi SJAM telah diaktifkan");
 
 function aktifkanFCM(){
 
-console.log("Mula aktifkan FCM");
+console.log("FCM bermula");
+
+
+messaging.getToken({
+
+vapidKey:
+"BJ7NZaZthzTky8M91T9PXZ6ET-rWixG3RkkONpxGHNT8wPYhuERYe4nsscTZKUCfGx2O4nZJdF7F84f7odS8iCs"
+
+})
+
+
+.then((token)=>{
+
+
+if(token){
+
+
+console.log("TOKEN FCM:",token);
+
+
+// simpan token ke Google Sheet
+
+fetch(SCRIPT_URL,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+action:"simpanToken",
+
+data:{
+
+idKrew:currentUser.id,
+
+nama:currentUser.nama,
+
+token:token
+
+}
+
+})
+
+})
+
+
+.then(r=>r.json())
+
+.then(res=>{
+
+
+console.log(
+"Token disimpan:",
+res
+);
+
+
+});
+
+
+}
+
+
+else{
+
+
+console.log(
+"Tiada token tersedia"
+);
+
+
+}
+
+
+})
+
+
+.catch((err)=>{
+
+
+console.error(
+"FCM ERROR:",
+err
+);
+
+
+});
+
 
 }
 
