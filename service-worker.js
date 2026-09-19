@@ -55,11 +55,88 @@ icon:
 "https://lh3.googleusercontent.com/d/1cPsr9IwF9IwydvnbG7JwZzfRPCma5fd3",
 
 badge:
-"https://lh3.googleusercontent.com/d/1cPsr9IwF9IwydvnbG7JwZzfRPCma5fd3"
+"https://lh3.googleusercontent.com/d/1cPsr9IwF9IwydvnbG7JwZzfRPCma5fd3",
+
+data:{
+url:"https://sjamkotabharu-hq.github.io/SJAM-SISTEM-KREW/"
+}
 
 }
 
 );
+
+
+});
+
+
+// ==============================
+// KLIK NOTIFICATION
+// ==============================
+
+self.addEventListener(
+"notificationclick",
+event=>{
+
+
+event.notification.close();
+
+
+event.waitUntil(
+
+clients.matchAll({
+
+type:"window",
+includeUncontrolled:true
+
+})
+
+.then(clientList=>{
+
+
+for(let client of clientList){
+
+
+if(client.url && "focus" in client){
+
+
+client.focus();
+
+
+client.postMessage({
+
+action:"bukaJadual"
+
+});
+
+
+return;
+
+}
+
+
+}
+
+
+// jika tiada page terbuka
+
+if(clients.openWindow){
+
+
+return clients.openWindow(
+
+event.notification.data.url
+
+);
+
+
+}
+
+
+})
+
+
+);
+
 
 });
 
