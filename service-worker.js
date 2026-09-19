@@ -1,61 +1,43 @@
-// FIREBASE IMPORT
-
-importScripts(
-'https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js'
-);
-
-importScripts(
-'https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js'
-);
+const CACHE_NAME = "sjam-krew-v2";
 
 
-// FIREBASE CONFIG
+// INSTALL
 
-firebase.initializeApp({
+self.addEventListener(
+"install",
+event=>{
 
-apiKey: "AIzaSyBMsHtZfM8ZTN_nY_G3g4rHr55--r9Sp0s",
-
-authDomain: "sjam-e-tuntutan.firebaseapp.com",
-
-projectId: "sjam-e-tuntutan",
-
-storageBucket: "sjam-e-tuntutan.firebasestorage.app",
-
-messagingSenderId: "660145662983",
-
-appId: "1:660145662983:web:5da13e032b97842a504ea2"
+self.skipWaiting();
 
 });
 
 
-const messaging = firebase.messaging();
+// ACTIVATE
+
+self.addEventListener(
+"activate",
+event=>{
 
 
-// BACKGROUND NOTIFICATION
+event.waitUntil(
 
-messaging.onBackgroundMessage((payload)=>{
+caches.keys().then(keys=>{
 
+return Promise.all(
 
-console.log(
-"📢 Background Message:",
-payload
+keys.map(key=>caches.delete(key))
+
+);
+
+})
+
 );
 
 
-self.registration.showNotification(
+self.clients.claim();
 
-payload.notification.title || "SJAM Krew",
 
-{
-
-body:
-payload.notification.body || "Tugasan baru",
-
-icon:
-"https://lh3.googleusercontent.com/d/1cPsr9IwF9IwydvnbG7JwZzfRPCma5fd3",
-
-badge:
-"https://lh3.googleusercontent.com/d/1cPsr9IwF9IwydvnbG7JwZzfRPCma5fd3",
+});
 
 data:{
 url:"https://sjamkotabharu-hq.github.io/SJAM-SISTEM-KREW/"
