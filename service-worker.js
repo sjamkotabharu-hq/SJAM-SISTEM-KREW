@@ -1,131 +1,73 @@
-const CACHE_NAME = "sjam-krew-v2";
+// FIREBASE IMPORT
+
+importScripts(
+'https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js'
+);
+
+importScripts(
+'https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js'
+);
 
 
-// INSTALL
+// FIREBASE CONFIG
 
-self.addEventListener(
-"install",
-event=>{
+firebase.initializeApp({
 
-self.skipWaiting();
+apiKey: "AIzaSyBMsHtZfM8ZTN_nY_G3g4rHr55--r9Sp0s",
+
+authDomain: "sjam-e-tuntutan.firebaseapp.com",
+
+projectId: "sjam-e-tuntutan",
+
+storageBucket: "sjam-e-tuntutan.firebasestorage.app",
+
+messagingSenderId: "660145662983",
+
+appId: "1:660145662983:web:5da13e032b97842a504ea2"
 
 });
 
 
-// ACTIVATE
-
-self.addEventListener(
-"activate",
-event=>{
+const messaging = firebase.messaging();
 
 
-event.waitUntil(
+// BACKGROUND NOTIFICATION
 
-caches.keys().then(keys=>{
+messaging.onBackgroundMessage((payload)=>{
 
-return Promise.all(
 
-keys.map(key=>caches.delete(key))
-
-);
-
-})
-
+console.log(
+"📢 Background Message:",
+payload
 );
 
 
-self.clients.claim();
+self.registration.showNotification(
 
+payload.notification.title || "SJAM Krew",
 
-});
+{
 
-data:{
-url:"https://sjamkotabharu-hq.github.io/SJAM-SISTEM-KREW/"
-}
+body:
+payload.notification.body || "Tugasan baru",
+
+icon:
+"https://lh3.googleusercontent.com/d/1cPsr9IwF9IwydvnbG7JwZzfRPCma5fd3",
+
+badge:
+"https://lh3.googleusercontent.com/d/1cPsr9IwF9IwydvnbG7JwZzfRPCma5fd3"
 
 }
 
 );
-
-
-});
-
-
-// ==============================
-// KLIK NOTIFICATION
-// ==============================
-
-self.addEventListener(
-"notificationclick",
-event=>{
-
-
-event.notification.close();
-
-
-event.waitUntil(
-
-clients.matchAll({
-
-type:"window",
-includeUncontrolled:true
-
-})
-
-.then(clientList=>{
-
-
-for(let client of clientList){
-
-
-if(client.url && "focus" in client){
-
-
-client.focus();
-
-
-client.postMessage({
-
-action:"bukaJadual"
-
-});
-
-
-return;
-
-}
-
-
-}
-
-
-// jika tiada page terbuka
-
-if(clients.openWindow){
-
-
-return clients.openWindow(
-
-event.notification.data.url
-
-);
-
-
-}
-
-
-})
-
-
-);
-
 
 });
 
 
 // SERVICE WORKER CONTROL
 
-const CACHE_NAME = "sjam-krew-v3";
+const CACHE_NAME = "sjam-krew-v2";
+
 
 self.addEventListener(
 "install",
