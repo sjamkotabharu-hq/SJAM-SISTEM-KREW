@@ -480,6 +480,8 @@ JSON.parse(localStorage.getItem("krew")) || null;
 
 let jumlahJadualLama = 0;
 
+let dataSejarahKrew = [];
+
 let adminSession =
 localStorage.getItem("admin") || null;
 
@@ -1248,6 +1250,8 @@ idKrew:currentUser.id
 
 .then(data=>{
 
+dataSejarahKrew = data;
+
 let html=`
 
 <div class="banner">
@@ -1321,6 +1325,112 @@ document.getElementById("content").innerHTML=html;
 console.error(error);
 
 });
+
+}
+
+function paparSejarahKategori(kategori){
+
+let html=`
+
+<div class="banner">
+
+<img src="${BANNER_URL}">
+
+</div>
+
+<div class="card">
+
+<h2>
+📚 ${kategori}
+</h2>
+
+`;
+
+let jumpa=false;
+
+
+dataSejarahKrew.forEach(x=>{
+
+
+if(x.jenis.includes(kategori)){
+
+
+jumpa=true;
+
+
+html+=`
+
+<div class="laporanItem">
+
+<b>
+${x.jenis}
+</b>
+
+<br>
+
+📅 Tarikh:
+${formatTarikh(x.tarikh)}
+
+<br>
+
+🧾 No Resit:
+${x.resit}
+
+<br>
+
+💰 RM ${x.jumlah || "-"}
+
+</div>
+
+`;
+
+}
+
+});
+
+
+if(!jumpa){
+
+html+=`
+
+<div class="settingBox">
+
+Tiada rekod untuk kategori ini.
+
+</div>
+
+`;
+
+}
+
+
+html+=`
+
+<button
+class="back"
+onclick="lihatSejarah()">
+
+⬅️ Kembali Kategori
+
+</button>
+
+
+<button
+class="back"
+onclick="bukaMenu()">
+
+⬅️ Menu Utama
+
+</button>
+
+
+</div>
+
+`;
+
+
+document.getElementById("content").innerHTML=html;
+
 
 }
 
@@ -3524,6 +3634,3 @@ if ("serviceWorker" in navigator) {
 </body>
 
 </html>
-
-
-
