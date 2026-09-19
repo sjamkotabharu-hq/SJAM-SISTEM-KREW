@@ -3566,11 +3566,16 @@ function aktifkanNotifikasiSJAM(){
 
 aktifkanAudio();
 
-// simpan status
+// simpan status bunyi
 localStorage.setItem(
 "audioAktif",
 "YES"
 );
+
+
+// AKTIFKAN FCM TOKEN
+aktifkanFCM();
+
 
 alert("🔔 Notifikasi SJAM telah diaktifkan");
 
@@ -3660,4 +3665,3 @@ lihatJadualKrew();
 </body>
 
 </html>
-
