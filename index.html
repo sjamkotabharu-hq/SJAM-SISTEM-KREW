@@ -3537,107 +3537,20 @@ kiraJadualBaru();
 
 let audioCtxGlobal = null;
 
-function aktifkanFCM(){
+function aktifkanAudio(){
 
-if(!("Notification" in window)){
+if(!audioCtxGlobal){
 
-alert("❌ Telefon tidak menyokong notification");
-
-return;
-
-}
-
-
-Notification.requestPermission()
-
-.then(permission=>{
-
-
-if(permission=="granted"){
-
-
-navigator.serviceWorker.ready
-
-.then(registration=>{
-
-
-firebase.messaging()
-
-.getToken({
-
-vapidKey:
-"BJ7NZaZthzTky8M91T9PXZ6ET-rWixG3RkkONpxGHNT8wPYhuERYe4nsscTZKUCfGx2O4nZJdF7F84f7odS8iCs"
-
-})
-
-.then(token=>{
-
-
-console.log(
-"FCM TOKEN:",
-token
-);
-
-
-
-fetch(SCRIPT_URL,{
-
-method:"POST",
-
-body:JSON.stringify({
-
-action:"simpanToken",
-
-data:{
-
-idKrew:currentUser.id,
-
-nama:currentUser.nama,
-
-token:token
+audioCtxGlobal =
+new (window.AudioContext || window.webkitAudioContext)();
 
 }
 
-})
+if(audioCtxGlobal.state==="suspended"){
 
-})
-
-
-.then(r=>r.json())
-
-.then(res=>{
-
-
-console.log(
-"Simpan token:",
-res
-);
-
-
-});
-
-
-});
-
-
-});
-
+audioCtxGlobal.resume();
 
 }
-
-else{
-
-
-alert(
-"❌ Notification tidak dibenarkan"
-);
-
-
-}
-
-
-});
-
 
 }
 
@@ -3649,15 +3562,11 @@ function aktifkanNotifikasiSJAM(){
 
 aktifkanAudio();
 
+// simpan status
 localStorage.setItem(
 "audioAktif",
 "YES"
 );
-
-
-// TAMBAHAN FCM
-aktifkanFCM();
-
 
 alert("🔔 Notifikasi SJAM telah diaktifkan");
 
@@ -3715,50 +3624,10 @@ beep(time,freq);
 
 </script>
 
-<!-- FIREBASE -->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
-
-
 <script>
-
 if ("serviceWorker" in navigator) {
-
-navigator.serviceWorker.register("service-worker.js")
-
-.then(reg=>{
-
-console.log(
-"Service Worker aktif",
-reg
-);
-
-});
-
+  navigator.serviceWorker.register("service-worker.js");
 }
-
-navigator.serviceWorker.addEventListener(
-"message",
-event=>{
-
-
-if(event.data.action=="bukaJadual"){
-
-
-if(currentUser){
-
-
-lihatJadualKrew();
-
-
-}
-
-
-}
-
-
-});
 
 </script>
 
