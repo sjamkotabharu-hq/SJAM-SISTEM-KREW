@@ -3537,20 +3537,107 @@ kiraJadualBaru();
 
 let audioCtxGlobal = null;
 
-function aktifkanAudio(){
+function aktifkanFCM(){
 
-if(!audioCtxGlobal){
+if(!("Notification" in window)){
 
-audioCtxGlobal =
-new (window.AudioContext || window.webkitAudioContext)();
+alert("❌ Telefon tidak menyokong notification");
+
+return;
+
+}
+
+
+Notification.requestPermission()
+
+.then(permission=>{
+
+
+if(permission=="granted"){
+
+
+navigator.serviceWorker.ready
+
+.then(registration=>{
+
+
+firebase.messaging()
+
+.getToken({
+
+vapidKey:
+"BJ7NZaZthzTky8M91T9PXZ6ET-rWixG3RkkONpxGHNT8wPYhuERYe4nsscTZKUCfGx2O4nZJdF7F84f7odS8iCs"
+
+})
+
+.then(token=>{
+
+
+console.log(
+"FCM TOKEN:",
+token
+);
+
+
+
+fetch(SCRIPT_URL,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+action:"simpanToken",
+
+data:{
+
+idKrew:currentUser.id,
+
+nama:currentUser.nama,
+
+token:token
 
 }
 
-if(audioCtxGlobal.state==="suspended"){
+})
 
-audioCtxGlobal.resume();
+})
+
+
+.then(r=>r.json())
+
+.then(res=>{
+
+
+console.log(
+"Simpan token:",
+res
+);
+
+
+});
+
+
+});
+
+
+});
+
 
 }
+
+else{
+
+
+alert(
+"❌ Notification tidak dibenarkan"
+);
+
+
+}
+
+
+});
+
 
 }
 
@@ -3562,11 +3649,15 @@ function aktifkanNotifikasiSJAM(){
 
 aktifkanAudio();
 
-// simpan status
 localStorage.setItem(
 "audioAktif",
 "YES"
 );
+
+
+// TAMBAHAN FCM
+aktifkanFCM();
+
 
 alert("🔔 Notifikasi SJAM telah diaktifkan");
 
