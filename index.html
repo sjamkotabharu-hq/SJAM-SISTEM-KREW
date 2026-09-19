@@ -3715,9 +3715,27 @@ beep(time,freq);
 
 </script>
 
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
+
+
 <script>
+
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("service-worker.js");
+
+navigator.serviceWorker.register("service-worker.js")
+
+.then(reg=>{
+
+console.log(
+"Service Worker aktif",
+reg
+);
+
+});
+
 }
 
 </script>
