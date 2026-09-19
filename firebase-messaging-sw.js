@@ -22,7 +22,7 @@ authDomain: "sjam-e-tuntutan.firebaseapp.com",
 
 projectId: "sjam-e-tuntutan",
 
-storageBucket: "sjam-e-tuntutan.appspot.com",
+storageBucket: "sjam-e-tuntutan.firebasestorage.app",
 
 messagingSenderId: "660145662983",
 
@@ -60,13 +60,11 @@ icon:
 "icon.png",
 
 badge:
-"icon.png",
-
-data:{
-url:
-"https://sjamkotabharu-hq.github.io/SJAM-SISTEM-KREW/"
-}
+"icon.png"
 
 }
 
 );
+
+
+});
