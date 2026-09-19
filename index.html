@@ -9,6 +9,9 @@
 
 <title>E-Tuntutan Krew SJAM</title>
 
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1565c0">
+
 <style>
 
 body{
@@ -246,7 +249,6 @@ display:none!important;
 
 }
 
-
 </style>
 
 </head>
@@ -479,8 +481,6 @@ let currentUser =
 JSON.parse(localStorage.getItem("krew")) || null;
 
 let jumlahJadualLama = 0;
-
-let dataSejarahKrew = [];
 
 let adminSession =
 localStorage.getItem("admin") || null;
@@ -1199,7 +1199,6 @@ function lihatSejarah(){
 document.getElementById("menuPage")
 .classList.add("hide");
 
-
 // PAPAR LOADING SEMENTARA
 document.getElementById("content").innerHTML = `
 
@@ -1250,8 +1249,6 @@ idKrew:currentUser.id
 
 .then(data=>{
 
-dataSejarahKrew = data;
-
 let html=`
 
 <div class="banner">
@@ -1260,61 +1257,85 @@ let html=`
 
 </div>
 
-
 <div class="card">
 
-
 <h2>
+
 📚 Sejarah Saya
+
 </h2>
 
+`;
 
-<p style="text-align:center">
-Pilih Kategori
-</p>
+data.forEach(x=>{
 
+html+=`
 
-<button onclick="paparSejarahKategori('Hari Biasa')">
+<div class="laporanItem">
 
-🟦 Hari Biasa
+<b>
 
-</button>
+${x.jenis}
 
+</b>
 
-<button onclick="paparSejarahKategori('Malam Jumaat/Sabtu')">
+<br>
 
-🌙 Malam Jumaat/Sabtu
+📅 Tarikh:
 
-</button>
+${formatTarikh(x.tarikh)}
 
+<br>
 
-<button onclick="paparSejarahKategori('Cuti Umum')">
+🧾 No Resit:
 
-🎉 Cuti Umum
+${x.resit}
 
-</button>
+<br>
 
+${x.jumlah?
 
-<button onclick="paparSejarahKategori('Keluar Negeri')">
+"💰 RM "+x.jumlah
 
-🌍 Keluar Negeri
+:
 
-</button>
+""
 
+}
+
+<br>
+
+${x.destinasi?
+
+"🗺️ Destinasi: "+x.destinasi
+
+:
+
+""
+
+}
+
+</div>
+
+`;
+
+});
+
+html+=`
 
 <button
+
 class="back"
+
 onclick="bukaMenu()">
 
 ⬅️ Menu Utama
 
 </button>
 
-
 </div>
 
 `;
-
 
 document.getElementById("content").innerHTML=html;
 
@@ -1325,112 +1346,6 @@ document.getElementById("content").innerHTML=html;
 console.error(error);
 
 });
-
-}
-
-function paparSejarahKategori(kategori){
-
-let html=`
-
-<div class="banner">
-
-<img src="${BANNER_URL}">
-
-</div>
-
-<div class="card">
-
-<h2>
-📚 ${kategori}
-</h2>
-
-`;
-
-let jumpa=false;
-
-
-dataSejarahKrew.forEach(x=>{
-
-
-if(x.jenis.includes(kategori)){
-
-
-jumpa=true;
-
-
-html+=`
-
-<div class="laporanItem">
-
-<b>
-${x.jenis}
-</b>
-
-<br>
-
-📅 Tarikh:
-${formatTarikh(x.tarikh)}
-
-<br>
-
-🧾 No Resit:
-${x.resit}
-
-<br>
-
-💰 RM ${x.jumlah || "-"}
-
-</div>
-
-`;
-
-}
-
-});
-
-
-if(!jumpa){
-
-html+=`
-
-<div class="settingBox">
-
-Tiada rekod untuk kategori ini.
-
-</div>
-
-`;
-
-}
-
-
-html+=`
-
-<button
-class="back"
-onclick="lihatSejarah()">
-
-⬅️ Kembali Kategori
-
-</button>
-
-
-<button
-class="back"
-onclick="bukaMenu()">
-
-⬅️ Menu Utama
-
-</button>
-
-
-</div>
-
-`;
-
-
-document.getElementById("content").innerHTML=html;
-
 
 }
 
@@ -2757,6 +2672,9 @@ krewNama.join(","),
 krewBackup:
 backupNama.join(","),
 
+backupTag:
+backupTag.join(","),
+
 masa:
 document.getElementById("masa"+i).value,
 
@@ -3295,7 +3213,6 @@ Tandatangan Krew
 
 </div>
 
-
 <div class="noPrint">
 
 <button onclick="window.print()">
@@ -3628,32 +3545,10 @@ beep(time,freq);
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("service-worker.js");
 }
-
-
-navigator.serviceWorker.addEventListener(
-"message",
-event=>{
-
-
-if(event.data.action=="bukaJadual"){
-
-
-if(currentUser){
-
-
-lihatJadualKrew();
-
-
-}
-
-
-}
-
-
-});
 </script>
 
 </body>
 
 </html>
+
 
