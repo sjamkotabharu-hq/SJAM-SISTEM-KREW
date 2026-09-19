@@ -143,8 +143,7 @@ event.notification.data.url
 
 // SERVICE WORKER CONTROL
 
-const CACHE_NAME = "sjam-krew-v2";
-
+const CACHE_NAME = "sjam-krew-v3";
 
 self.addEventListener(
 "install",
