@@ -9,9 +9,6 @@
 
 <title>E-Tuntutan Krew SJAM</title>
 
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#1565c0">
-
 <style>
 
 body{
@@ -249,6 +246,7 @@ display:none!important;
 
 }
 
+
 </style>
 
 </head>
@@ -443,6 +441,8 @@ font-size:14px;
 ">
 0
 </span>
+
+</button>
 
 <button onclick="aktifkanNotifikasiSJAM()">
 
@@ -1197,6 +1197,7 @@ function lihatSejarah(){
 document.getElementById("menuPage")
 .classList.add("hide");
 
+
 // PAPAR LOADING SEMENTARA
 document.getElementById("content").innerHTML = `
 
@@ -1255,85 +1256,61 @@ let html=`
 
 </div>
 
+
 <div class="card">
 
+
 <h2>
-
 📚 Sejarah Saya
-
 </h2>
 
-`;
 
-data.forEach(x=>{
+<p style="text-align:center">
+Pilih Kategori
+</p>
 
-html+=`
 
-<div class="laporanItem">
+<button onclick="paparSejarahKategori('Hari Biasa')">
 
-<b>
+🟦 Hari Biasa
 
-${x.jenis}
+</button>
 
-</b>
 
-<br>
+<button onclick="paparSejarahKategori('Malam Jumaat/Sabtu')">
 
-📅 Tarikh:
+🌙 Malam Jumaat/Sabtu
 
-${formatTarikh(x.tarikh)}
+</button>
 
-<br>
 
-🧾 No Resit:
+<button onclick="paparSejarahKategori('Cuti Umum')">
 
-${x.resit}
+🎉 Cuti Umum
 
-<br>
+</button>
 
-${x.jumlah?
 
-"💰 RM "+x.jumlah
+<button onclick="paparSejarahKategori('Keluar Negeri')">
 
-:
+🌍 Keluar Negeri
 
-""
+</button>
 
-}
-
-<br>
-
-${x.destinasi?
-
-"🗺️ Destinasi: "+x.destinasi
-
-:
-
-""
-
-}
-
-</div>
-
-`;
-
-});
-
-html+=`
 
 <button
-
 class="back"
-
 onclick="bukaMenu()">
 
 ⬅️ Menu Utama
 
 </button>
 
+
 </div>
 
 `;
+
 
 document.getElementById("content").innerHTML=html;
 
@@ -1590,10 +1567,6 @@ if(res.success){
 
 alert("✅ Tugasan berjaya diterima");
 
-jumlahJadualLama = 0;
-
-kiraJadualBaru();
-
 lihatJadualKrew();
 
 }
@@ -1651,10 +1624,6 @@ namaKrew:currentUser.nama
 if(res.success){
 
 alert("❌ Tugasan berjaya ditolak");
-
-jumlahJadualLama = 0;
-
-kiraJadualBaru();
 
 lihatJadualKrew();
 
@@ -2678,9 +2647,6 @@ krewNama.join(","),
 krewBackup:
 backupNama.join(","),
 
-backupTag:
-backupTag.join(","),
-
 masa:
 document.getElementById("masa"+i).value,
 
@@ -3219,6 +3185,7 @@ Tandatangan Krew
 
 </div>
 
+
 <div class="noPrint">
 
 <button onclick="window.print()">
@@ -3485,25 +3452,13 @@ function aktifkanNotifikasiSJAM(){
 
 aktifkanAudio();
 
+// simpan status
 localStorage.setItem(
 "audioAktif",
 "YES"
 );
 
-
-if(window.aktifkanFCM){
-
-aktifkanFCM();
-
-}
-
-else{
-
-alert(
-"Firebase belum siap dimuatkan"
-);
-
-}
+alert("🔔 Notifikasi SJAM telah diaktifkan");
 
 }
 
@@ -3559,168 +3514,16 @@ beep(time,freq);
 
 </script>
 
-
-<!-- FIREBASE SDK -->
-<script type="module">
-
-import { initializeApp } 
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-
-
-import { 
-getMessaging,
-getToken
-} 
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js";
-
-
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBMsHtZfM8ZTN_nY_G3g4rHr55--r9SpOs",
-  authDomain: "sjam-e-tuntutan.firebaseapp.com",
-  projectId: "sjam-e-tuntutan",
-  storageBucket: "sjam-e-tuntutan.firebasestorage.app",
-  messagingSenderId: "660145662983",
-  appId: "1:660145662983:web:5da13e032b97842a504ea2",
-  measurementId: "G-MEWTFG98W5"
-};
-
-
-
-const app = initializeApp(firebaseConfig);
-
-
-const messaging = getMessaging(app);
-
-let firebaseRegistration = null;
-
-navigator.serviceWorker.register(
-"/SJAM-SISTEM-KREW/firebase-messaging-sw.js",
-{
-scope:"/SJAM-SISTEM-KREW/"
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("service-worker.js");
 }
-)
-.then((registration)=>{
-
-firebaseRegistration = registration;
-
-console.log(
-"Firebase SW registered",
-registration
-);
-
-});
-
-window.aktifkanFCM = async function(){
-
-if(!firebaseRegistration){
-
-firebaseRegistration = await navigator.serviceWorker.register(
-"/SJAM-SISTEM-KREW/firebase-messaging-sw.js",
-{
-scope:"/SJAM-SISTEM-KREW/"
-}
-);
-
-console.log(
-"Firebase SW Ready",
-firebaseRegistration
-);
-
-}
-
-
-
-try{
-
-
-const permission = await Notification.requestPermission();
-
-
-
-if(permission==="granted"){
-
-
-const token = await getToken(
-messaging,
-{
-
-vapidKey:
-"BJ7NZaZthzTky8M91T9PXZ6ET-rWixG3RkkONpxGHNT8wPYhuERYe4nsscTZKUCfGx2O4nZJdF7F84f7odS8iCs",
-
-serviceWorkerRegistration: firebaseRegistration
-
-}
-
-);
-
-
-console.log(
-"FCM TOKEN:",
-token
-);
-
-
-// SIMPAN TOKEN KREW
-fetch(SCRIPT_URL,{
-
-method:"POST",
-
-body:JSON.stringify({
-
-action:"simpanToken",
-
-data:{
-idKrew:currentUser.id,
-nama:currentUser.nama,
-token:token
-}
-
-})
-
-});
-
-
-alert(
-"✅ Notifikasi SJAM berjaya diaktifkan"
-);
-
-
-
-}
-
-else{
-
-
-alert(
-"❌ Kebenaran notifikasi ditolak"
-);
-
-
-}
-
-
-}
-
-catch(error){
-
-console.log(error);
-
-alert(error);
-
-}
-
-
-}
-
-
-
-console.log("🔥 Firebase SJAM Connected");
 
 </script>
 
 </body>
-  
+
 </html>
+
 
 
