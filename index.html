@@ -11,6 +11,14 @@
 
 <link rel="manifest" href="manifest.json">
 
+
+<!-- FIREBASE -->
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
+
+
 </head>
 
 <style>
@@ -478,6 +486,22 @@ const SCRIPT_URL =
 
 const BANNER_URL =
 "https://lh3.googleusercontent.com/d/1cPsr9IwF9IwydvnbG7JwZzfRPCma5fd3";
+
+const firebaseConfig = {
+
+apiKey: "ISI_FIREBASE_API_KEY",
+
+authDomain: "ISI_FIREBASE_AUTHDOMAIN",
+
+projectId: "ISI_PROJECT_ID",
+
+storageBucket: "ISI_STORAGE_BUCKET",
+
+messagingSenderId: "ISI_SENDER_ID",
+
+appId: "ISI_APP_ID"
+
+};
 
 let currentUser =
 JSON.parse(localStorage.getItem("krew")) || null;
@@ -3566,11 +3590,14 @@ function aktifkanNotifikasiSJAM(){
 
 aktifkanAudio();
 
-// simpan status bunyi
 localStorage.setItem(
 "audioAktif",
 "YES"
 );
+
+
+// AKTIFKAN FCM TOKEN
+aktifkanFCM();
 
 
 alert("🔔 Notifikasi SJAM telah diaktifkan");
@@ -3666,6 +3693,8 @@ lihatJadualKrew();
 
 
 });
+
+
 </script>
 
 </body>
