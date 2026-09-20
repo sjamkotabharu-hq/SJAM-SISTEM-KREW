@@ -448,6 +448,13 @@ if(user){
 
 currentUser=user;
 
+if(Notification.permission=="granted" &&
+localStorage.getItem("notifAktif")=="YA"){
+
+aktifkanNotifikasiSJAM();
+
+}
+
 if(localStorage.getItem("audioAktif")=="YES"){
 
 aktifkanAudio();
@@ -3246,6 +3253,11 @@ token:token
 })
 
 });
+
+localStorage.setItem(
+"notifAktif",
+"YA"
+);
 
 
 alert("✅ Token SJAM berjaya disimpan");
