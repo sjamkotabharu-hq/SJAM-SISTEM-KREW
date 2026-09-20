@@ -1401,6 +1401,24 @@ ${x.krewNama || "-"}
 
 <br>
 
+<div style="
+background:#f5f9ff;
+padding:15px;
+margin-top:15px;
+border-radius:15px;
+border:1px solid #ccc;
+">
+
+<h3 style="color:#1565c0;">
+🚑 STATUS RESPON KREW
+</h3>
+
+<div id="statusKrew${x.idJadual}">
+⏳ Sedang semak status...
+</div>
+
+</div>
+
 🆘 Krew Backup:
 ${x.krewBackup || "-"}
 
@@ -2148,6 +2166,101 @@ onclick="bukaDashboardAdmin()">
 `;
 
 document.getElementById("adminArea").innerHTML=html;
+
+data.data.forEach(x=>{
+
+fetch(SCRIPT_URL,{
+method:"POST",
+body:JSON.stringify({
+action:"statusKrew",
+idJadual:x.idJadual
+})
+})
+.then(r=>r.json())
+.then(status=>{
+
+let box=document.getElementById(
+"statusKrew"+x.idJadual
+);
+
+let html="";
+
+let terima=0;
+let tolak=0;
+let belum=0;
+
+
+status.forEach(k=>{
+
+if(k.STATUS=="TERIMA"){
+terima++;
+}
+
+else if(k.STATUS=="TOLAK"){
+tolak++;
+}
+
+else{
+belum++;
+}
+
+
+html+=`
+
+<div style="
+background:white;
+padding:10px;
+margin:5px 0;
+border-radius:10px;
+">
+
+👤 ${k.NAMA_KREW}
+
+<br>
+
+${
+k.STATUS=="TERIMA"
+?
+"✅ TERIMA"
+:
+k.STATUS=="TOLAK"
+?
+"❌ TOLAK"
+:
+"⏳ BELUM RESPON"
+}
+
+${k.MASA_RESPON ?
+"<br>⏰ "+k.MASA_RESPON
+:
+""}
+
+</div>
+
+`;
+
+});
+
+
+html+=`
+
+<hr>
+
+<b>
+✅ ${terima} Terima |
+❌ ${tolak} Tolak |
+⏳ ${belum} Belum
+</b>
+
+`;
+
+
+box.innerHTML=html;
+
+
+});
+
+});
 
 });
 
