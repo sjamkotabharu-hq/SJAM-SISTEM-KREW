@@ -3171,9 +3171,16 @@ return;
 }
 
 
+const registration =
+await navigator.serviceWorker.ready;
+
+
 const token = await messaging.getToken({
 
-vapidKey:"BJ7NZaZthzTky8M91T9PXZ6ET-rWixG3RkkONpxGHNT8wPYhuERYe4nsscTZKUCfGx2O4nZJdF7F84f7odS8iCs"
+vapidKey:
+"BJ7NZaZthzTky8M91T9PXZ6ET-rWixG3RkkONpxGHNT8wPYhuERYe4nsscTZKUCfGx2O4nZJdF7F84f7odS8iCs",
+
+serviceWorkerRegistration: registration
 
 });
 
@@ -3264,12 +3271,21 @@ beep(time,freq);
 
 </script>
 
+</div> <!-- tutup container -->
 
+
+<!-- =============================== -->
 <!-- FIREBASE SDK -->
+<!-- =============================== -->
+
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
 
+
+<!-- =============================== -->
+<!-- FIREBASE CONFIG -->
+<!-- =============================== -->
 
 <script>
 
@@ -3293,15 +3309,17 @@ appId: "1:660145662983:web:5da13e032b97842a504ea2"
 const messaging = firebase.messaging();
 
 
-if ("serviceWorker" in navigator) {
+navigator.serviceWorker.register(
+"firebase-messaging-sw.js"
+);
 
-navigator.serviceWorker.register("firebase-messaging-sw.js");
-
-}
 
 </script>
 
 
-</body>
+<!-- =============================== -->
+<!-- AKHIR HTML -->
+<!-- =============================== -->
 
+</body>
 </html>
