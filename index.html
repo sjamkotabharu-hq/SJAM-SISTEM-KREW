@@ -1435,14 +1435,36 @@ ${x.krewNama || "-"}
 
 <br>
 
+<div style="
+background:#f5f9ff;
+padding:15px;
+margin-top:15px;
+border-radius:15px;
+border:1px solid #ccc;
+">
+
+<h3 style="color:#1565c0;">
+🚑 STATUS RESPON KREW
+</h3>
+
+<div id="statusKrew${x.idJadual}">
+⏳ Sedang semak status...
+</div>
+
+</div>
+
 🆘 Krew Backup:
 ${x.krewBackup || "-"}
 
-<br><br>
+<br>
 
 📌 Status:
-
+<span style="
+color:${x.status=="TERIMA"?"green":x.status=="TOLAK"?"red":"orange"};
+font-weight:bold;
+">
 ${x.status || "BARU"}
+</span>
 
 <br><br>
 
@@ -1450,7 +1472,6 @@ ${
 x.status=="BARU"
 ?
 `
-
 <button 
 class="green"
 onclick="sahkanJadual('${x.idJadual}')">
@@ -1459,7 +1480,6 @@ onclick="sahkanJadual('${x.idJadual}')">
 
 </button>
 
-
 <button 
 class="red"
 onclick="tolakJadual('${x.idJadual}')">
@@ -1467,12 +1487,10 @@ onclick="tolakJadual('${x.idJadual}')">
 ❌ TOLAK TUGASAN
 
 </button>
-
 `
 :
 ""
 }
-
 
 </div>
 
@@ -1497,71 +1515,6 @@ onclick="bukaMenu()">
 `;
 
 document.getElementById("content").innerHTML=html;
-
-
-if(res.data && res.data.length > 0){
-
-res.data.forEach(x=>{
-
-fetch(SCRIPT_URL,{
-
-method:"POST",
-body:JSON.stringify({
-action:"statusKrew",
-idJadual:x.idJadual
-})
-})
-.then(r=>r.json())
-.then(status=>{
-
-let box=document.getElementById(
-"statusKrew"+x.idJadual
-);
-
-if(!box) return;
-
-let html="";
-
-status.forEach(k=>{
-
-html+=`
-
-<div style="
-background:white;
-padding:10px;
-margin:5px 0;
-border-radius:10px;
-">
-
-👤 ${k.NAMA_KREW}
-
-<br>
-
-${
-k.STATUS=="TERIMA"
-?
-"✅ TERIMA"
-:
-k.STATUS=="TOLAK"
-?
-"❌ TOLAK"
-:
-"⏳ BELUM RESPON"
-}
-
-</div>
-
-`;
-
-});
-
-box.innerHTML=html;
-
-});
-
-});
-
-}
 
 })
 
@@ -2095,6 +2048,251 @@ value="${k.id}|${k.nama}">
 </div>
 
 `;
+
+});
+
+});
+
+}
+
+// ==============================
+// LIHAT JADUAL BERTUGAS ADMIN
+// ==============================
+
+function lihatJadualAdmin(){
+
+fetch(SCRIPT_URL,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+action:"lihatJadual"
+
+})
+
+})
+
+.then(r=>r.json())
+
+.then(data=>{
+
+let html=`
+
+<div class="card">
+
+<h2>
+📋 Jadual Bertugas Ambulans
+</h2>
+
+`;
+
+data.data.forEach(x=>{
+
+fetch(SCRIPT_URL,{
+method:"POST",
+body:JSON.stringify({
+action:"statusKrew",
+idJadual:x.idJadual
+})
+})
+.then(r=>r.json())
+.then(status=>{
+console.log(status);
+});
+
+html+=`
+
+<div class="krewBox">
+
+<b>🚑 ${x.kes}</b>
+
+<br>
+
+📅 Tarikh:
+${formatTarikh(x.tarikh)}
+
+<br>
+
+📍 Lokasi:
+${x.lokasi}
+
+<br>
+
+🏥 Destinasi:
+${x.destinasi}
+
+<br>
+
+⏰ Masa:
+${x.masa}
+
+<br>
+
+🚑 Ambulans:
+${x.ambulans || "-"}
+
+<br>
+
+💰 Bayaran:
+RM ${x.bayaran || "-"}
+
+<br>
+
+🍩 Donut & Air:
+${x.makan || "-"}
+
+<br>
+
+👥 Krew Backup:
+${x.krewBackup || "-"}
+
+<br>
+
+📌 Status:
+${x.status || "BARU"}
+
+<br>
+
+👥 Krew Bertugas:
+${x.krewNama || "-"}
+
+<br>
+
+📌 Status Respon:
+${x.statusKrew || "BELUM RESPON"}
+
+<br>
+
+⏰ Masa Respon:
+${x.masaRespon ? formatMasa(x.masaRespon) : "-"}
+
+<br>
+
+📨 Status Hantar:
+${x.statusHantar || "-"}
+
+<br>
+
+⏰ Masa Hantar:
+${x.masaHantar || "-"}
+
+<br><br>
+
+</div>
+
+`;
+
+});
+
+html+=`
+
+<button class="back"
+
+onclick="bukaDashboardAdmin()">
+
+⬅️ Dashboard
+
+</button>
+
+</div>
+
+`;
+
+document.getElementById("adminArea").innerHTML=html;
+
+data.data.forEach(x=>{
+
+fetch(SCRIPT_URL,{
+method:"POST",
+body:JSON.stringify({
+action:"statusKrew",
+idJadual:x.idJadual
+})
+})
+.then(r=>r.json())
+.then(status=>{
+
+let box=document.getElementById(
+"statusKrew"+x.idJadual
+);
+
+let html="";
+
+let terima=0;
+let tolak=0;
+let belum=0;
+
+
+status.forEach(k=>{
+
+if(k.STATUS=="TERIMA"){
+terima++;
+}
+
+else if(k.STATUS=="TOLAK"){
+tolak++;
+}
+
+else{
+belum++;
+}
+
+
+html+=`
+
+<div style="
+background:white;
+padding:10px;
+margin:5px 0;
+border-radius:10px;
+">
+
+👤 ${k.NAMA_KREW}
+
+<br>
+
+${
+k.STATUS=="TERIMA"
+?
+"✅ TERIMA"
+:
+k.STATUS=="TOLAK"
+?
+"❌ TOLAK"
+:
+"⏳ BELUM RESPON"
+}
+
+${k.MASA_RESPON ?
+"<br>⏰ "+k.MASA_RESPON
+:
+""}
+
+</div>
+
+`;
+
+});
+
+
+html+=`
+
+<hr>
+
+<b>
+✅ ${terima} Terima |
+❌ ${tolak} Tolak |
+⏳ ${belum} Belum
+</b>
+
+`;
+
+
+box.innerHTML=html;
+
+
+});
 
 });
 
@@ -3297,3 +3495,4 @@ hour12:true
 
 </body>
 </html>
+
