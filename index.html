@@ -2131,7 +2131,7 @@ ${x.statusKrew || "BELUM RESPON"}
 <br>
 
 ⏰ Masa Respon:
-${x.masaRespon || "-"}
+${x.masaRespon ? formatMasa(x.masaRespon) : "-"}
 
 <br>
 
@@ -3428,6 +3428,25 @@ let freq = (i % 2 === 0) ? 900 : 500;
 beep(time,freq);
 
 }
+
+}
+
+function formatMasa(masa){
+
+let d = new Date(masa);
+
+if(isNaN(d)){
+return masa;
+}
+
+return d.toLocaleString("ms-MY",{
+day:"2-digit",
+month:"2-digit",
+year:"numeric",
+hour:"2-digit",
+minute:"2-digit",
+hour12:true
+});
 
 }
 
