@@ -7,6 +7,40 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
+
+
+<script>
+
+firebase.initializeApp({
+
+apiKey: "AIzaSyBMsHtZfM8ZTN_nY_G3g4rHr55--r9SpOs",
+
+authDomain: "sjam-e-tuntutan.firebaseapp.com",
+
+projectId: "sjam-e-tuntutan",
+
+storageBucket: "sjam-e-tuntutan.firebasestorage.app",
+
+messagingSenderId: "660145662983",
+
+appId: "1:660145662983:web:5da13e032b97842a504ea2"
+
+});
+
+
+const messaging = firebase.messaging();
+
+
+navigator.serviceWorker.register(
+"firebase-messaging-sw.js"
+);
+
+</script>
+
 <title>E-Tuntutan Krew SJAM</title>
 
 <link rel="manifest" href="manifest.json">
@@ -3453,49 +3487,6 @@ hour12:true
 </script>
 
 </div> <!-- tutup container -->
-
-
-<!-- =============================== -->
-<!-- FIREBASE SDK -->
-<!-- =============================== -->
-
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
-
-
-<!-- =============================== -->
-<!-- FIREBASE CONFIG -->
-<!-- =============================== -->
-
-<script>
-
-firebase.initializeApp({
-
-apiKey: "AIzaSyBMsHtZfM8ZTN_nY_G3g4rHr55--r9Sp0s",
-
-authDomain: "sjam-e-tuntutan.firebaseapp.com",
-
-projectId: "sjam-e-tuntutan",
-
-storageBucket: "sjam-e-tuntutan.firebasestorage.app",
-
-messagingSenderId: "660145662983",
-
-appId: "1:660145662983:web:5da13e032b97842a504ea2"
-
-});
-
-
-const messaging = firebase.messaging();
-
-
-navigator.serviceWorker.register(
-"firebase-messaging-sw.js"
-);
-
-
-</script>
 
 
 <!-- =============================== -->
