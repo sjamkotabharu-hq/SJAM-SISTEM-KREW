@@ -2030,6 +2030,18 @@ let html=`
 
 data.data.forEach(x=>{
 
+fetch(SCRIPT_URL,{
+method:"POST",
+body:JSON.stringify({
+action:"statusKrew",
+idJadual:x.idJadual
+})
+})
+.then(r=>r.json())
+.then(status=>{
+console.log(status);
+});
+
 html+=`
 
 <div class="krewBox">
