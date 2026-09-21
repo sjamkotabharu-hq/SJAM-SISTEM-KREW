@@ -1246,57 +1246,68 @@ let html=`
 
 `;
 
+let kategori = {};
+
 data.forEach(x=>{
 
-html+=`
+let jenis = x.jenis;
+
+if(!kategori[jenis]){
+kategori[jenis]=[];
+}
+
+kategori[jenis].push(x);
+
+});
+
+
+function paparKategori(tajuk,array){
+
+let hasil = "";
+
+hasil += `
+<h3>${tajuk}</h3>
+`;
+
+array.forEach(x=>{
+
+hasil += `
 
 <div class="laporanItem">
 
-<b>
-
-${x.jenis}
-
-</b>
-
-<br>
-
-📅 Tarikh:
-
-${formatTarikh(x.tarikh)}
+📅 ${formatTarikh(x.tarikh)}
 
 <br>
 
 🧾 No Resit:
-
 ${x.resit}
 
 <br>
 
-${x.jumlah?
-
-"💰 RM "+x.jumlah
-
-:
-
-""
-
-}
+${x.jumlah ? "💰 RM "+x.jumlah : ""}
 
 <br>
 
-${x.destinasi?
-
-"🗺️ Destinasi: "+x.destinasi
-
-:
-
-""
-
-}
+${x.destinasi ? "🗺️ Destinasi: "+x.destinasi : ""}
 
 </div>
 
 `;
+
+});
+
+return hasil;
+
+}
+
+
+// SUSUNAN BARU
+Object.keys(kategori).forEach(jenis=>{
+
+html += paparKategori(
+jenis,
+kategori[jenis]
+);
 
 });
 
