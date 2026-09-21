@@ -2192,7 +2192,7 @@ ${x.statusHantar || "-"}
 <br>
 
 ⏰ Masa Hantar:
-${x.masaHantar || "-"}
+${x.masaHantar ? formatMasa(x.masaHantar) : "-"}
 
 <br><br>
 
