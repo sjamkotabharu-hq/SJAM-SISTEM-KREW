@@ -427,7 +427,7 @@ font-size:14px;
 
 </button>
 
-<button onclick="aktifkanNotifikasiSJAM()">
+<button onclick="aktifkanNotifikasiSJAM()" style="display:none">
 
 🔔 AKTIFKAN NOTIFIKASI SJAM
 
@@ -482,8 +482,7 @@ if(user){
 
 currentUser=user;
 
-if(Notification.permission=="granted" &&
-localStorage.getItem("notifAktif")=="YA"){
+if(Notification.permission=="granted"){
 
 autoSimpanTokenSJAM();
 
@@ -746,6 +745,12 @@ document.getElementById("daftarPage")
 
 document.getElementById("menuPage")
 .classList.remove("hide");
+
+setTimeout(()=>{
+
+autoSimpanTokenSJAM();
+
+},1000);
 
 document.getElementById("content").innerHTML="";
 
