@@ -68,3 +68,55 @@ badge:
 
 
 });
+
+// ==============================
+// CLICK NOTIFICATION
+// ==============================
+
+self.addEventListener(
+"notificationclick",
+event=>{
+
+event.notification.close();
+
+
+event.waitUntil(
+
+clients.matchAll({
+type:"window",
+includeUncontrolled:true
+})
+
+.then(clientList=>{
+
+
+for(let client of clientList){
+
+if(client.url.includes("sjamkotabharu-hq.github.io")
+&& "focus" in client){
+
+return client.focus();
+
+}
+
+}
+
+
+// jika page belum buka
+
+if(clients.openWindow){
+
+return clients.openWindow(
+"https://sjamkotabharu-hq.github.io/SJAM-SISTEM-KREW/"
+);
+
+}
+
+
+})
+
+
+);
+
+
+});
