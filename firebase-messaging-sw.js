@@ -43,7 +43,7 @@ messaging.onBackgroundMessage((payload)=>{
 
 console.log(
 "📢 Background Message:",
-payload
+JSON.stringify(payload)
 );
 
 
