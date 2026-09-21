@@ -2196,6 +2196,14 @@ ${x.masaHantar ? formatMasa(x.masaHantar) : "-"}
 
 <br><br>
 
+<button 
+class="green"
+onclick="editJadualAdmin('${x.idJadual}')">
+
+✏️ Edit Jadual
+
+</button>
+
 </div>
 
 `;
@@ -2314,6 +2322,12 @@ box.innerHTML=html;
 });
 
 });
+
+}
+
+function editJadualAdmin(idJadual){
+
+alert("Edit ID: "+idJadual);
 
 }
 
