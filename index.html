@@ -230,6 +230,30 @@ break-inside:avoid;
 
 }
 
+.statusTerima{
+background:#e8f5e9;
+border-left:6px solid #2e7d32;
+padding:12px;
+margin:8px 0;
+border-radius:12px;
+}
+
+.statusTolak{
+background:#ffebee;
+border-left:6px solid #c62828;
+padding:12px;
+margin:8px 0;
+border-radius:12px;
+}
+
+.statusBelum{
+background:#fff8e1;
+border-left:6px solid #f9a825;
+padding:12px;
+margin:8px 0;
+border-radius:12px;
+}
+
 </style>
 
 </head>
@@ -1869,6 +1893,12 @@ onclick="simpanBulanAktif()">
 <button onclick="lihatJadualAdmin()">
 
 📋 Lihat Jadual Bertugas
+
+</button>
+
+<button onclick="lihatStatusKrewAdmin()">
+
+📊 Status Respon Krew
 
 </button>
 
@@ -3542,6 +3572,192 @@ token:token
 
 }
 
+// ==============================
+// STATUS RESPON KREW ADMIN
+// ==============================
+
+function lihatStatusKrewAdmin(){
+
+document.getElementById("adminArea").innerHTML=`
+
+<div class="card">
+
+<h2>
+📊 Status Respon Krew
+</h2>
+
+<div class="settingBox">
+
+⏳ Sedang semak respon krew...
+
+</div>
+
+</div>
+
+`;
+
+
+fetch(SCRIPT_URL,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+action:"statusSemuaKrew"
+
+})
+
+})
+
+.then(r=>r.json())
+
+.then(data=>{
+
+
+let html=`
+
+<div class="card">
+
+<h2>
+📊 Status Respon Krew
+</h2>
+
+`;
+
+
+let terima=0;
+let tolak=0;
+let belum=0;
+
+
+data.forEach(k=>{
+
+
+if(k.STATUS=="TERIMA"){
+
+terima++;
+
+html+=`
+
+<div class="statusTerima">
+
+👤 <b>${k.NAMA_KREW}</b>
+
+<br>
+
+✅ TERIMA TUGASAN
+
+<br>
+
+⏰ ${k.MASA_RESPON || "-"}
+
+</div>
+
+`;
+
+}
+
+else if(k.STATUS=="TOLAK"){
+
+tolak++;
+
+html+=`
+
+<div class="statusTolak">
+
+👤 <b>${k.NAMA_KREW}</b>
+
+<br>
+
+❌ TOLAK TUGASAN
+
+<br>
+
+⏰ ${k.MASA_RESPON || "-"}
+
+</div>
+
+`;
+
+}
+
+else{
+
+belum++;
+
+html+=`
+
+<div class="statusBelum">
+
+👤 <b>${k.NAMA_KREW}</b>
+
+<br>
+
+⏳ BELUM RESPON
+
+</div>
+
+`;
+
+}
+
+
+});
+
+
+html+=`
+
+<div class="settingBox">
+
+✅ Terima : ${terima}
+
+<br>
+
+❌ Tolak : ${tolak}
+
+<br>
+
+⏳ Belum : ${belum}
+
+</div>
+
+
+<button class="back"
+
+onclick="bukaDashboardAdmin()">
+
+⬅️ Dashboard
+
+</button>
+
+
+</div>
+
+`;
+
+
+document.getElementById("adminArea").innerHTML=html;
+
+
+})
+
+
+.catch(error=>{
+
+
+console.error(error);
+
+
+alert(
+"❌ Tidak dapat mengambil status krew."
+);
+
+
+});
+
+
+}
+
 </script>
 
 </div> <!-- tutup container -->
@@ -3553,4 +3769,3 @@ token:token
 
 </body>
 </html>
-
