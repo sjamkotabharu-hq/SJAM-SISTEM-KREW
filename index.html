@@ -3649,7 +3649,7 @@ html+=`
 
 <br>
 
-⏰ ${k.MASA_RESPON || "-"}
+⏰ ${k.MASA_RESPON ? formatMasaMalaysia(k.MASA_RESPON) : "-"}
 
 </div>
 
@@ -3758,6 +3758,39 @@ alert(
 
 }
 
+// ==============================
+// FORMAT TARIKH MASA MALAYSIA
+// ==============================
+
+function formatMasaMalaysia(masa){
+
+if(!masa){
+return "-";
+}
+
+
+let d = new Date(masa);
+
+
+return d.toLocaleString("ms-MY",{
+
+timeZone:"Asia/Kuala_Lumpur",
+
+day:"2-digit",
+
+month:"2-digit",
+
+year:"numeric",
+
+hour:"2-digit",
+
+minute:"2-digit",
+
+hour12:false
+
+});
+
+}
 </script>
 
 </div> <!-- tutup container -->
