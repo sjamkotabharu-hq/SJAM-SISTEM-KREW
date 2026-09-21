@@ -2181,10 +2181,6 @@ ${x.statusKrew || "BELUM RESPON"}
 
 <br>
 
-<div id="statusKrew${x.idJadual}">
-⏳ Semak respon krew...
-</div>
-
 ⏰ Masa Respon:
 ${x.masaRespon ? formatMasa(x.masaRespon) : "-"}
 
@@ -2199,14 +2195,6 @@ ${x.statusHantar || "-"}
 ${x.masaHantar ? formatMasa(x.masaHantar) : "-"}
 
 <br><br>
-
-<button 
-class="green"
-onclick="editJadualAdmin('${x.idJadual}')">
-
-✏️ Edit Jadual
-
-</button>
 
 </div>
 
@@ -2328,31 +2316,6 @@ box.innerHTML=html;
 });
 
 }
-
-function editJadualAdmin(idJadual){
-
-fetch(SCRIPT_URL,{
-method:"POST",
-body:JSON.stringify({
-
-action:"ambilJadualEdit",
-
-idJadual:idJadual
-
-})
-
-})
-
-.then(r=>r.json())
-
-.then(res=>{
-
-console.log(res);
-
-});
-
-}
-
 
 // ==============================
 // TAMBAH KES BARU
@@ -2582,9 +2545,6 @@ tarikh: tarikh,
 
 kes: "KES "+i,
 
-namaPesakit:
-document.getElementById("namaPesakit"+i).value,
-
 lokasi:
 document.getElementById("lokasi"+i).value,
 
@@ -2629,39 +2589,11 @@ data:data
 
 })
 
-})
-
-.then(r=>r.json())
-
-.then(res=>{
-
-if(i == jumlahKes){
-
-if(res.success){
-
-alert("✅ Semua jadual berjaya disimpan");
-
-}
-
-else{
-
-alert("❌ Gagal simpan jadual");
-
-}
-
-}
-
-})
-
-.catch(error=>{
-
-console.error(error);
-
-alert("❌ Sistem tidak dapat dihubungi");
-
 });
 
 }
+
+alert("✅ Semua jadual berjaya disimpan");
 
 }
 
@@ -3581,3 +3513,4 @@ return d.getFullYear()
 
 </body>
 </html>
+
