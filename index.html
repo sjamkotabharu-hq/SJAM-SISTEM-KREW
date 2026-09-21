@@ -427,7 +427,7 @@ font-size:14px;
 
 </button>
 
-<button onclick="aktifkanNotifikasiSJAM()" style="display:none">
+<button onclick="aktifkanNotifikasiSJAM()">
 
 🔔 AKTIFKAN NOTIFIKASI SJAM
 
@@ -482,7 +482,8 @@ if(user){
 
 currentUser=user;
 
-if(Notification.permission=="granted"){
+if(Notification.permission=="granted" &&
+localStorage.getItem("notifAktif")=="YA"){
 
 autoSimpanTokenSJAM();
 
@@ -745,12 +746,6 @@ document.getElementById("daftarPage")
 
 document.getElementById("menuPage")
 .classList.remove("hide");
-
-setTimeout(()=>{
-
-autoSimpanTokenSJAM();
-
-},1000);
 
 document.getElementById("content").innerHTML="";
 
@@ -1251,68 +1246,57 @@ let html=`
 
 `;
 
-let kategori = {};
-
 data.forEach(x=>{
 
-let jenis = x.jenis;
-
-if(!kategori[jenis]){
-kategori[jenis]=[];
-}
-
-kategori[jenis].push(x);
-
-});
-
-
-function paparKategori(tajuk,array){
-
-let hasil = "";
-
-hasil += `
-<h3>${tajuk}</h3>
-`;
-
-array.forEach(x=>{
-
-hasil += `
+html+=`
 
 <div class="laporanItem">
 
-📅 ${formatTarikh(x.tarikh)}
+<b>
+
+${x.jenis}
+
+</b>
+
+<br>
+
+📅 Tarikh:
+
+${formatTarikh(x.tarikh)}
 
 <br>
 
 🧾 No Resit:
+
 ${x.resit}
 
 <br>
 
-${x.jumlah ? "💰 RM "+x.jumlah : ""}
+${x.jumlah?
+
+"💰 RM "+x.jumlah
+
+:
+
+""
+
+}
 
 <br>
 
-${x.destinasi ? "🗺️ Destinasi: "+x.destinasi : ""}
+${x.destinasi?
+
+"🗺️ Destinasi: "+x.destinasi
+
+:
+
+""
+
+}
 
 </div>
 
 `;
-
-});
-
-return hasil;
-
-}
-
-
-// SUSUNAN BARU
-Object.keys(kategori).forEach(jenis=>{
-
-html += paparKategori(
-jenis,
-kategori[jenis]
-);
 
 });
 
@@ -3569,3 +3553,4 @@ token:token
 
 </body>
 </html>
+
