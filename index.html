@@ -1187,6 +1187,29 @@ function lihatSejarah(){
 document.getElementById("menuPage")
 .classList.add("hide");
 
+document.getElementById("content").innerHTML = `
+
+<div class="banner">
+
+<img src="${BANNER_URL}">
+
+</div>
+
+<div class="card">
+
+<h2>📚 Sejarah Saya</h2>
+
+<div class="settingBox">
+
+⏳ Sedang menyemak sejarah tugasan anda...<br>
+Sila tunggu sebentar.
+
+</div>
+
+</div>
+
+`;
+
 fetch(SCRIPT_URL,{
 
 method:"POST",
@@ -1300,6 +1323,16 @@ document.getElementById("content").innerHTML=html;
 .catch(error=>{
 
 console.error(error);
+
+document.getElementById("content").innerHTML += `
+
+<div class="settingBox" style="color:red">
+
+❌ Gagal mengambil sejarah tugasan.
+
+</div>
+
+`;
 
 });
 
