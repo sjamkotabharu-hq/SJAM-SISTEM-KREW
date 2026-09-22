@@ -1211,7 +1211,6 @@ function lihatSejarah(){
 document.getElementById("menuPage")
 .classList.add("hide");
 
-
 document.getElementById("content").innerHTML = `
 
 <div class="banner">
@@ -1220,45 +1219,20 @@ document.getElementById("content").innerHTML = `
 
 </div>
 
-
 <div class="card">
 
+<h2>📚 Sejarah Saya</h2>
 
-<h2>
-📚 Sejarah Saya
-</h2>
+<div class="settingBox">
 
+⏳ Sedang menyemak sejarah tugasan anda...<br>
+Sila tunggu sebentar.
 
-<button onclick="pilihSejarah('Hari Biasa')">
-🟦 Hari Biasa
-</button>
-
-
-<button onclick="pilihSejarah('Malam Jumaat/Sabtu')">
-🌙 Malam Jumaat/Sabtu
-</button>
-
-
-<button onclick="pilihSejarah('Cuti Umum')">
-🎉 Cuti Umum
-</button>
-
-
-<button onclick="pilihSejarah('Keluar Negeri')">
-🌍 Keluar Negeri
-</button>
-
-
-<button class="back" onclick="bukaMenu()">
-⬅️ Menu Utama
-</button>
-
+</div>
 
 </div>
 
 `;
-
-/*
 
 fetch(SCRIPT_URL,{
 
@@ -1385,215 +1359,6 @@ document.getElementById("content").innerHTML += `
 `;
 
 });
-
-*/
-
-}
-
-function pilihSejarah(jenis){
-
-document.getElementById("content").innerHTML = `
-
-<div class="card">
-
-<h2>
-${jenis}
-</h2>
-
-
-<select id="bulanSejarah">
-
-<option>
-September 2026
-</option>
-
-<option>
-Oktober 2026
-</option>
-
-<option>
-November 2026
-</option>
-
-</select>
-
-
-<button onclick="semakSejarah('${jenis}')">
-
-🔍 Papar Rekod
-
-</button>
-
-
-<button class="back" onclick="lihatSejarah()">
-
-⬅️ Kembali
-
-</button>
-
-
-</div>
-
-`;
-
-}
-
-
-
-function semakSejarah(jenis){
-
-
-let bulan =
-document.getElementById("bulanSejarah").value;
-
-
-document.getElementById("content").innerHTML=`
-
-<div class="card">
-
-<h2>
-⏳ Sila tunggu...
-</h2>
-
-
-<div class="settingBox">
-
-Sejarah tuntutan anda sedang disemak.
-
-</div>
-
-</div>
-
-`;
-
-
-
-fetch(SCRIPT_URL,{
-
-method:"POST",
-
-body:JSON.stringify({
-
-action:"sejarahBulan",
-
-idKrew:currentUser.id,
-
-jenis:jenis,
-
-bulan:bulan
-
-})
-
-})
-
-
-.then(r=>r.json())
-
-.then(data=>{
-
-
-let html=`
-
-<div class="card">
-
-<h2>
-📄 Rekod ${jenis}
-</h2>
-
-
-<div class="settingBox">
-
-📅 ${bulan}
-
-</div>
-
-`;
-
-
-
-if(data.length==0){
-
-
-html+=`
-
-<div class="settingBox">
-
-Tiada rekod tuntutan.
-
-</div>
-
-`;
-
-}
-
-else{
-
-
-data.forEach(x=>{
-
-
-html+=`
-
-<div class="laporanItem">
-
-<b>${x.jenis}</b>
-
-<br>
-
-📅 Tarikh:
-${formatTarikh(x.tarikh)}
-
-<br>
-
-🧾 No Resit:
-${x.resit}
-
-<br>
-
-💰 RM ${x.jumlah || "-"}
-
-
-${x.destinasi ?
-`
-<br>
-🗺️ Destinasi:
-${x.destinasi}
-`
-:
-""}
-
-
-</div>
-
-
-`;
-
-});
-
-
-}
-
-
-
-html+=`
-
-<button class="back" onclick="pilihSejarah('${jenis}')">
-
-⬅️ Kembali
-
-</button>
-
-
-</div>
-
-`;
-
-
-document.getElementById("content").innerHTML=html;
-
-
-});
-
 
 }
 
@@ -4037,3 +3802,4 @@ hour12:false
 
 </body>
 </html>
+
