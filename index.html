@@ -957,22 +957,27 @@ return jenis;
 
 }
 
+// FIX PAPAR KADAR LAPORAN
+function formatJenisLaporan(jenis,nama){
 
-if(jenis=="Hari Biasa"){
+let kadar = kadarNamaKrew(nama);
+
+if(jenis.includes("Hari Biasa")){
 return "Hari Biasa " + kadar.hari;
 }
 
-if(jenis=="Malam Jumaat/Sabtu"){
+if(jenis.includes("Malam Jumaat/Sabtu")){
 return "Malam Jumaat/Sabtu " + kadar.malam;
 }
 
-if(jenis=="Cuti Umum"){
+if(jenis.includes("Cuti Umum")){
 return "Cuti Umum " + kadar.cuti;
 }
 
 return jenis;
 
 }
+
 
 // ==============================
 // BUKA BORANG TUNTUTAN
@@ -982,8 +987,6 @@ function bukaBorang(jenis){
 
 document.getElementById("menuPage")
 .classList.add("hide");
-
-let kadar = kadarKrew();
 
 let jumlahBox="";
 let tambahan="";
@@ -2385,6 +2388,8 @@ ${x.statusKrew || "BELUM RESPON"}
 
 <br>
 
+<div id="statusKrew${x.idJadual || x.ID_JADUAL}"></div>
+
 ⏰ Masa Respon:
 ${x.masaRespon ? formatMasa(x.masaRespon) : "-"}
 
@@ -2435,7 +2440,7 @@ idJadual:x.idJadual
 .then(status=>{
 
 let box=document.getElementById(
-"statusKrew"+x.idJadual
+"statusKrew"+(x.idJadual || x.ID_JADUAL)
 );
 
 let html="";
@@ -2748,6 +2753,9 @@ let data={
 tarikh: tarikh,
 
 kes: "KES "+i,
+
+namaPesakit:
+document.getElementById("namaPesakit"+i).value,
 
 lokasi:
 document.getElementById("lokasi"+i).value,
