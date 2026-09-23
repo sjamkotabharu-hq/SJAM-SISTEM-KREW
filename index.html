@@ -181,6 +181,32 @@ border-bottom:1px solid #ddd;
 line-height:1.5;
 }
 
+
+.sejarahBox{
+background:white;
+padding:15px;
+margin-top:15px;
+border-radius:15px;
+box-shadow:0 3px 10px #ccc;
+border-left:6px solid #1565c0;
+}
+
+.sejarahHeader{
+font-size:18px;
+font-weight:bold;
+color:#1565c0;
+margin-bottom:10px;
+}
+
+.sejarahItem{
+background:#f5f9ff;
+padding:12px;
+margin-top:8px;
+border-radius:12px;
+border:1px solid #ddd;
+line-height:1.6;
+}
+
 .jumlahKategori{
 font-weight:bold;
 margin-top:10px;
@@ -1270,33 +1296,57 @@ let html=`
 
 `;
 
+let kategori = {};
+
 data.forEach(x=>{
+
+let jenis = x.jenis;
+
+if(!kategori[jenis]){
+kategori[jenis]=[];
+}
+
+kategori[jenis].push(x);
+
+});
+
+
+Object.keys(kategori).forEach(jenis=>{
+
 
 html+=`
 
-<div class="laporanItem">
+<div class="sejarahBox">
 
-<b>
+<div class="sejarahHeader">
 
-${x.jenis}
+${jenis}
 
-</b>
+</div>
 
-<br>
+`;
+
+
+kategori[jenis].forEach(x=>{
+
+
+html+=`
+
+<div class="sejarahItem">
+
 
 📅 Tarikh:
-
 ${formatTarikh(x.tarikh)}
 
 <br>
 
 🧾 No Resit:
-
-${x.resit}
+${x.resit || "-"}
 
 <br>
 
-${x.jumlah?
+
+${x.jumlah ?
 
 "💰 RM "+x.jumlah
 
@@ -1306,17 +1356,47 @@ ${x.jumlah?
 
 }
 
+
+${x.destinasi ?
+
+`
 <br>
-
-${x.destinasi?
-
-"🗺️ Destinasi: "+x.destinasi
+🗺️ Destinasi:
+${x.destinasi}
+`
 
 :
 
 ""
 
 }
+
+
+${x.pemandu ?
+
+`
+<br>
+🚑 Pemandu:
+${x.pemandu}
+`
+
+:
+
+""
+
+}
+
+
+</div>
+
+
+`;
+
+
+});
+
+
+html+=`
 
 </div>
 
