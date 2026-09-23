@@ -245,6 +245,24 @@ display:none!important;
 display:none!important;
 }
 
+.laporanItem{
+
+display:none;
+
+}
+
+.sejarahItem{
+
+display:none;
+
+}
+
+.printSection h3{
+
+margin-top:5px;
+
+}
+
 .card{
 box-shadow:none;
 border-radius:0;
@@ -1275,8 +1293,13 @@ idKrew:currentUser.id
 })
 
 .then(r=>r.json())
-
 .then(data=>{
+
+data.sort((a,b)=>{
+
+return new Date(b.tarikh)-new Date(a.tarikh);
+
+});
 
 let html=`
 
@@ -2919,10 +2942,37 @@ console.error(error);
 
 }
 
+
 // ==============================
 // BAHAGIAN 7/10
 // LAPORAN KREW ADMIN
 // ==============================
+
+function formatJumlahKategori(data){
+
+return {
+
+nama:data.nama || "",
+
+bulan:data.bulan || "",
+
+jumlahHariBiasa:data.jumlahHariBiasa || 0,
+
+jumlahMalam:data.jumlahMalam || 0,
+
+jumlahCutiUmum:data.jumlahCutiUmum || 0,
+
+hariBiasa:data.hariBiasa || [],
+
+malam:data.malam || [],
+
+cutiUmum:data.cutiUmum || [],
+
+keluarNegeri:data.keluarNegeri || []
+
+};
+
+}
 
 function laporanKrew(idKrew){
 
@@ -2943,6 +2993,8 @@ idKrew:idKrew
 .then(r=>r.json())
 
 .then(data=>{
+
+data = formatJumlahKategori(data);
 
 let html=`
 
@@ -3205,13 +3257,49 @@ html+=`
 
 <hr>
 
+<div class="printSection">
+
+<h3>
+📌 Ringkasan Tuntutan
+</h3>
+
+<div class="jumlahKategori">
+
+🟦 Hari Biasa :
+
+RM ${data.jumlahHariBiasa}
+
+<br>
+
+🌙 Malam Jumaat/Sabtu :
+
+RM ${data.jumlahMalam}
+
+<br>
+
+🎉 Cuti Umum :
+
+RM ${data.jumlahCutiUmum}
+
+<br>
+
+🌍 Keluar Negeri :
+
+${data.keluarNegeri.length} Rekod
+
+</div>
+
+</div>
+
+<hr>
+
 <button
 
 class="noPrint"
 
-onclick="window.print()">
+onclick="printRingkasKrew()">
 
-🖨️ PRINT LAPORAN
+🖨️ PRINT RINGKAS LAPORAN
 
 </button>
 
@@ -3871,6 +3959,36 @@ hour12:false
 });
 
 }
+
+function printRingkasKrew(){
+
+let laporan =
+document.getElementById("adminArea").querySelector(".card");
+
+let old =
+document.body.innerHTML;
+
+
+document.body.innerHTML=
+`
+<div class="card">
+
+${laporan.innerHTML}
+
+</div>
+`;
+
+
+window.print();
+
+
+document.body.innerHTML=old;
+
+
+location.reload();
+
+}
+
 </script>
 
 </div> <!-- tutup container -->
