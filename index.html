@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 
@@ -889,6 +890,29 @@ cuti:"14%"
 
 }
 
+function kadarNamaKrew(nama){
+
+if(
+nama &&
+nama.toUpperCase()=="ABDUL HALIM BIN NORDIN"
+){
+
+return {
+hari:"13%",
+malam:"15%",
+cuti:"18%"
+};
+
+}
+
+return {
+hari:"10%",
+malam:"12%",
+cuti:"14%"
+};
+
+}
+
 function updateKadarMenu(){
 
 let kadar = kadarKrew();
@@ -914,21 +938,22 @@ cuti.innerHTML = kadar.cuti;
 
 function paparJenis(jenis){
 
-let kadar = {
-hari:"10%",
-malam:"12%",
-cuti:"14%"
-};
+let kadar = kadarKrew();
 
 
-if(currentUser &&
-currentUser.nama.toUpperCase()=="ABDUL HALIM BIN NORDIN"){
+if(jenis=="Hari Biasa"){
+return "Hari Biasa " + kadar.hari;
+}
 
-kadar = {
-hari:"13%",
-malam:"15%",
-cuti:"18%"
-};
+if(jenis=="Malam Jumaat/Sabtu"){
+return "Malam Jumaat/Sabtu " + kadar.malam;
+}
+
+if(jenis=="Cuti Umum"){
+return "Cuti Umum " + kadar.cuti;
+}
+
+return jenis;
 
 }
 
@@ -3042,6 +3067,8 @@ idKrew:idKrew
 
 data = formatJumlahKategori(data);
 
+let kadar = kadarNamaKrew(data.nama);
+
 let html=`
 
 <div class="banner reportBanner">
@@ -3086,7 +3113,7 @@ html+=`
 
 <h3>
 
-🟦 ${paparJenis("Hari Biasa")}
+🟦 Hari Biasa ${kadar.hari}
 
 </h3>
 
@@ -3142,7 +3169,7 @@ html+=`
 
 <h3>
 
-🌙 ${paparJenis("Malam Jumaat/Sabtu")}
+🌙 Malam Jumaat/Sabtu ${kadar.malam}
 
 </h3>
 
@@ -3198,7 +3225,7 @@ html+=`
 
 <h3>
 
-🎉 ${paparJenis("Cuti Umum")}
+🎉 Cuti Umum ${kadar.cuti}
 
 </h3>
 
