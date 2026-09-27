@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>SJAM Admin</title>
+</head>
+
+<body>
+
+<h2>Cipta Sesi Tugasan SJAM</h2>
+
+<label>Program</label><br>
+<input id="program"><br><br>
+
+<label>Tempat</label><br>
+<input id="tempat"><br><br>
+
+<label>Tarikh</label><br>
+<input type="date" id="tarikh"><br><br>
+
+<label>Masa Mula</label><br>
+<input type="time" id="mula"><br><br>
+
+<label>Masa Tamat</label><br>
+<input type="time" id="tamat"><br><br>
+
+<label>Nama Ketua</label><br>
+<input id="ketua"><br><br>
+
+
+<button onclick="createSession()">
+Cipta Sesi
+</button>
+
+
+<h3>ID SESI:</h3>
+<p id="sessionID"></p>
+
+
+<script>
+
+function createSession(){
+
+let id = 
+"SJAM-KB-" + Date.now();
+
+
+document.getElementById("sessionID").innerHTML=id;
+
+
+}
+
+</script>
+
+
+</body>
+</html>
