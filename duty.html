@@ -156,6 +156,8 @@ SJAM DIGITAL DUTY FORM
 
 
 <script>
+const SCRIPT_URL =
+"https://script.google.com/macros/s/AKfycbz41kLreglua9XskplXqFbN0j6N8VjAw69BPl6-NGs1EVhzZW-huaoxlT3xLD4lWBjQ/exec";
 
 
 function bukaCrew(){
@@ -225,23 +227,25 @@ SUBMIT
 
 function bukaAdmin(){
 
-
 document.getElementById("paparan").innerHTML=`
 
 <div class="card">
 
 <h2>
-Admin Login
+👨‍💼 ADMIN LOGIN
 </h2>
 
 
-<input placeholder="Username">
+<input id="username"
+placeholder="Username">
 
 
-<input type="password" placeholder="Password">
+<input id="password"
+type="password"
+placeholder="Password">
 
 
-<button>
+<button onclick="loginAdmin()">
 
 LOGIN
 
@@ -250,12 +254,215 @@ LOGIN
 
 </div>
 
-
 `;
+
+}
+
+
+
+
+function loginAdmin(){
+
+
+let data={
+
+action:"adminLogin",
+
+username:
+document.getElementById("username").value,
+
+password:
+document.getElementById("password").value
+
+};
+
+
+
+fetch(SCRIPT_URL,{
+
+method:"POST",
+
+body:JSON.stringify(data)
+
+})
+
+
+.then(r=>r.json())
+
+.then(res=>{
+
+
+if(res.success){
+
+
+alert("✅ Login berjaya");
+
+
+adminDashboard();
 
 
 }
 
+else{
+
+
+alert("❌ Username / password salah");
+
+
+}
+
+
+});
+
+
+}
+
+
+
+
+function adminDashboard(){
+
+
+document.getElementById("paparan").innerHTML=`
+
+<div class="card">
+
+
+<h2>
+👨‍💼 ADMIN DASHBOARD
+</h2>
+
+
+
+<button onclick="createTaskForm()">
+
+➕ CREATE TUGASAN BARU
+
+</button>
+
+
+
+</div>
+
+
+`;
+
+}
+
+function createTaskForm(){
+
+
+document.getElementById("paparan").innerHTML=`
+
+<div class="card">
+
+<h2>
+CREATE TUGASAN
+</h2>
+
+
+<input id="jenis"
+placeholder="Jenis Tugasan">
+
+
+<input id="tarikh"
+type="date">
+
+
+<input id="tempat"
+placeholder="Tempat">
+
+
+<input id="anjuran"
+placeholder="Anjuran">
+
+
+<input id="mula"
+type="time">
+
+
+<input id="tamat"
+type="time">
+
+
+<input id="pendapatan"
+placeholder="Pendapatan RM">
+
+
+<button onclick="saveTask()">
+
+SAVE
+
+</button>
+
+
+</div>
+
+`;
+
+}
+
+
+
+function saveTask(){
+
+
+let data={
+
+jenis:
+document.getElementById("jenis").value,
+
+tarikh:
+document.getElementById("tarikh").value,
+
+tempat:
+document.getElementById("tempat").value,
+
+anjuran:
+document.getElementById("anjuran").value,
+
+mula:
+document.getElementById("mula").value,
+
+tamat:
+document.getElementById("tamat").value,
+
+pendapatan:
+document.getElementById("pendapatan").value
+
+};
+
+
+
+fetch(SCRIPT_URL,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+action:"createTask",
+
+data:data
+
+})
+
+})
+
+
+.then(r=>r.json())
+
+.then(res=>{
+
+
+alert(
+"✅ Tugasan berjaya dibuat\nID : "
++res.id
+);
+
+
+});
+
+}
 
 </script>
 
