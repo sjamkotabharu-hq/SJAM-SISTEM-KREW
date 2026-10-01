@@ -1,0 +1,1514 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SJAM Kawasan Kelantan Utara - Borang Kehadiran Bertugas</title>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { 
+    getFirestore,
+    collection,
+    addDoc,
+    getDocs,
+    getDoc,
+    setDoc,
+    doc,
+    onSnapshot,
+    deleteDoc,
+    runTransaction,
+    serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCEJvPajtgGCWaXIiWTWRmDr80SNQiao2s",
+  authDomain: "sjam-kehadiran-crew.firebaseapp.com",
+  projectId: "sjam-kehadiran-crew",
+  storageBucket: "sjam-kehadiran-crew.firebasestorage.app",
+  messagingSenderId: "1099185903702",
+  appId: "1:1099185903702:web:958fee417c2e5644f943f7",
+  measurementId: "G-34EWQK5CS3"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+window.db = db;
+window.firebaseAddDoc = addDoc;
+window.firebaseCollection = collection;
+window.firebaseGetDocs = getDocs;
+window.firebaseGetDoc = getDoc;
+window.firebaseSetDoc = setDoc;
+window.firebaseDoc = doc;
+window.firebaseOnSnapshot = onSnapshot;
+window.firebaseDeleteDoc = deleteDoc;
+window.firebaseRunTransaction = runTransaction;
+window.firebaseServerTimestamp = serverTimestamp;
+</script>
+
+<!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- jsPDF for PDF Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+        }
+        @media print {
+
+@page {
+        size: A4 portrait;
+        margin: 8mm;
+    }
+
+body {
+        background-color: #ffffff;
+        zoom: 75%;
+    }
+
+.no-print {
+        display: none !important;
+    }
+
+input[type="time"]::-webkit-calendar-picker-indicator {
+        display: none !important;
+}
+
+input[type="time"] {
+        appearance: none !important;
+        -webkit-appearance: none !important;
+}
+
+.print-container {
+        box-shadow: none !important;
+        border: none !important;
+        padding: 5px !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+
+#form-paper {
+        page-break-inside: avoid;
+    }
+
+table {
+        font-size: 9px !important;
+    }
+
+th,
+    td {
+        padding: 3px !important;
+    }
+
+.rounded-xl {
+        border-radius: 4px !important;
+    }
+
+.rounded-lg {
+        border-radius: 3px !important;
+    }
+
+.p-4 {
+        padding: 5px !important;
+    }
+
+.p-2\.5 {
+        padding: 3px !important;
+    }
+
+.mb-6 {
+        margin-bottom: 5px !important;
+    }
+
+.gap-6 {
+        gap: 5px !important;
+    }
+
+.gap-4 {
+        gap: 4px !important;
+    }
+
+textarea {
+        height: 35px !important;
+    }
+
+}
+        /* Custom scrollbar for table on mobile */
+        .table-responsive::-webkit-scrollbar {
+            height: 6px;
+        }
+        .table-responsive::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 4px;
+        }
+@media (max-width: 640px) {
+
+.table-responsive {
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+        position: relative;
+    }
+
+.table-responsive table {
+        min-width: 850px !important;
+        width: 850px !important;
+    }
+
+.table-responsive th,
+    .table-responsive td {
+        white-space: normal;
+    }
+
+.table-responsive input {
+        min-width: 110px;
+    }
+}
+
+</style>
+</head>
+<body class="min-h-screen py-6 px-2 sm:px-6">
+
+<!-- Top Action Bar (No Print) -->
+    <div class="max-w-4xl mx-auto mb-6 flex flex-wrap items-center justify-between gap-3 no-print bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+        <div class="flex items-center gap-2">
+            <span class="bg-red-600 text-white p-2 rounded-lg text-sm font-semibold shadow-sm"><i class="fa-solid fa-notes-medical"></i></span>
+            <div>
+                <h1 class="text-sm font-bold text-slate-800">
+SISTEM E-KEHADIRAN TUGAS AWAM
+</h1>
+                <p class="text-xs text-slate-500"></p>
+            </div>
+        </div>
+        <div class="flex flex-wrap gap-2">
+
+<button onclick="saveForm()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
+        <i class="fa-solid fa-floppy-disk"></i> Simpan
+    </button>
+<button onclick="shareCrewLink()" class="bg-cyan-600 hover:bg-cyan-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
+    <i class="fa-solid fa-share-nodes"></i> Share Link Kru
+</button>
+
+<button onclick="loadForm()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
+        <i class="fa-solid fa-folder-open"></i> Buka Rekod
+    </button>
+
+<button onclick="deleteCurrentForm()" class="bg-red-700 hover:bg-red-800 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
+    <i class="fa-solid fa-trash"></i> Padam Rekod
+</button>
+
+<button onclick="addNewCrew()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
+        <i class="fa-solid fa-user-plus"></i> Tambah Kru
+    </button>
+            <button onclick="resetNewForm()" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-file-circle-plus"></i> Borang Baru
+            </button>
+            <button onclick="window.print()" class="bg-slate-700 hover:bg-slate-800 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-print"></i> Cetak
+            </button>
+            <button onclick="exportToPDF()" class="bg-rose-600 hover:bg-rose-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-file-pdf"></i> Export PDF
+            </button>
+        </div>
+    </div>
+
+<!-- Notification Toast -->
+    <div id="toast" class="fixed top-5 right-5 z-50 transform translate-x-full transition-transform duration-300 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl flex items-center gap-3 text-sm no-print">
+        <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+        <span id="toast-msg">Mesej sistem</span>
+    </div>
+
+<!-- Official Form Container (Styled like the original paper form) -->
+    <div id="form-paper" class="max-w-4xl mx-auto bg-white border border-slate-300 rounded-2xl shadow-xl p-4 sm:p-8 print-container">
+
+<!-- Header Section -->
+        <div class="border-b-2 border-black pb-4 mb-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <!-- Logo SJAM -->
+<div class="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 flex items-center justify-center">
+    <img src="https://drive.google.com/thumbnail?id=19bbspRPQQSG95xYPdS_xmly5XTR78tI4&sz=w1000"
+     class="w-full h-full object-contain"
+     alt="Logo SJAM">
+</div>                <div class="text-center sm:text-left">
+                    <h2 class="text-base sm:text-xl font-bold tracking-tight text-black">ST. JOHN AMBULANS MALAYSIA</h2>
+                    <h3 class="text-sm sm:text-base font-bold text-black uppercase">
+    KAWASAN KELANTAN UTARA <span class="whitespace-nowrap">(KOTA BHARU)</span>
+</h3>
+                    <h4 class="text-xs sm:text-sm font-bold text-black uppercase">NEGERI KELANTAN</h4>
+                </div>
+            </div>
+            <!-- Form ID Badge -->
+            <div class="text-right bg-slate-100 border border-slate-300 p-2 sm:p-3 rounded-lg w-full sm:w-auto">
+                <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">ID Borang Rasmi</span>
+                <span id="form-id-display" class="text-xs sm:text-sm font-mono font-bold text-red-700">SJAM-KB-202609-001</span>
+            </div>
+        </div>
+
+<!-- Form Main Title -->
+        <div class="text-center bg-slate-900 text-white py-2 px-4 rounded-lg mb-6 shadow-sm">
+            <h5 class="text-xs sm:text-sm font-bold tracking-wider uppercase">KEHADIRAN BERTUGAS CREW PERKHIDMATAN TUGAS AWAM / PAMERAN / LAIN-LAIN</h5>
+        </div>
+
+<!-- Program Details Section -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 text-sm">
+
+<!-- Jenis Program -->
+    <div class="flex flex-col gap-1">
+        <label class="font-semibold text-slate-700 text-xs uppercase">
+            Jenis Tugas Awam / Program:
+        </label>
+
+<input type="text" 
+        id="program-type"
+        placeholder="Cth: Kejohanan Olahraga MSSM / Pameran Kesihatan"
+        class="border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-red-500 focus:outline-none text-sm bg-slate-50/50">
+    </div>
+
+<!-- Anjuran -->
+    <div class="flex flex-col gap-1">
+        <label class="font-semibold text-slate-700 text-xs uppercase">
+            Anjuran:
+        </label>
+
+<input type="text" 
+        id="program-organizer"
+        placeholder="Cth: Pejabat Pendidikan Daerah / Kelab Belia"
+        class="border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-red-500 focus:outline-none text-sm bg-slate-50/50">
+    </div>
+
+<!-- Tarikh -->
+    <div class="flex flex-col gap-1">
+
+<label class="font-semibold text-slate-700 text-xs uppercase">
+            Tarikh:
+        </label>
+
+<button type="button"
+        onclick="document.getElementById('program-date').showPicker()"
+        class="border border-slate-300 rounded-lg p-2.5 text-left bg-slate-50/50">
+            Pilih Tarikh
+        </button>
+
+<input type="date"
+        id="program-date"
+        hidden
+        onchange="this.previousElementSibling.innerText=this.value">
+
+</div>
+
+<!-- Masa -->
+    <div class="grid grid-cols-2 gap-2">
+
+<!-- Masa Mula -->
+        <div class="flex flex-col gap-1">
+
+<label class="font-semibold text-slate-700 text-xs uppercase">
+                Masa Mula:
+            </label>
+
+<button type="button"
+            onclick="document.getElementById('program-start').showPicker()"
+            class="border border-slate-300 rounded-lg p-2.5 text-left bg-slate-50/50">
+                Pilih Masa Mula
+            </button>
+
+<input type="time"
+            id="program-start"
+            value="08:00"
+            hidden
+            onchange="this.previousElementSibling.innerText=this.value">
+
+</div>
+
+<!-- Masa Tamat -->
+        <div class="flex flex-col gap-1">
+
+<label class="font-semibold text-slate-700 text-xs uppercase">
+                Hingga Jam Tamat:
+            </label>
+
+<button type="button"
+            onclick="document.getElementById('program-end').showPicker()"
+            class="border border-slate-300 rounded-lg p-2.5 text-left bg-slate-50/50">
+                Pilih Masa Tamat
+            </button>
+
+<input type="time"
+            id="program-end"
+            value="17:00"
+            hidden
+            onchange="this.previousElementSibling.innerText=this.value">
+
+</div>
+
+</div>
+
+<!-- Tempat -->
+    <div class="md:col-span-2 flex flex-col gap-1">
+
+<label class="font-semibold text-slate-700 text-xs uppercase">
+            Tempat:
+        </label>
+
+<input type="text"
+        id="program-location"
+        placeholder="Cth: Stadium Sultan Mohammad IV, Kota Bharu"
+        class="border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-red-500 focus:outline-none text-sm bg-slate-50/50">
+
+</div>
+
+</div>
+
+<!-- Crew List Table Section -->
+        <div class="mb-6">
+            <div class="flex items-center justify-between mb-3">
+                <h6 class="font-bold text-slate-800 text-sm uppercase flex items-center gap-2">
+                    <i class="fa-solid fa-users text-red-600"></i> Senarai Pegawai / Ahli Bertugas (Crew)
+                </h6>
+                <button type="button" onclick="addNewCrew()" class="no-print bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-plus"></i> Tambah Kru
+                </button>
+            </div>
+
+<div class="border border-slate-300 rounded-xl overflow-x-auto overflow-y-hidden shadow-sm table-responsive">
+    <table class="w-full text-left border-collapse min-w-[850px]">
+                    <thead>
+                        <tr class="bg-slate-100 text-slate-800 text-xs font-bold uppercase border-b border-slate-300">
+                            <th class="p-2.5 text-center w-12 border-r border-slate-300">Bil</th>
+                            <th class="p-2.5 border-r border-slate-300">Pegawai / Ahli Bertugas</th>
+                            <th class="p-2.5 w-36 border-r border-slate-300">No Kad Pengenalan</th>
+                            <th class="p-2.5 w-32 border-r border-slate-300">Kad ID SJAM</th>
+                            <th class="p-2.5 w-48 border-r border-slate-300">Masa Bertugas (Dari - Hingga)</th>
+                            <th class="p-2.5 text-center w-20 border-r border-slate-300">Jum. Jam</th>
+                            <th class="p-2.5 text-center w-14 no-print">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="crew-table-body" class="text-xs divide-y divide-slate-200">
+                        <!-- Rows dynamically inserted via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+            <p class="text-[11px] text-slate-500 italic mt-2">*** Sila isi nama dan IC dengan jelas sebagaimana IC/Kad Pengenalan rasmi.</p>
+        </div>
+
+<!-- Financial & Notes Section -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 items-start">
+            <!-- Notes & Officer in Charge -->
+            <div class="flex flex-col gap-4">
+                <div class="border border-slate-300 rounded-xl p-4 bg-slate-50/50">
+                    <h6 class="font-bold text-slate-800 text-xs uppercase mb-2">Nota / Catatan Tugas:</h6>
+                    <textarea id="form-notes" rows="3" placeholder="Nyatakan sebarang insiden, catatan khas atau laporan ringkas bertugas..." class="w-full border border-slate-300 rounded-lg p-2.5 text-xs bg-white focus:ring-2 focus:ring-red-500 focus:outline-none"></textarea>
+                </div>
+
+<div class="border border-slate-300 rounded-xl p-4 bg-slate-50/50">
+                    <h6 class="font-bold text-slate-800 text-xs uppercase mb-3">Disediakan Oleh (Nama Inčas Bertugas):</h6>
+                    <div class="space-y-3">
+                        <input type="text" id="officer-name" placeholder="Nama Penuh Inčas Bertugas " class="w-full border border-slate-300 rounded-lg p-2.5 text-xs bg-white focus:ring-2 focus:ring-red-500 focus:outline-none">
+                                            </div>
+                </div>
+            </div>
+
+<!-- Financial Box (Matching original paper format) -->
+            <div class="border-2 border-slate-800 rounded-xl overflow-hidden bg-white shadow-sm">
+                <div class="bg-slate-800 text-white p-2.5 text-center font-bold text-xs uppercase tracking-wider">
+                    Kewangan / Perbelanjaan Tugas
+                </div>
+                <div class="p-4 space-y-3 text-xs">
+                    <div class="flex items-center justify-between pb-2 border-b border-slate-200">
+                        <span class="font-bold text-slate-700 uppercase">Pendapatan (RM):</span>
+                        <div class="flex items-center gap-1">
+                            <span>RM</span>
+                            <input type="number" id="fin-income" value="0.00" step="0.01" oninput="calculateFinancials()" class="w-28 border border-slate-300 rounded-md p-1.5 text-right font-semibold text-emerald-700 bg-slate-50">
+                        </div>
+                    </div>
+
+<div class="space-y-2 pt-1">
+                        <span class="font-bold text-slate-700 uppercase block text-[11px]">Perbelanjaan:</span>
+
+<div class="flex items-center justify-between">
+                            <span class="text-slate-600">1. Minyak Kenderaan</span>
+                            <div class="flex items-center gap-1">
+                                <span>RM</span>
+                                <input type="number" id="exp-fuel" value="0.00" step="0.01" oninput="calculateFinancials()" class="w-24 border border-slate-300 rounded-md p-1.5 text-right bg-slate-50">
+                            </div>
+                        </div>
+
+<div class="flex items-center justify-between">
+                            <span class="text-slate-600">2. Makan / Minum</span>
+                            <div class="flex items-center gap-1">
+                                <span>RM</span>
+                                <input type="number" id="exp-food" value="0.00" step="0.01" oninput="calculateFinancials()" class="w-24 border border-slate-300 rounded-md p-1.5 text-right bg-slate-50">
+                            </div>
+                        </div>
+
+<div class="flex items-center justify-between">
+                            <span class="text-slate-600">3. Lain-lain (Alatan/Ubat)</span>
+                            <div class="flex items-center gap-1">
+                                <span>RM</span>
+                                <input type="number" id="exp-other1" value="0.00" step="0.01" oninput="calculateFinancials()" class="w-24 border border-slate-300 rounded-md p-1.5 text-right bg-slate-50">
+                            </div>
+                        </div>
+
+<div class="flex items-center justify-between">
+                            <span class="text-slate-600">4. Lain-lain (Tol/Parking)</span>
+                            <div class="flex items-center gap-1">
+                                <span>RM</span>
+                                <input type="number" id="exp-other2" value="0.00" step="0.01" oninput="calculateFinancials()" class="w-24 border border-slate-300 rounded-md p-1.5 text-right bg-slate-50">
+                            </div>
+                        </div>
+
+<div class="flex items-center justify-between">
+                            <span class="text-slate-600">5. Lain-lain (Lain)</span>
+                            <div class="flex items-center gap-1">
+                                <span>RM</span>
+                                <input type="number" id="exp-other3" value="0.00" step="0.01" oninput="calculateFinancials()" class="w-24 border border-slate-300 rounded-md p-1.5 text-right bg-slate-50">
+                            </div>
+                        </div>
+                    </div>
+
+<div class="pt-3 border-t-2 border-slate-800 flex items-center justify-between font-bold text-sm bg-slate-100 p-2.5 rounded-lg">
+                        <span class="uppercase text-slate-800">JUMLAH PERBELANJAAN:</span>
+                        <span id="total-expense-display" class="font-mono text-red-700">RM 0.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+<!-- Footer Stamp & Sign Note -->
+        <div class="text-center pt-4 border-t border-slate-300 text-[11px] text-slate-500">
+            <p>St. John Ambulans Malaysia • Kawasan Kelantan Utara (Kota Bharu) • Sistem Kehadiran Digital Rasmi</p>
+        </div>
+    </div>
+
+<!-- JavaScript Application Logic -->
+    <script>
+        // State and Initialization
+        let crewList = [];
+let stopCrewListener = null;
+
+function listenCrewRealtime(formId) {
+
+    // Hentikan listener lama jika ada
+    if (stopCrewListener) {
+        stopCrewListener();
+    }
+
+    const crewCollection = firebaseCollection(
+        db,
+        "kehadiran_crew",
+        formId,
+        "crew"
+    );
+
+    stopCrewListener = firebaseOnSnapshot(
+        crewCollection,
+        (snapshot) => {
+
+            crewList = [];
+
+            snapshot.forEach((crewDoc) => {
+
+                const data = crewDoc.data();
+
+                crewList.push({
+                    id: crewDoc.id,
+                    name: data.name || '',
+                    ic: data.ic || '',
+                    idSjam: data.idSjam || '',
+                    startTime: data.startTime || '',
+                    endTime: data.endTime || ''
+                });
+
+            });
+
+            renderCrewTable();
+
+        },
+        (error) => {
+            console.error("Realtime crew error:", error);
+        }
+    );
+}
+
+        window.addEventListener('DOMContentLoaded', async () => {
+
+    // Semak sama ada link mempunyai ?id=...
+    const urlParams = new URLSearchParams(window.location.search);
+    const linkFormId = urlParams.get('id');
+
+    // Jika buka melalui link khas ID Tugas
+if (linkFormId) {
+
+    // Buka rekod Firebase secara automatik
+    await loadFormById(linkFormId);
+
+} else {
+
+        // Cara asal
+        let savedID = localStorage.getItem('current_sjam_id');
+
+        if (savedID) {
+    document.getElementById('form-id-display').innerText = savedID;
+} else {
+    await generateFormID();
+}
+
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('program-date').value = today;
+
+        addNewCrew();
+    }
+
+});
+
+        // Generate Unique Form ID (e.g., SJAM-KB-202609-001)
+        async function generateFormID() {
+
+    try {
+
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+
+        const period = `${year}${month}`;
+
+        const counterRef = firebaseDoc(
+            db,
+            "system_counters",
+            `borang_${period}`
+        );
+
+        const newNumber = await firebaseRunTransaction(
+            db,
+            async (transaction) => {
+
+                const counterSnap = await transaction.get(counterRef);
+
+                let nextNumber = 1;
+
+                if (counterSnap.exists()) {
+                    nextNumber =
+                        (counterSnap.data().lastNumber || 0) + 1;
+                }
+
+                transaction.set(
+                    counterRef,
+                    {
+                        lastNumber: nextNumber,
+                        period: period,
+                        updatedAt: firebaseServerTimestamp()
+                    },
+                    { merge: true }
+                );
+
+                return nextNumber;
+            }
+        );
+
+        const countStr =
+            String(newNumber).padStart(3, '0');
+
+        const generatedID =
+            `SJAM-KB-${period}-${countStr}`;
+
+        document.getElementById(
+            'form-id-display'
+        ).innerText = generatedID;
+
+        localStorage.setItem(
+            'current_sjam_id',
+            generatedID
+        );
+
+        return generatedID;
+
+    } catch (error) {
+
+        console.error(
+            "Generate Firebase ID error:",
+            error
+        );
+
+        showToast(
+            "Gagal menjana ID borang baru.",
+            "error"
+        );
+
+        return null;
+    }
+}
+
+        // Add New Crew Row Function
+        function addNewCrew(name = '', ic = '', idSjam = '', startTime = '', endTime = '') {
+
+    const crewId = 'crew_' + Date.now() + '_' +
+        Math.random().toString(36).substring(2, 8);
+
+    const newCrew = {
+        id: crewId,
+        name: name,
+        ic: ic,
+        idSjam: idSjam,
+        startTime: startTime,
+        endTime: endTime
+    };
+
+    crewList.push(newCrew);
+
+    renderCrewTable();
+}
+
+        // Remove Crew Row
+        function removeCrew(crewId) {
+            if (crewList.length <= 1) {
+                showToast('Sekurang-kurangnya 1 kru diperlukan dalam senarai.', 'error');
+                return;
+            }
+            crewList = crewList.filter(c => c.id !== crewId);
+            renderCrewTable();
+        }
+
+        // Render Crew Table
+        function renderCrewTable() {
+            const tbody = document.getElementById('crew-table-body');
+            tbody.innerHTML = '';
+
+            crewList.forEach((crew, index) => {
+                // Calculate hours automatically
+                const hours = calculateHours(crew.startTime, crew.endTime);
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition border-b border-slate-200";
+                tr.innerHTML = `
+                    <td class="p-2.5 text-center font-bold text-slate-600 border-r border-slate-200">${index + 1}</td>
+                    <td class="p-2.5 border-r border-slate-200">
+                        <input type="text" value="${escapeHtml(crew.name)}" placeholder="Nama Penuh Kru" oninput="updateCrewData('${crew.id}', 'name', this.value)" class="w-full border border-slate-300 rounded-md p-1.5 text-xs focus:ring-1 focus:ring-red-500 focus:outline-none bg-white">
+                    </td>
+                    <td class="p-2.5 border-r border-slate-200">
+                        <input type="text" value="${escapeHtml(crew.ic)}" placeholder="YYMMDD-PB-####" oninput="updateCrewData('${crew.id}', 'ic', this.value)" class="w-full border border-slate-300 rounded-md p-1.5 text-xs font-mono focus:ring-1 focus:ring-red-500 focus:outline-none bg-white">
+                    </td>
+                    <td class="p-2.5 border-r border-slate-200">
+                        <input type="text" value="${escapeHtml(crew.idSjam)}" placeholder="KN01-xxxx" oninput="updateCrewData('${crew.id}', 'idSjam', this.value)" class="w-full border border-slate-300 rounded-md p-1.5 text-xs font-mono focus:ring-1 focus:ring-red-500 focus:outline-none bg-white">
+                    </td>
+                    <td class="p-2.5 border-r border-slate-200">
+                        <div class="flex items-center gap-1">
+                            <input type="time" value="${crew.startTime}" onchange="updateCrewData('${crew.id}', 'startTime', this.value)" class="border border-slate-300 rounded px-1 py-1 text-[11px] bg-white w-full">
+                            <span class="text-slate-400">-</span>
+                            <input type="time" value="${crew.endTime}" onchange="updateCrewData('${crew.id}', 'endTime', this.value)" class="border border-slate-300 rounded px-1 py-1 text-[11px] bg-white w-full">
+                        </div>
+                    </td>
+                    <td class="p-2.5 text-center font-bold text-red-600 border-r border-slate-200 bg-red-50/30">
+                        <span id="hours_${crew.id}">${hours} Jam</span>
+                    </td>
+                    <td class="p-2.5 text-center no-print">
+                        <button type="button" onclick="removeCrew('${crew.id}')" class="text-rose-600 hover:text-rose-800 p-1 rounded transition" title="Buang Baris">
+                            <i class="fa-solid fa-trash-can text-xs"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Update Crew Data on Input
+        function updateCrewData(id, field, value) {
+            const crew = crewList.find(c => c.id === id);
+            if (crew) {
+                crew[field] = value;
+                if (field === 'startTime' || field === 'endTime') {
+                    renderCrewTable(); // re-render to update hours badge instantly
+                }
+            }
+        }
+
+        // Calculate hours between start and end time strings (HH:MM)
+        function calculateHours(start, end) {
+            if (!start || !end) return 0;
+            const [startH, startM] = start.split(':').map(Number);
+            const [endH, endM] = end.split(':').map(Number);
+
+            let startMinutes = startH * 60 + startM;
+            let endMinutes = endH * 60 + endM;
+
+            if (endMinutes < startMinutes) {
+                // cross midnight shift
+                endMinutes += 24 * 60;
+            }
+
+            const diffMinutes = endMinutes - startMinutes;
+            const hours = (diffMinutes / 60).toFixed(1);
+            return hours.endsWith('.0') ? parseInt(hours) : hours;
+        }
+
+        // Calculate Total Expenses
+        function calculateFinancials() {
+            const fuel = parseFloat(document.getElementById('exp-fuel').value) || 0;
+            const food = parseFloat(document.getElementById('exp-food').value) || 0;
+            const other1 = parseFloat(document.getElementById('exp-other1').value) || 0;
+            const other2 = parseFloat(document.getElementById('exp-other2').value) || 0;
+            const other3 = parseFloat(document.getElementById('exp-other3').value) || 0;
+
+            const total = fuel + food + other1 + other2 + other3;
+            document.getElementById('total-expense-display').innerText = `RM ${total.toFixed(2)}`;
+        }
+
+        // Save Form State Locally
+        async function saveForm() {
+
+    try {
+
+        const formId =
+            document.getElementById('form-id-display').innerText.trim();
+
+        // =========================
+        // SIMPAN MAKLUMAT PROGRAM
+        // =========================
+
+        const formData = {
+
+            formId: formId,
+
+            programType:
+                document.getElementById('program-type').value,
+
+            organizer:
+                document.getElementById('program-organizer').value,
+
+            date:
+                document.getElementById('program-date').value,
+
+            start:
+                document.getElementById('program-start').value,
+
+            end:
+                document.getElementById('program-end').value,
+
+            location:
+                document.getElementById('program-location').value,
+
+            notes:
+                document.getElementById('form-notes').value,
+
+            officerName:
+                document.getElementById('officer-name').value,
+
+            income:
+                document.getElementById('fin-income').value,
+
+            expenses: {
+
+                fuel:
+                    document.getElementById('exp-fuel').value,
+
+                food:
+                    document.getElementById('exp-food').value,
+
+                other1:
+                    document.getElementById('exp-other1').value,
+
+                other2:
+                    document.getElementById('exp-other2').value,
+
+                other3:
+                    document.getElementById('exp-other3').value
+            }
+        };
+
+
+        // Simpan dokumen program
+        await firebaseSetDoc(
+
+            firebaseDoc(
+                db,
+                "kehadiran_crew",
+                formId
+            ),
+
+            formData,
+
+            { merge: true }
+
+        );
+
+
+        // =========================
+        // SIMPAN SETIAP KRU
+        // =========================
+
+        for (const crew of crewList) {
+
+            // Jangan simpan row kosong
+            if (
+                !crew.name.trim() &&
+                !crew.ic.trim() &&
+                !crew.idSjam.trim()
+            ) {
+                continue;
+            }
+
+            await firebaseSetDoc(
+
+                firebaseDoc(
+                    db,
+                    "kehadiran_crew",
+                    formId,
+                    "crew",
+                    crew.id
+                ),
+
+                {
+                    name: crew.name || '',
+                    ic: crew.ic || '',
+                    idSjam: crew.idSjam || '',
+                    startTime: crew.startTime || '',
+                    endTime: crew.endTime || ''
+                },
+
+                { merge: true }
+
+            );
+
+        }
+
+
+        localStorage.setItem(
+            'current_sjam_id',
+            formId
+        );
+
+
+        showToast(
+            'Borang dan rekod kru berjaya disimpan!',
+            'success'
+        );
+
+
+        // Aktifkan realtime untuk ID ini
+        listenCrewRealtime(formId);
+
+
+    } catch (error) {
+
+        console.error(
+            "Firebase save error:",
+            error
+        );
+
+        showToast(
+            'Gagal menyimpan rekod Firebase.',
+            'error'
+        );
+
+    }
+}
+
+
+// Buka Rekod Simpanan
+async function loadForm() {
+
+try {
+
+    const querySnapshot = await firebaseGetDocs(
+    firebaseCollection(db, "kehadiran_crew")
+);
+
+    let pilihan = "";
+
+    querySnapshot.forEach((doc)=>{
+
+    const data = doc.data();
+
+    if(data.formId){
+        pilihan += data.formId + "\n";
+    }
+
+});
+
+
+    const pilihID = prompt(
+`Senarai Borang Firebase:
+
+${pilihan}
+
+Masukkan ID Borang:`
+    );
+
+
+    if(!pilihID){
+        return;
+    }
+
+
+    let jumpa = false;
+
+
+    querySnapshot.forEach((doc)=>{
+
+        const data = doc.data();
+
+
+        if(data.formId === pilihID){
+
+            jumpa = true;
+
+
+            document.getElementById('form-id-display').innerText=data.formId;
+
+            document.getElementById('program-type').value=data.programType;
+
+            document.getElementById('program-organizer').value=data.organizer;
+
+            document.getElementById('program-date').value=data.date;
+
+            document.getElementById('program-start').value=data.start;
+
+            document.getElementById('program-end').value=data.end;
+
+document.getElementById('program-date')
+.previousElementSibling.innerText =
+data.date || 'Pilih Tarikh';
+
+
+document.getElementById('program-start')
+.previousElementSibling.innerText =
+data.start || 'Pilih Masa Mula';
+
+
+document.getElementById('program-end')
+.previousElementSibling.innerText =
+data.end || 'Pilih Masa Tamat';
+            document.getElementById('program-location').value=data.location;
+
+
+            document.getElementById('form-notes').value=data.notes;
+
+            document.getElementById('officer-name').value=data.officerName;
+
+
+            crewList=data.crew || [];
+
+            renderCrewTable();
+
+
+            calculateFinancials();
+
+
+            showToast("Rekod Firebase berjaya dibuka!","success");
+
+        }
+
+    });
+
+
+    if(!jumpa){
+
+        showToast("ID borang tidak dijumpai.","error");
+
+    }
+
+}
+
+catch(error){
+
+    console.error(error);
+
+    showToast("Firebase gagal dibuka","error");
+
+}
+
+}
+
+// Buka rekod terus berdasarkan ID daripada link
+async function loadFormById(formId) {
+
+    try {
+
+        const formRef = firebaseDoc(
+            db,
+            "kehadiran_crew",
+            formId
+        );
+
+        const formSnap = await firebaseGetDoc(formRef);
+
+        if (!formSnap.exists()) {
+
+            showToast(
+                "ID borang tidak dijumpai.",
+                "error"
+            );
+
+            return;
+        }
+
+        const data = formSnap.data();
+
+        // Paparkan ID borang
+        document.getElementById(
+            'form-id-display'
+        ).innerText = formId;
+
+
+        // Maklumat program
+        document.getElementById(
+            'program-type'
+        ).value = data.programType || '';
+
+        document.getElementById(
+            'program-organizer'
+        ).value = data.organizer || '';
+
+        document.getElementById(
+            'program-date'
+        ).value = data.date || '';
+
+        document.getElementById(
+            'program-start'
+        ).value = data.start || '';
+
+        document.getElementById(
+            'program-end'
+        ).value = data.end || '';
+
+document.getElementById('program-date')
+.previousElementSibling.innerText =
+data.date || 'Pilih Tarikh';
+
+
+document.getElementById('program-start')
+.previousElementSibling.innerText =
+data.start || 'Pilih Masa Mula';
+
+
+document.getElementById('program-end')
+.previousElementSibling.innerText =
+data.end || 'Pilih Masa Tamat';
+
+        document.getElementById(
+            'program-location'
+        ).value = data.location || '';
+
+
+        // Catatan
+        document.getElementById(
+            'form-notes'
+        ).value = data.notes || '';
+
+        document.getElementById(
+            'officer-name'
+        ).value = data.officerName || '';
+
+
+        // Kewangan
+        document.getElementById(
+            'fin-income'
+        ).value = data.income || '0.00';
+
+        const expenses = data.expenses || {};
+
+        document.getElementById(
+            'exp-fuel'
+        ).value = expenses.fuel || '0.00';
+
+        document.getElementById(
+            'exp-food'
+        ).value = expenses.food || '0.00';
+
+        document.getElementById(
+            'exp-other1'
+        ).value = expenses.other1 || '0.00';
+
+        document.getElementById(
+            'exp-other2'
+        ).value = expenses.other2 || '0.00';
+
+        document.getElementById(
+            'exp-other3'
+        ).value = expenses.other3 || '0.00';
+
+
+        // Kira semula jumlah kewangan
+        calculateFinancials();
+
+
+        // Simpan ID semasa
+        localStorage.setItem(
+            'current_sjam_id',
+            formId
+        );
+
+
+        // Kosongkan senarai sementara
+        crewList = [];
+
+        renderCrewTable();
+
+
+        // Buka kru secara realtime
+        listenCrewRealtime(formId);
+
+
+        showToast(
+            "Rekod tugasan berjaya dibuka!",
+            "success"
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Load Form By ID Error:",
+            error
+        );
+
+        showToast(
+            "Gagal membuka rekod tugasan.",
+            "error"
+        );
+
+    }
+
+}
+
+// Padam Rekod Semasa Dari Firebase
+async function deleteCurrentForm() {
+
+    const formId =
+        document.getElementById('form-id-display').innerText.trim();
+
+    if (!formId) {
+        showToast('ID borang tidak dijumpai.', 'error');
+        return;
+    }
+
+    const confirmDelete = confirm(
+        `AMARAN!\n\nAnda pasti mahu padam rekod:\n${formId}?\n\nSemua rekod kru di bawah ID ini juga akan dipadam.\n\nTindakan ini tidak boleh dibatalkan.`
+    );
+
+    if (!confirmDelete) {
+        return;
+    }
+
+    try {
+
+        // Hentikan realtime listener dahulu
+        if (stopCrewListener) {
+            stopCrewListener();
+            stopCrewListener = null;
+        }
+
+        // =====================================
+        // 1. DAPATKAN SEMUA KRU
+        // =====================================
+
+        const crewCollectionRef = firebaseCollection(
+            db,
+            "kehadiran_crew",
+            formId,
+            "crew"
+        );
+
+        const crewSnapshot =
+            await firebaseGetDocs(crewCollectionRef);
+
+
+        // =====================================
+        // 2. PADAM SEMUA DOKUMEN KRU
+        // =====================================
+
+        const deleteCrewPromises = [];
+
+        crewSnapshot.forEach((crewDoc) => {
+
+            deleteCrewPromises.push(
+
+                firebaseDeleteDoc(
+
+                    firebaseDoc(
+                        db,
+                        "kehadiran_crew",
+                        formId,
+                        "crew",
+                        crewDoc.id
+                    )
+
+                )
+
+            );
+
+        });
+
+        await Promise.all(deleteCrewPromises);
+
+
+        // =====================================
+        // 3. PADAM DOKUMEN UTAMA BORANG
+        // =====================================
+
+        await firebaseDeleteDoc(
+
+            firebaseDoc(
+                db,
+                "kehadiran_crew",
+                formId
+            )
+
+        );
+
+
+        // =====================================
+        // 4. BUANG ID DARIPADA LOCAL STORAGE
+        // =====================================
+
+        if (
+            localStorage.getItem('current_sjam_id') === formId
+        ) {
+            localStorage.removeItem('current_sjam_id');
+        }
+
+
+        // =====================================
+        // 5. KOSONGKAN PAPARAN
+        // =====================================
+
+        crewList = [];
+
+        showToast(
+            `Rekod ${formId} berjaya dipadam sepenuhnya.`,
+            'success'
+        );
+
+
+        // =====================================
+        // 6. BUKA BORANG BARU
+        // =====================================
+
+        setTimeout(async () => {
+
+            await generateFormID();
+
+            document.getElementById('program-type').value = '';
+            document.getElementById('program-organizer').value = '';
+            document.getElementById('program-location').value = '';
+            document.getElementById('form-notes').value = '';
+            document.getElementById('officer-name').value = '';
+
+            document.getElementById('fin-income').value = '0.00';
+            document.getElementById('exp-fuel').value = '0.00';
+            document.getElementById('exp-food').value = '0.00';
+            document.getElementById('exp-other1').value = '0.00';
+            document.getElementById('exp-other2').value = '0.00';
+            document.getElementById('exp-other3').value = '0.00';
+
+            calculateFinancials();
+
+            crewList = [];
+            addNewCrew();
+
+        }, 1000);
+
+
+    } catch (error) {
+
+        console.error(
+            "Delete Firebase record error:",
+            error
+        );
+
+        showToast(
+            'Gagal memadam rekod Firebase.',
+            'error'
+        );
+
+    }
+}
+
+        // Reset to Brand New Form
+        async function resetNewForm() {
+    if (confirm('Buka borang baru? Semua maklumat semasa akan dikosongkan.')) {
+        localStorage.removeItem('current_sjam_id');
+        await generateFormID();
+                document.getElementById('program-type').value = '';
+                document.getElementById('program-organizer').value = '';
+                document.getElementById('program-location').value = '';
+                document.getElementById('form-notes').value = '';
+                document.getElementById('officer-name').value = '';
+                document.getElementById('fin-income').value = '0.00';
+                document.getElementById('exp-fuel').value = '0.00';
+                document.getElementById('exp-food').value = '0.00';
+                document.getElementById('exp-other1').value = '0.00';
+                document.getElementById('exp-other2').value = '0.00';
+                document.getElementById('exp-other3').value = '0.00';
+                calculateFinancials();
+                crewList = [];
+                addNewCrew();
+                showToast('Borang baru telah dimulakan.', 'success');
+            }
+        }
+
+        // Export to PDF using jsPDF & html2canvas
+        function exportToPDF() {
+            showToast('Menjana fail PDF rasmi...', 'success');
+            const element = document.getElementById('form-paper');
+            
+            // Hide non-print elements temporarily if any inside
+            const options = {
+                scale: 2,
+                useCORS: true,
+                logging: false
+            };
+
+            html2canvas(element, options).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const imgWidth = 210; 
+                const pageHeight = 295;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                let heightLeft = imgHeight;
+                let position = 0;
+
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+
+                const formId = document.getElementById('form-id-display').innerText;
+                pdf.save(`${formId}_Kehadiran_Crew.pdf`);
+                showToast('PDF berjaya dimuat turun!', 'success');
+            }).catch(err => {
+                console.error(err);
+                showToast('Ralat semasa menjana PDF.', 'error');
+            });
+        }
+
+        // Helper Toast Notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
+            const toastIcon = document.getElementById('toast-icon');
+
+            toastMsg.innerText = message;
+            if (type === 'success') {
+                toastIcon.className = 'fa-solid fa-circle-check text-emerald-400 text-lg';
+            } else {
+                toastIcon.className = 'fa-solid fa-triangle-exclamation text-rose-400 text-lg';
+            }
+
+            toast.classList.remove('translate-x-full');
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+            }, 3500);
+        }
+
+        // HTML Escape Helper
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+// Share Link Kru
+async function shareCrewLink() {
+
+    const formId =
+        document.getElementById('form-id-display').innerText.trim();
+
+    if (!formId) {
+        showToast('ID borang tidak dijumpai.', 'error');
+        return;
+    }
+
+    const crewLink =
+        `${window.location.origin}${window.location.pathname}?id=${encodeURIComponent(formId)}`;
+
+    const program =
+        document.getElementById('program-type').value.trim();
+
+    const date =
+        document.getElementById('program-date').value;
+
+    const location =
+        document.getElementById('program-location').value.trim();
+
+    let shareText =
+`ST. JOHN AMBULANS MALAYSIA
+Kawasan Kelantan Utara (Kota Bharu)
+
+E-Kehadiran Tugas Awam
+
+ID Tugas: ${formId}`;
+
+    if (program) {
+        shareText += `\nProgram: ${program}`;
+    }
+
+    if (date) {
+        shareText += `\nTarikh: ${date}`;
+    }
+
+    if (location) {
+        shareText += `\nTempat: ${location}`;
+    }
+
+    shareText += `\n\nSila buka link berikut untuk rekod kehadiran:\n${crewLink}`;
+
+    // Telefon / tablet yang menyokong Share
+    if (navigator.share) {
+
+        try {
+
+            await navigator.share({
+                title: `SJAM - ${formId}`,
+                text: shareText
+            });
+
+        } catch (error) {
+
+            // Pengguna tekan Cancel - tidak perlu papar error
+            if (error.name !== 'AbortError') {
+                console.error('Share error:', error);
+            }
+
+        }
+
+    } else {
+
+        // Jika browser tidak menyokong Share,
+        // salin link secara automatik
+        try {
+
+            await navigator.clipboard.writeText(crewLink);
+
+            showToast(
+                'Link kru berjaya disalin!',
+                'success'
+            );
+
+        } catch (error) {
+
+            console.error('Copy link error:', error);
+
+            prompt(
+                'Salin link kru ini:',
+                crewLink
+            );
+
+        }
+    }
+}
+    </script>
+</body>
+</html>
