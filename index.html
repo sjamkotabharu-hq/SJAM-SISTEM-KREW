@@ -2969,11 +2969,20 @@ html+=`
 
 <div class="krewBox">
 
-<b>
-
+<button
+type="button"
+onclick="laporanKrew('${k.id}')"
+style="
+width:auto;
+padding:0;
+margin:0;
+background:transparent;
+color:#1565c0;
+font-weight:bold;
+text-align:left;
+">
 👤 ${k.nama}
-
-</b>
+</button>
 
 <br>
 
@@ -3051,6 +3060,115 @@ keluarNegeri:data.keluarNegeri || []
 
 };
 
+}
+
+function selamatAtributTuntutan(value){
+  return String(value ?? "").replace(/[&<>"']/g, function(huruf){
+    return {
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;",
+      "'":"&#39;"
+    }[huruf];
+  });
+}
+
+function butangPadamTuntutan(x, idKrew){
+  if(!x.idTuntutan){
+    return "";
+  }
+
+  return `
+    <button
+      type="button"
+      class="red noPrint"
+      data-id-tuntutan="${selamatAtributTuntutan(x.idTuntutan)}"
+      data-id-krew="${selamatAtributTuntutan(idKrew)}"
+      data-resit="${selamatAtributTuntutan(x.resit)}"
+      data-tarikh="${selamatAtributTuntutan(
+        x.tarikh ? formatTarikh(x.tarikh) : "-"
+      )}"
+      onclick="padamTuntutan(this)"
+      style="width:auto;padding:8px 12px;font-size:14px;">
+      🗑️ Padam
+    </button>
+  `;
+}
+
+async function padamTuntutan(button){
+  if(button.disabled){
+    return;
+  }
+
+  const idTuntutan = button.dataset.idTuntutan;
+  const idKrew = button.dataset.idKrew;
+
+  if(!confirm(
+    "Padam tuntutan ini?\n\n" +
+    "No Resit: " + (button.dataset.resit || "-") + "\n" +
+    "Tarikh: " + (button.dataset.tarikh || "-") + "\n\n" +
+    "Rekod ini juga akan dipadam daripada Google Sheet."
+  )){
+    return;
+  }
+
+  const username = prompt("Username admin:");
+
+  if(username === null || !username.trim()){
+    return;
+  }
+
+  const password = prompt(
+    "Password admin (teks akan kelihatan):"
+  );
+
+  if(password === null || !password){
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = "⏳ Memadam...";
+
+  try {
+    const response = await fetch(SCRIPT_URL, {
+      method:"POST",
+      body:JSON.stringify({
+        action:"padamTuntutan",
+        idTuntutan:idTuntutan,
+        idKrew:idKrew,
+        username:username.trim(),
+        password:password
+      })
+    });
+
+    if(!response.ok){
+      throw new Error("Permintaan gagal.");
+    }
+
+    const res = await response.json();
+
+    if(!res.success){
+      alert("❌ " + (res.message || "Tuntutan gagal dipadam."));
+      return;
+    }
+
+    alert("✅ Tuntutan berjaya dipadam daripada Google Sheet.");
+
+    laporanKrew(idKrew);
+
+  } catch(error){
+    console.error(error);
+
+    alert(
+      "❌ Status pemadaman tidak dapat dipastikan. " +
+      "Buka semula laporan untuk menyemak sebelum mencuba lagi."
+    );
+
+  } finally {
+    button.disabled = false;
+    button.textContent = "🗑️ Padam";
+  }
 }
 
 function laporanKrew(idKrew){
@@ -3145,6 +3263,8 @@ ${x.resit}
 
 💰 RM ${x.jumlah}
 
+${butangPadamTuntutan(x, idKrew)}
+
 </div>
 
 `;
@@ -3201,6 +3321,8 @@ ${x.resit}
 
 💰 RM ${x.jumlah}
 
+${butangPadamTuntutan(x, idKrew)}
+
 </div>
 
 `;
@@ -3256,6 +3378,8 @@ ${x.resit}
 <br>
 
 💰 RM ${x.jumlah}
+
+${butangPadamTuntutan(x, idKrew)}
 
 </div>
 
@@ -3325,6 +3449,8 @@ ${x.destinasi}
 🚑 Pemandu:
 
 ${x.pemandu}
+
+${butangPadamTuntutan(x, idKrew)}
 
 </div>
 
@@ -4081,5 +4207,3 @@ location.reload();
 
 </body>
 </html>
-
-
