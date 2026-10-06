@@ -1076,17 +1076,8 @@ document.getElementById("content").innerHTML=`
 </div>
 
 <input
-id="tarikhPapar"
-type="text"
-placeholder="DD/MM/YYYY"
-inputmode="numeric"
-maxlength="10"
-oninput="formatInputTarikh(this)">
-
-<input
 id="tarikh"
-type="hidden">
-
+type="date">
 <input
 
 id="resit"
@@ -3676,52 +3667,6 @@ d.getFullYear();
 }
 
 // ==============================
-// FORMAT INPUT TARIKH DD/MM/YYYY
-// ==============================
-
-function formatInputTarikh(input){
-
-let nombor = input.value.replace(/\D/g,"").slice(0,8);
-
-let hasil = nombor;
-
-if(nombor.length > 4){
-
-hasil =
-nombor.slice(0,2) + "/" +
-nombor.slice(2,4) + "/" +
-nombor.slice(4);
-
-}
-else if(nombor.length > 2){
-
-hasil =
-nombor.slice(0,2) + "/" +
-nombor.slice(2);
-
-}
-
-input.value = hasil;
-
-if(nombor.length === 8){
-
-let hari = nombor.slice(0,2);
-let bulan = nombor.slice(2,4);
-let tahun = nombor.slice(4,8);
-
-document.getElementById("tarikh").value =
-tahun + "-" + bulan + "-" + hari;
-
-}
-else{
-
-document.getElementById("tarikh").value = "";
-
-}
-
-}
-
-// ==============================
 // BAHAGIAN 10/10
 // PENUTUP SCRIPT
 // ==============================
@@ -4259,4 +4204,3 @@ location.reload();
 
 </body>
 </html>
-
