@@ -607,33 +607,64 @@ bukaDashboardAdmin();
 // AMBIL BULAN AKTIF
 // ==============================
 
+let cacheBulanSJAM = null;
+let permintaanBulanSJAM = null;
+
 function ambilBulanAktif(){
 
-fetch(SCRIPT_URL,{
+  function paparBulan(teks){
+    ["paparBulanKrew", "bulanBorang"].forEach(id=>{
+      const box = document.getElementById(id);
 
-method:"POST",
+      if(box){
+        box.textContent = teks;
+      }
+    });
+  }
 
-body:JSON.stringify({
+  if(cacheBulanSJAM !== null){
+    paparBulan(cacheBulanSJAM + " (menyemak...)");
+  }
 
-action:"bulanAktif"
+  if(permintaanBulanSJAM){
+    return permintaanBulanSJAM;
+  }
 
-})
+  permintaanBulanSJAM = fetch(SCRIPT_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"bulanAktif"
+    })
+  })
+  .then(r=>{
+    if(!r.ok){
+      throw new Error("Gagal mengambil bulan");
+    }
 
-})
+    return r.json();
+  })
+  .then(res=>{
+    if(!res.success || typeof res.bulan !== "string"){
+      throw new Error("Respons bulan tidak sah");
+    }
 
-.then(r=>r.json())
+    cacheBulanSJAM = res.bulan;
+    paparBulan(cacheBulanSJAM);
+  })
+  .catch(error=>{
+    console.error(error);
 
-.then(res=>{
+    paparBulan(
+      cacheBulanSJAM !== null
+      ? cacheBulanSJAM + " (belum disahkan semula)"
+      : "Tidak dapat menyemak bulan"
+    );
+  })
+  .finally(()=>{
+    permintaanBulanSJAM = null;
+  });
 
-if(res.success){
-
-document.getElementById("paparBulanKrew").innerHTML =
-res.bulan;
-
-}
-
-});
-
+  return permintaanBulanSJAM;
 }
 
 // ==============================
@@ -1115,40 +1146,8 @@ ambilBulanAktifBorang();
 // ==============================
 // PAPAR BULAN DI BORANG
 // ==============================
-
 function ambilBulanAktifBorang(){
-
-fetch(SCRIPT_URL,{
-
-method:"POST",
-
-body:JSON.stringify({
-
-action:"bulanAktif"
-
-})
-
-})
-
-.then(r=>r.json())
-
-.then(res=>{
-
-if(res.success){
-
-let box =
-document.getElementById("bulanBorang");
-
-if(box){
-
-box.innerHTML=res.bulan;
-
-}
-
-}
-
-});
-
+  return ambilBulanAktif();
 }
 
 // ==============================
@@ -4177,3 +4176,4 @@ location.reload();
 
 </body>
 </html>
+
