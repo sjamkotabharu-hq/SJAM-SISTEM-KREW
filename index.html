@@ -2216,63 +2216,60 @@ ambilKrewJadual();
 
 function ambilKrewJadual(){
 
-fetch(SCRIPT_URL,{
+  fetch(SCRIPT_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"senaraiKrew"
+    })
+  })
+  .then(r=>r.json())
+  .then(data=>{
 
-method:"POST",
+    let krewBox = document.getElementById("krew1");
+    let backupBox = document.getElementById("backup1");
 
-body:JSON.stringify({
+    if(!krewBox || !backupBox){
+      return;
+    }
 
-action:"senaraiKrew"
+    let htmlKrew = "<p><b>👥 Pilih Krew Bertugas</b></p>";
+    let htmlBackup = "<p><b>🆘 Pilih Krew Backup</b></p>";
 
-})
+    data.forEach(k=>{
 
-})
+      const nilai = selamatAtributTuntutan(k.id + "|" + k.nama);
+      const nama = selamatAtributTuntutan(k.nama);
 
-.then(r=>r.json())
+      htmlKrew += `
+        <div class="krewCheck">
+          <input
+            type="checkbox"
+            name="krew1"
+            value="${nilai}">
+          <span>${nama}</span>
+        </div>
+      `;
 
-.then(data=>{
+      htmlBackup += `
+        <div class="krewCheck">
+          <input
+            type="checkbox"
+            name="backup1"
+            value="${nilai}">
+          <span>${nama}</span>
+        </div>
+      `;
 
-let krewBox =
-document.getElementById("krew1");
+    });
 
-let backupBox =
-document.getElementById("backup1");
+    krewBox.innerHTML = htmlKrew;
+    backupBox.innerHTML = htmlBackup;
 
-data.forEach(k=>{
-
-krewBox.innerHTML += `
-
-<div class="krewCheck">
-
-<input
-type="checkbox"
-name="krew1"
-value="${k.id}|${k.nama}">
-
-<span>${k.nama}</span>
-
-</div>
-
-`;
-
-backupBox.innerHTML += `
-
-<div class="krewCheck">
-
-<input
-type="checkbox"
-name="backup1"
-value="${k.id}|${k.nama}">
-
-<span>${k.nama}</span>
-
-</div>
-
-`;
-
-});
-
-});
+  })
+  .catch(error=>{
+    console.error("Gagal mengambil senarai krew:", error);
+    alert("❌ Tidak dapat mengambil senarai krew.");
+  });
 
 }
 
@@ -2309,18 +2306,6 @@ let html=`
 `;
 
 data.data.forEach(x=>{
-
-fetch(SCRIPT_URL,{
-method:"POST",
-body:JSON.stringify({
-action:"statusKrew",
-idJadual:x.idJadual
-})
-})
-.then(r=>r.json())
-.then(status=>{
-console.log(status);
-});
 
 html+=`
 
@@ -2436,84 +2421,72 @@ idJadual:x.idJadual
 .then(r=>r.json())
 .then(status=>{
 
-let box=document.getElementById(
-"statusKrew"+(x.idJadual || x.ID_JADUAL)
+let box = document.getElementById(
+  "statusKrew" + (x.idJadual || x.ID_JADUAL)
 );
 
-let html="";
+if(!box){
+  return;
+}
 
-let terima=0;
-let tolak=0;
-let belum=0;
-
+let html = "";
+let terima = 0;
+let tolak = 0;
+let belum = 0;
 
 status.forEach(k=>{
 
-if(k.STATUS=="TERIMA"){
-terima++;
-}
+  if(k.status == "TERIMA"){
+    terima++;
+  }
+  else if(k.status == "TOLAK"){
+    tolak++;
+  }
+  else{
+    belum++;
+  }
 
-else if(k.STATUS=="TOLAK"){
-tolak++;
-}
+  html += `
+    <div style="
+      background:white;
+      padding:10px;
+      margin:5px 0;
+      border-radius:10px;
+    ">
 
-else{
-belum++;
-}
+      👤 ${k.namaKrew}
 
+      <br>
 
-html+=`
+      ${
+        k.status == "TERIMA"
+        ? "✅ TERIMA"
+        : k.status == "TOLAK"
+        ? "❌ TOLAK"
+        : "⏳ BELUM RESPON"
+      }
 
-<div style="
-background:white;
-padding:10px;
-margin:5px 0;
-border-radius:10px;
-">
+      ${
+        k.masaRespon
+        ? "<br>⏰ " + k.masaRespon
+        : ""
+      }
 
-👤 ${k.NAMA_KREW}
-
-<br>
-
-${
-k.STATUS=="TERIMA"
-?
-"✅ TERIMA"
-:
-k.STATUS=="TOLAK"
-?
-"❌ TOLAK"
-:
-"⏳ BELUM RESPON"
-}
-
-${k.MASA_RESPON ?
-"<br>⏰ "+k.MASA_RESPON
-:
-""}
-
-</div>
-
-`;
+    </div>
+  `;
 
 });
 
-
-html+=`
-
-<hr>
-
-<b>
-✅ ${terima} Terima |
-❌ ${tolak} Tolak |
-⏳ ${belum} Belum
-</b>
-
+html += `
+  <hr>
+  <b>
+    ✅ ${terima} Terima |
+    ❌ ${tolak} Tolak |
+    ⏳ ${belum} Belum
+  </b>
 `;
 
-
-box.innerHTML=html;
-
+box.innerHTML = html;
 
 });
 
@@ -4204,4 +4177,3 @@ location.reload();
 
 </body>
 </html>
-
