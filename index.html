@@ -607,64 +607,33 @@ bukaDashboardAdmin();
 // AMBIL BULAN AKTIF
 // ==============================
 
-let cacheBulanSJAM = null;
-let permintaanBulanSJAM = null;
-
 function ambilBulanAktif(){
 
-  function paparBulan(teks){
-    ["paparBulanKrew", "bulanBorang"].forEach(id=>{
-      const box = document.getElementById(id);
+fetch(SCRIPT_URL,{
 
-      if(box){
-        box.textContent = teks;
-      }
-    });
-  }
+method:"POST",
 
-  if(cacheBulanSJAM !== null){
-    paparBulan(cacheBulanSJAM + " (menyemak...)");
-  }
+body:JSON.stringify({
 
-  if(permintaanBulanSJAM){
-    return permintaanBulanSJAM;
-  }
+action:"bulanAktif"
 
-  permintaanBulanSJAM = fetch(SCRIPT_URL,{
-    method:"POST",
-    body:JSON.stringify({
-      action:"bulanAktif"
-    })
-  })
-  .then(r=>{
-    if(!r.ok){
-      throw new Error("Gagal mengambil bulan");
-    }
+})
 
-    return r.json();
-  })
-  .then(res=>{
-    if(!res.success || typeof res.bulan !== "string"){
-      throw new Error("Respons bulan tidak sah");
-    }
+})
 
-    cacheBulanSJAM = res.bulan;
-    paparBulan(cacheBulanSJAM);
-  })
-  .catch(error=>{
-    console.error(error);
+.then(r=>r.json())
 
-    paparBulan(
-      cacheBulanSJAM !== null
-      ? cacheBulanSJAM + " (belum disahkan semula)"
-      : "Tidak dapat menyemak bulan"
-    );
-  })
-  .finally(()=>{
-    permintaanBulanSJAM = null;
-  });
+.then(res=>{
 
-  return permintaanBulanSJAM;
+if(res.success){
+
+document.getElementById("paparBulanKrew").innerHTML =
+res.bulan;
+
+}
+
+});
+
 }
 
 // ==============================
@@ -1146,8 +1115,40 @@ ambilBulanAktifBorang();
 // ==============================
 // PAPAR BULAN DI BORANG
 // ==============================
+
 function ambilBulanAktifBorang(){
-  return ambilBulanAktif();
+
+fetch(SCRIPT_URL,{
+
+method:"POST",
+
+body:JSON.stringify({
+
+action:"bulanAktif"
+
+})
+
+})
+
+.then(r=>r.json())
+
+.then(res=>{
+
+if(res.success){
+
+let box =
+document.getElementById("bulanBorang");
+
+if(box){
+
+box.innerHTML=res.bulan;
+
+}
+
+}
+
+});
+
 }
 
 // ==============================
@@ -2215,60 +2216,63 @@ ambilKrewJadual();
 
 function ambilKrewJadual(){
 
-  fetch(SCRIPT_URL,{
-    method:"POST",
-    body:JSON.stringify({
-      action:"senaraiKrew"
-    })
-  })
-  .then(r=>r.json())
-  .then(data=>{
+fetch(SCRIPT_URL,{
 
-    let krewBox = document.getElementById("krew1");
-    let backupBox = document.getElementById("backup1");
+method:"POST",
 
-    if(!krewBox || !backupBox){
-      return;
-    }
+body:JSON.stringify({
 
-    let htmlKrew = "<p><b>👥 Pilih Krew Bertugas</b></p>";
-    let htmlBackup = "<p><b>🆘 Pilih Krew Backup</b></p>";
+action:"senaraiKrew"
 
-    data.forEach(k=>{
+})
 
-      const nilai = selamatAtributTuntutan(k.id + "|" + k.nama);
-      const nama = selamatAtributTuntutan(k.nama);
+})
 
-      htmlKrew += `
-        <div class="krewCheck">
-          <input
-            type="checkbox"
-            name="krew1"
-            value="${nilai}">
-          <span>${nama}</span>
-        </div>
-      `;
+.then(r=>r.json())
 
-      htmlBackup += `
-        <div class="krewCheck">
-          <input
-            type="checkbox"
-            name="backup1"
-            value="${nilai}">
-          <span>${nama}</span>
-        </div>
-      `;
+.then(data=>{
 
-    });
+let krewBox =
+document.getElementById("krew1");
 
-    krewBox.innerHTML = htmlKrew;
-    backupBox.innerHTML = htmlBackup;
+let backupBox =
+document.getElementById("backup1");
 
-  })
-  .catch(error=>{
-    console.error("Gagal mengambil senarai krew:", error);
-    alert("❌ Tidak dapat mengambil senarai krew.");
-  });
+data.forEach(k=>{
+
+krewBox.innerHTML += `
+
+<div class="krewCheck">
+
+<input
+type="checkbox"
+name="krew1"
+value="${k.id}|${k.nama}">
+
+<span>${k.nama}</span>
+
+</div>
+
+`;
+
+backupBox.innerHTML += `
+
+<div class="krewCheck">
+
+<input
+type="checkbox"
+name="backup1"
+value="${k.id}|${k.nama}">
+
+<span>${k.nama}</span>
+
+</div>
+
+`;
+
+});
+
+});
 
 }
 
@@ -2305,6 +2309,18 @@ let html=`
 `;
 
 data.data.forEach(x=>{
+
+fetch(SCRIPT_URL,{
+method:"POST",
+body:JSON.stringify({
+action:"statusKrew",
+idJadual:x.idJadual
+})
+})
+.then(r=>r.json())
+.then(status=>{
+console.log(status);
+});
 
 html+=`
 
@@ -2420,72 +2436,84 @@ idJadual:x.idJadual
 .then(r=>r.json())
 .then(status=>{
 
-let box = document.getElementById(
-  "statusKrew" + (x.idJadual || x.ID_JADUAL)
+let box=document.getElementById(
+"statusKrew"+(x.idJadual || x.ID_JADUAL)
 );
 
-if(!box){
-  return;
-}
+let html="";
 
-let html = "";
-let terima = 0;
-let tolak = 0;
-let belum = 0;
+let terima=0;
+let tolak=0;
+let belum=0;
+
 
 status.forEach(k=>{
 
-  if(k.status == "TERIMA"){
-    terima++;
-  }
-  else if(k.status == "TOLAK"){
-    tolak++;
-  }
-  else{
-    belum++;
-  }
+if(k.STATUS=="TERIMA"){
+terima++;
+}
 
-  html += `
-    <div style="
-      background:white;
-      padding:10px;
-      margin:5px 0;
-      border-radius:10px;
-    ">
+else if(k.STATUS=="TOLAK"){
+tolak++;
+}
 
-      👤 ${k.namaKrew}
+else{
+belum++;
+}
 
-      <br>
 
-      ${
-        k.status == "TERIMA"
-        ? "✅ TERIMA"
-        : k.status == "TOLAK"
-        ? "❌ TOLAK"
-        : "⏳ BELUM RESPON"
-      }
+html+=`
 
-      ${
-        k.masaRespon
-        ? "<br>⏰ " + k.masaRespon
-        : ""
-      }
+<div style="
+background:white;
+padding:10px;
+margin:5px 0;
+border-radius:10px;
+">
 
-    </div>
-  `;
+👤 ${k.NAMA_KREW}
+
+<br>
+
+${
+k.STATUS=="TERIMA"
+?
+"✅ TERIMA"
+:
+k.STATUS=="TOLAK"
+?
+"❌ TOLAK"
+:
+"⏳ BELUM RESPON"
+}
+
+${k.MASA_RESPON ?
+"<br>⏰ "+k.MASA_RESPON
+:
+""}
+
+</div>
+
+`;
 
 });
 
-html += `
-  <hr>
-  <b>
-    ✅ ${terima} Terima |
-    ❌ ${tolak} Tolak |
-    ⏳ ${belum} Belum
-  </b>
+
+html+=`
+
+<hr>
+
+<b>
+✅ ${terima} Terima |
+❌ ${tolak} Tolak |
+⏳ ${belum} Belum
+</b>
+
 `;
 
-box.innerHTML = html;
+
+box.innerHTML=html;
+
 
 });
 
