@@ -299,6 +299,66 @@ margin:8px 0;
 border-radius:12px;
 }
 
+
+/* ==============================
+   CETAKAN LAPORAN KREW A4
+   HANYA UBAH SAIZ CETAKAN
+   ============================== */
+
+@media print {
+
+  /* Gunakan lebar kertas A4 */
+  body > .card {
+    width: 100% !important;
+    max-width: none !important;
+    box-sizing: border-box;
+    padding: 0 !important;
+    margin: 0 !important;
+    font-size: 18px !important;
+    line-height: 1.5;
+  }
+
+  /* Tajuk laporan */
+  body > .card h2 {
+    font-size: 26px !important;
+    margin: 0 0 20px;
+  }
+
+  /* Nama krew */
+  body > .card > h3 {
+    font-size: 21px !important;
+    margin: 12px 0 20px;
+  }
+
+  /* Bulan tuntutan */
+  body > .card .settingBox {
+    font-size: 19px !important;
+    padding: 12px;
+    margin: 15px 0 25px;
+    background: white !important;
+    border: 1px solid #bbb;
+  }
+
+  /* Tajuk setiap kategori */
+  body > .card .printSection h3 {
+    font-size: 21px !important;
+    margin: 18px 0 14px;
+  }
+
+  /* Jumlah tuntutan dan ringkasan */
+  body > .card .jumlahKategori {
+    font-size: 19px !important;
+    line-height: 1.8;
+    padding: 12px 0;
+  }
+
+  /* Jarak garisan pemisah */
+  body > .card hr {
+    margin: 15px 0;
+  }
+
+}
+
 </style>
 
 </head>
@@ -4206,5 +4266,3 @@ location.reload();
 
 </body>
 </html>
-
-
