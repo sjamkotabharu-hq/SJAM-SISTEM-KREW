@@ -444,7 +444,61 @@ body > .card .printSection {
 
 }
 
+/* BESARKAN SAIZ LAPORAN CETAK A4 */
+
+@media print {
+
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+
+  body > .card {
+    font-size: 18px !important;
+    line-height: 1.4 !important;
+  }
+
+  body > .card h2 {
+    font-size: 25px !important;
+    margin: 0 0 15px !important;
+  }
+
+  body > .card > h3 {
+    font-size: 21px !important;
+    margin: 10px 0 14px !important;
+  }
+
+  body > .card .settingBox {
+    font-size: 18px !important;
+    padding: 12px !important;
+    margin: 10px 0 16px !important;
+  }
+
+  body > .card .printSection h3 {
+    font-size: 20px !important;
+    margin: 14px 0 10px !important;
+  }
+
+  body > .card .jumlahKategori {
+    font-size: 18px !important;
+    line-height: 1.5 !important;
+    padding: 10px 0 !important;
+    margin: 9px 0 !important;
+  }
+
+  body > .card .pemanduCetak {
+    font-size: 18px !important;
+    margin: 10px 0 !important;
+  }
+
+  body > .card hr {
+    margin: 11px 0 !important;
+  }
+
+}
+
 </style>
+
 </head>
 
 <body>
