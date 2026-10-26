@@ -248,7 +248,7 @@ display:none!important;
 
 .laporanItem{
 
-display:none;
+display:block !important;
 
 }
 
@@ -356,6 +356,70 @@ border-radius:12px;
   body > .card hr {
     margin: 15px 0;
   }
+
+}
+
+/* CETAKAN RINGKAS A4 - KOMPAK */
+
+@media print {
+
+@page {
+  size: A4;
+  margin: 6mm;
+}
+
+body > .card {
+  font-size: 14px !important;
+  line-height: 1.2 !important;
+}
+
+body > .card h2 {
+  font-size: 19px !important;
+  margin: 0 0 6px !important;
+}
+
+body > .card > h3 {
+  font-size: 16px !important;
+  margin: 5px 0 8px !important;
+}
+
+body > .card .settingBox {
+  font-size: 13px !important;
+  padding: 6px !important;
+  margin: 6px 0 8px !important;
+}
+
+body > .card .printSection h3 {
+  font-size: 15px !important;
+  margin: 8px 0 5px !important;
+}
+
+body > .card .laporanItem {
+  display: inline-block !important;
+  width: 49% !important;
+  box-sizing: border-box;
+  vertical-align: top;
+  font-size: 13px !important;
+  line-height: 1.2 !important;
+  padding: 4px !important;
+  margin: 0 !important;
+  break-inside: avoid;
+}
+
+body > .card .jumlahKategori {
+  font-size: 13px !important;
+  line-height: 1.25 !important;
+  padding: 5px 0 !important;
+  margin-top: 5px !important;
+}
+
+body > .card hr {
+  margin: 5px 0 !important;
+}
+
+body > .card .printSection {
+  break-inside: auto !important;
+}
 
 }
 
