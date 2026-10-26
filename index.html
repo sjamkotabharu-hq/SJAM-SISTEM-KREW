@@ -423,8 +423,28 @@ body > .card .printSection {
 
 }
 
-</style>
+/* PAPAR PEMANDU SEMASA PRINT SAHAJA */
 
+.pemanduCetak {
+  display: none;
+}
+
+@media print {
+
+  body > .card .laporanItem {
+    display: none !important;
+  }
+
+  body > .card .pemanduCetak {
+    display: block !important;
+    font-size: 15px !important;
+    font-weight: bold;
+    margin: 6px 0;
+  }
+
+}
+
+</style>
 </head>
 
 <body>
@@ -3565,6 +3585,18 @@ html+=`
 🌍 Keluar Negeri
 
 </h3>
+
+<div class="pemanduCetak">
+
+🚑 Pemandu:
+${data.keluarNegeri.length
+  ? [...new Set(data.keluarNegeri.map(x =>
+      String(x.pemandu || "BELUM DIISI").trim().toUpperCase()
+    ))].map(selamatAtributTuntutan).join(" / ")
+  : "TIADA REKOD"
+}
+
+</div>
 
 `;
 
