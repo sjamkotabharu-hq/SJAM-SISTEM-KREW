@@ -3356,13 +3356,18 @@ html+=`
 
 <h3>
 
-🌙 Malam Jumaat/Sabtu ${kadar.malam}
+🌙 Malam Jumaat/Sabtu / Keluar Negeri ${kadar.malam}
 
 </h3>
 
 `;
 
 data.malam.forEach(x=>{
+
+const keluarNegeri = data.keluarNegeri.find(k =>
+  String(k.resit || "").trim() === String(x.resit || "").trim() &&
+  formatTarikh(k.tarikh) === formatTarikh(x.tarikh)
+);
 
 html+=`
 
@@ -3380,8 +3385,24 @@ ${x.resit}
 
 💰 RM ${x.jumlah}
 
-${butangPadamTuntutan(x, idKrew)}
+<br>
 
+🌍 Keluar Negeri:
+${keluarNegeri ? "YA (ADA REKOD)" : "TIADA REKOD"}
+
+${keluarNegeri ? `
+
+<br>
+🗺️ Destinasi:
+${selamatAtributTuntutan(keluarNegeri.destinasi || "-")}
+
+<br>
+🚑 Pemandu:
+${selamatAtributTuntutan(keluarNegeri.pemandu || "BELUM DIISI")}
+
+` : ""}
+
+${butangPadamTuntutan(x, idKrew)}
 </div>
 
 `;
@@ -4266,3 +4287,4 @@ location.reload();
 
 </body>
 </html>
+
