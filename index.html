@@ -1521,7 +1521,7 @@ alert(
 // SEJARAH KREW
 // ==============================
 
-function lihatSejarah(){
+function lihatSejarah(bulanPilihan=""){
 
 document.getElementById("menuPage")
 .classList.add("hide");
@@ -1572,6 +1572,59 @@ return new Date(b.tarikh)-new Date(a.tarikh);
 
 });
 
+// AMBIL BULAN AKTIF ADMIN
+
+const bulanAktifKrew =
+document.getElementById("paparBulanKrew")?.textContent.trim() || "";
+
+const namaBulan = [
+"Januari","Februari","Mac","April",
+"Mei","Jun","Julai","Ogos",
+"September","Oktober","November","Disember"
+];
+
+const bulanSah =
+/^(Januari|Februari|Mac|April|Mei|Jun|Julai|Ogos|September|Oktober|November|Disember)\s+\d{4}$/i.test(bulanAktifKrew)
+? bulanAktifKrew : "";
+
+const nomborBulan = bulan => {
+
+const [nama,tahun] =
+String(bulan).trim().split(/\s+/);
+
+const indeks = namaBulan.findIndex(x =>
+x.toLowerCase() === String(nama || "").toLowerCase()
+);
+
+return (Number(tahun) || 0) * 12 + indeks;
+
+};
+
+// SENARAI BULAN TUNTUTAN
+
+const senaraiBulan = [...new Set([
+
+...data.map(x => String(x.bulan || "").trim()),
+
+bulanSah
+
+].filter(Boolean))].sort((a,b)=>
+nomborBulan(b)-nomborBulan(a)
+);
+
+// BULAN DIPILIH
+
+const bulanDipilih =
+bulanPilihan && senaraiBulan.includes(bulanPilihan)
+? bulanPilihan
+: (bulanSah || senaraiBulan[0] || "");
+
+// TAPIS REKOD MENGIKUT BULAN
+
+data = data.filter(x =>
+String(x.bulan || "").trim() === bulanDipilih
+);
+
 let html=`
 
 <div class="banner">
@@ -1587,6 +1640,41 @@ let html=`
 📚 Sejarah Saya
 
 </h2>
+
+<div class="settingBox">
+
+📅 Pilih Bulan Tuntutan
+
+<select
+id="bulanSejarah"
+onchange="lihatSejarah(this.value)">
+
+${senaraiBulan.map(b => `
+
+<option
+value="${selamatAtributTuntutan(b)}"
+${b === bulanDipilih ? "selected" : ""}>
+
+${selamatAtributTuntutan(b)}
+
+</option>
+
+`).join("")}
+
+</select>
+
+</div>
+
+${data.length === 0 ? `
+
+<div class="settingBox">
+
+Tiada rekod tuntutan bagi bulan
+${selamatAtributTuntutan(bulanDipilih || "-")}.
+
+</div>
+
+` : ""}
 
 `;
 
