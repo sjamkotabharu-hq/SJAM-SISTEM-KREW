@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 
@@ -8,11 +7,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
-
 
 <script>
 
@@ -182,7 +179,6 @@ border-bottom:1px solid #ddd;
 line-height:1.5;
 }
 
-
 .sejarahBox{
 background:white;
 padding:15px;
@@ -299,7 +295,6 @@ margin:8px 0;
 border-radius:12px;
 }
 
-
 /* ==============================
    CETAKAN LAPORAN KREW A4
    HANYA UBAH SAIZ CETAKAN
@@ -307,7 +302,7 @@ border-radius:12px;
 
 @media print {
 
-  /* Gunakan lebar kertas A4 */
+/* Gunakan lebar kertas A4 */
   body > .card {
     width: 100% !important;
     max-width: none !important;
@@ -318,19 +313,19 @@ border-radius:12px;
     line-height: 1.5;
   }
 
-  /* Tajuk laporan */
+/* Tajuk laporan */
   body > .card h2 {
     font-size: 26px !important;
     margin: 0 0 20px;
   }
 
-  /* Nama krew */
+/* Nama krew */
   body > .card > h3 {
     font-size: 21px !important;
     margin: 12px 0 20px;
   }
 
-  /* Bulan tuntutan */
+/* Bulan tuntutan */
   body > .card .settingBox {
     font-size: 19px !important;
     padding: 12px;
@@ -339,20 +334,20 @@ border-radius:12px;
     border: 1px solid #bbb;
   }
 
-  /* Tajuk setiap kategori */
+/* Tajuk setiap kategori */
   body > .card .printSection h3 {
     font-size: 21px !important;
     margin: 18px 0 14px;
   }
 
-  /* Jumlah tuntutan dan ringkasan */
+/* Jumlah tuntutan dan ringkasan */
   body > .card .jumlahKategori {
     font-size: 19px !important;
     line-height: 1.8;
     padding: 12px 0;
   }
 
-  /* Jarak garisan pemisah */
+/* Jarak garisan pemisah */
   body > .card hr {
     margin: 15px 0;
   }
@@ -431,11 +426,11 @@ body > .card .printSection {
 
 @media print {
 
-  body > .card .laporanItem {
+body > .card .laporanItem {
     display: none !important;
   }
 
-  body > .card .pemanduCetak {
+body > .card .pemanduCetak {
     display: block !important;
     font-size: 15px !important;
     font-weight: bold;
@@ -448,53 +443,101 @@ body > .card .printSection {
 
 @media print {
 
-  @page {
+@page {
     size: A4;
     margin: 10mm;
   }
 
-  body > .card {
+body > .card {
     font-size: 18px !important;
     line-height: 1.4 !important;
   }
 
-  body > .card h2 {
+body > .card h2 {
     font-size: 25px !important;
     margin: 0 0 15px !important;
   }
 
-  body > .card > h3 {
+body > .card > h3 {
     font-size: 21px !important;
     margin: 10px 0 14px !important;
   }
 
-  body > .card .settingBox {
+body > .card .settingBox {
     font-size: 18px !important;
     padding: 12px !important;
     margin: 10px 0 16px !important;
   }
 
-  body > .card .printSection h3 {
+body > .card .printSection h3 {
     font-size: 20px !important;
     margin: 14px 0 10px !important;
   }
 
-  body > .card .jumlahKategori {
+body > .card .jumlahKategori {
     font-size: 18px !important;
     line-height: 1.5 !important;
     padding: 10px 0 !important;
     margin: 9px 0 !important;
   }
 
-  body > .card .pemanduCetak {
+body > .card .pemanduCetak {
     font-size: 18px !important;
     margin: 10px 0 !important;
   }
 
-  body > .card hr {
+body > .card hr {
     margin: 11px 0 !important;
   }
 
+}
+
+/* JAM DIGITAL SJAM */
+
+.jamSJAM{
+background:linear-gradient(135deg,#0b1c35,#06101f);
+color:white;
+text-align:center;
+padding:22px 12px;
+border-radius:20px;
+margin:15px 0 20px;
+box-shadow:0 4px 15px #ccc;
+}
+
+#jamSJAM{
+font-size:clamp(36px,10vw,52px);
+font-weight:bold;
+letter-spacing:1px;
+font-variant-numeric:tabular-nums;
+}
+
+#tarikhSJAM{
+font-size:19px;
+font-weight:bold;
+margin-top:15px;
+}
+
+.zonSJAM{
+font-size:13px;
+color:#a7b5c8;
+margin-top:12px;
+}
+
+/* TAMAT JAM DIGITAL SJAM */
+
+/* JAM UNTUK SEMUA SUBHALAMAN */
+
+.jamMasaSubSJAM{
+font-size:clamp(36px,10vw,52px);
+font-weight:bold;
+letter-spacing:1px;
+font-variant-numeric:tabular-nums;
+}
+
+.jamTarikhSubSJAM{
+font-size:19px;
+font-weight:bold;
+margin-top:15px;
 }
 
 </style>
@@ -595,6 +638,20 @@ onclick="bukaDaftar()">
 <div class="banner">
 
 <img src="https://lh3.googleusercontent.com/d/1cPsr9IwF9IwydvnbG7JwZzfRPCma5fd3">
+
+</div>
+
+<!-- JAM DAN TARIKH SJAM -->
+
+<div class="jamSJAM">
+
+<div id="jamSJAM">00:00:00</div>
+
+<div id="tarikhSJAM">Memuatkan tarikh...</div>
+
+<div class="zonSJAM">
+Zon Waktu: Asia/Kuala_Lumpur (MYT)
+</div>
 
 </div>
 
@@ -1275,15 +1332,64 @@ document.getElementById("content").innerHTML=`
 
 </div>
 
+<!-- PILIH TARIKH TUNTUTAN -->
+
+<label for="tarikh"
+style="
+display:block;
+font-size:16px;
+font-weight:bold;
+color:#1565c0;
+margin-top:15px;
+margin-bottom:5px;
+">
+
+📅 TARIKH TUNTUTAN
+<br>
+<small style="color:#666;font-weight:normal;">
+Tekan kotak di bawah untuk pilih tarikh
+</small>
+
+</label>
+
+<div style="position:relative;">
+
 <input
 id="tarikh"
-type="date">
+type="date"
+style="
+background:white;
+cursor:pointer;
+border:2px solid #1565c0;
+font-size:16px;
+"
+onclick="if(typeof this.showPicker==='function'){this.showPicker();}"
+onchange="
+this.nextElementSibling.style.display =
+this.value ? 'none' : 'block';
+"
+>
+
+<span style="
+position:absolute;
+left:15px;
+top:50%;
+transform:translateY(-50%);
+color:#777;
+font-size:15px;
+pointer-events:none;
+background:white;
+padding:2px 5px;
+">
+📅 Pilih tarikh tuntutan
+</span>
+
+</div>
 <input
 
 id="resit"
 
 placeholder="No Resit">
-
 ${jumlahBox}
 
 ${tambahan}
@@ -4514,11 +4620,196 @@ location.reload();
 
 }
 
+// ==============================
+// JAM DAN TARIKH AUTOMATIK SJAM
+// ==============================
+
+function kemasKiniJamSJAM(){
+
+const sekarang = new Date();
+
+const jam = document.getElementById("jamSJAM");
+const tarikh = document.getElementById("tarikhSJAM");
+
+if(!jam || !tarikh){
+return;
+}
+
+jam.textContent = sekarang.toLocaleTimeString("en-GB",{
+timeZone:"Asia/Kuala_Lumpur",
+hour:"2-digit",
+minute:"2-digit",
+second:"2-digit",
+hour12:false
+});
+
+tarikh.textContent = sekarang.toLocaleDateString("ms-MY",{
+timeZone:"Asia/Kuala_Lumpur",
+weekday:"long",
+day:"numeric",
+month:"long",
+year:"numeric"
+});
+
+}
+
+kemasKiniJamSJAM();
+
+setInterval(kemasKiniJamSJAM,1000);
+
+// TAMAT JAM SJAM
+// ==============================
+// JAM DAN TARIKH AUTOMATIK SJAM
+// ==============================
+
+function kemasKiniJamSJAM(){
+
+const sekarang = new Date();
+
+const jam = document.getElementById("jamSJAM");
+const tarikh = document.getElementById("tarikhSJAM");
+
+if(!jam || !tarikh){
+return;
+}
+
+jam.textContent = sekarang.toLocaleTimeString("en-GB",{
+timeZone:"Asia/Kuala_Lumpur",
+hour:"2-digit",
+minute:"2-digit",
+second:"2-digit",
+hour12:false
+});
+
+tarikh.textContent = sekarang.toLocaleDateString("ms-MY",{
+timeZone:"Asia/Kuala_Lumpur",
+weekday:"long",
+day:"numeric",
+month:"long",
+year:"numeric"
+});
+
+}
+
+kemasKiniJamSJAM();
+
+setInterval(kemasKiniJamSJAM,1000);
+
+// TAMAT JAM SJAM
+
+
+// ==============================
+// JAM AUTOMATIK SEMUA SUBHALAMAN
+// ==============================
+
+function kemasKiniJamSubSJAM(){
+
+const sekarang = new Date();
+
+const masa = sekarang.toLocaleTimeString("en-GB",{
+timeZone:"Asia/Kuala_Lumpur",
+hour:"2-digit",
+minute:"2-digit",
+second:"2-digit",
+hour12:false
+});
+
+const tarikh = sekarang.toLocaleDateString("ms-MY",{
+timeZone:"Asia/Kuala_Lumpur",
+weekday:"long",
+day:"numeric",
+month:"long",
+year:"numeric"
+});
+
+document.querySelectorAll(".jamMasaSubSJAM")
+.forEach(el=>{
+el.textContent=masa;
+});
+
+document.querySelectorAll(".jamTarikhSubSJAM")
+.forEach(el=>{
+el.textContent=tarikh;
+});
+
+}
+
+
+// ==============================
+// PASANG JAM PADA SUBHALAMAN
+// ==============================
+
+function pasangJamSubSJAM(){
+
+const kawasan =
+document.getElementById("content");
+
+if(!kawasan){
+return;
+}
+
+const banner =
+kawasan.querySelector(":scope > .banner");
+
+if(!banner){
+return;
+}
+
+if(kawasan.querySelector(":scope > .jamSJAM")){
+return;
+}
+
+banner.insertAdjacentHTML("afterend",`
+
+<div class="jamSJAM">
+
+<div class="jamMasaSubSJAM">
+00:00:00
+</div>
+
+<div class="jamTarikhSubSJAM">
+Memuatkan tarikh...
+</div>
+
+<div class="zonSJAM">
+Zon Waktu: Asia/Kuala_Lumpur (MYT)
+</div>
+
+</div>
+
+`);
+
+kemasKiniJamSubSJAM();
+
+}
+
+
+// ==============================
+// KESAN PERTUKARAN HALAMAN
+// ==============================
+
+const kawasanJamSJAM =
+document.getElementById("content");
+
+if(kawasanJamSJAM){
+
+const pemerhatiJamSJAM =
+new MutationObserver(pasangJamSubSJAM);
+
+pemerhatiJamSJAM.observe(kawasanJamSJAM,{
+childList:true
+});
+
+}
+
+pasangJamSubSJAM();
+
+setInterval(kemasKiniJamSubSJAM,1000);
+
+// TAMAT JAM SEMUA SUBHALAMAN
+
 </script>
-
 </div> <!-- tutup container -->
-
-
 <!-- =============================== -->
 <!-- AKHIR HTML -->
 <!-- =============================== -->
