@@ -736,7 +736,6 @@ Keluar Negeri
 
 </button>
 
-
 <button class="red" onclick="logout()">
 
 🚪 Logout
@@ -2763,11 +2762,22 @@ onclick="simpanBulanAktif()">
 </button>
 
 
+<!-- MENU STATUS KREW ESOK -->
+
 <button
+  type="button"
+  class="noPrint"
+  style="background:#7b1fa2;"
+  onclick="bukaStatusKrewEsokSJAM()">
 
-class="red noPrint"
+👥 Status Krew Esok
 
-onclick="logoutAdmin()">
+</button>
+
+
+<button
+  class="red noPrint"
+  onclick="logoutAdmin()">
 
 🚪 Logout Admin
 
@@ -2780,6 +2790,134 @@ onclick="logoutAdmin()">
 `;
 
 paparBulanAdmin();
+
+}
+
+// ==========================================
+// HALAMAN KHAS STATUS KREW ESOK
+// ==========================================
+
+
+function bukaStatusKrewEsokSJAM(){
+
+  const kawasan =
+    document.getElementById("adminArea");
+
+  if(!kawasan){
+    alert("❌ Halaman admin tidak dijumpai.");
+    return;
+  }
+
+  kawasan.innerHTML = `
+
+    <div class="card">
+
+      <h2>👥 STATUS KREW ESOK</h2>
+
+      <div class="settingBox">
+
+        📅 TARIKH BERTUGAS
+
+        <br><br>
+
+        <b id="tarikhKrewEsokSJAM">
+          Memuatkan tarikh...
+        </b>
+
+      </div>
+
+      <div class="krewBox"
+        style="text-align:center;">
+
+        <b>
+          ADAKAH ANDA BOLEH BERTUGAS ESOK
+          JIKA TERDAPAT KES AMBULANS
+          SERVIS LAST MINUTE
+          (DISCAJ HOSPITAL, TEMUJANJI
+          ATAU MASUK WAD)?
+        </b>
+
+      </div>
+
+      <p style="
+        text-align:center;
+        color:#c62828;
+        font-weight:bold;
+      ">
+        ⚠️ SEMUA KREW WAJIB MEMILIH STATUS
+      </p>
+
+      <!-- SOALAN POLL -->
+
+      <div class="krewBox">
+
+        <h3>📋 SOALAN POLL WHATSAPP</h3>
+
+        <p>
+          Soalan ini menggunakan tarikh
+          esok secara automatik.
+        </p>
+
+        <button
+          type="button"
+          class="green"
+          onclick="salinSoalanPollStatusSJAM()">
+
+          📋 COPY QUESTION
+
+        </button>
+
+      </div>
+
+      <!-- OPTION 1 -->
+
+      <div class="statusTerima">
+
+        🟢 ON - FREE DAN BOLEH BERTUGAS
+        &amp; BOLEH HUBUNGI SAYA
+
+        <button
+          type="button"
+          class="green"
+          onclick="salinOptionPollStatusSJAM(1)">
+
+          📋 COPY OPTION 1
+
+        </button>
+
+      </div>
+
+      <!-- OPTION 2 -->
+
+      <div class="statusTolak">
+
+        🔴 OFF - MAAF, TIDAK FREE.. DARI PAGI HINGGA MALAM
+
+        <button
+          type="button"
+          class="red"
+          onclick="salinOptionPollStatusSJAM(2)">
+
+          📋 COPY OPTION 2
+
+        </button>
+
+      </div>
+
+     
+      <button
+        class="back"
+        onclick="bukaDashboardAdmin()">
+
+        ⬅️ Kembali Dashboard
+
+      </button>
+
+    </div>
+
+  `;
+
+  kemasKiniStatusKrewEsokSJAM();
 
 }
 
@@ -7600,6 +7738,271 @@ function padamJadualAmbulansSJAM(tarikh){
   }
 
 }
+
+
+// ==========================================
+// STATUS KREW ESOK - TARIKH AUTOMATIK SJAM
+// ZON WAKTU MALAYSIA
+// ==========================================
+
+function tarikhEsokMalaysiaSJAM(){
+
+  const sekarang = new Date();
+
+  const bahagian = new Intl.DateTimeFormat(
+    "en-CA",
+    {
+      timeZone:"Asia/Kuala_Lumpur",
+      year:"numeric",
+      month:"2-digit",
+      day:"2-digit"
+    }
+  ).formatToParts(sekarang);
+
+  const tahun = Number(
+    bahagian.find(x => x.type === "year").value
+  );
+
+  const bulan = Number(
+    bahagian.find(x => x.type === "month").value
+  );
+
+  const hari = Number(
+    bahagian.find(x => x.type === "day").value
+  );
+
+  // Tambah satu hari mengikut tarikh Malaysia
+  const esok = new Date(
+    Date.UTC(tahun, bulan - 1, hari + 1, 12)
+  );
+
+  return new Intl.DateTimeFormat(
+    "ms-MY",
+    {
+      timeZone:"UTC",
+      weekday:"long",
+      day:"numeric",
+      month:"long",
+      year:"numeric"
+    }
+  ).format(esok);
+
+}
+
+
+// ==========================================
+// PAPAR TARIKH KREW ESOK
+// ==========================================
+
+function kemasKiniStatusKrewEsokSJAM(){
+
+  const paparan = document.getElementById(
+    "tarikhKrewEsokSJAM"
+  );
+
+  if(!paparan){
+    return;
+  }
+
+  paparan.textContent =
+    tarikhEsokMalaysiaSJAM();
+
+}
+
+
+// ==========================================
+// KONGSI HEBAHAN STATUS KREW KE WHATSAPP
+// ==========================================
+
+function kongsiStatusKrewEsokSJAM(){
+
+  const tarikh = tarikhEsokMalaysiaSJAM();
+
+  const mesej =
+
+    "🚑 *STATUS KREW ESOK*\n" +
+
+    "*SJAM KAWASAN KELANTAN UTARA*\n\n" +
+
+    "📅 *TARIKH BERTUGAS: " +
+    tarikh.toUpperCase() + "*\n\n" +
+
+    "Assalamualaikum dan salam sejahtera.\n\n" +
+
+    "Mohon kerjasama semua krew untuk " +
+    "memberikan maklum balas berkenaan " +
+    "ketersediaan bertugas pada esok hari " +
+    "sekiranya terdapat kes Ambulans Service " +
+    "secara *LAST MINUTE*, termasuk:\n\n" +
+
+    "1. Discaj hospital\n" +
+    "2. Temujanji hospital\n" +
+    "3. Kemasukan wad\n\n" +
+
+    "⚠️ *SEMUA KREW DIWAJIBKAN MENJAWAB POLL.*\n\n" +
+
+    "Sila pilih satu jawapan sahaja:\n\n" +
+
+    "🟢 ON - FREE DAN BOLEH BERTUGAS\n\n" +
+
+    "🔴 OFF - MAAF, TIDAK FREE\n\n" +
+
+    "🟡 LAIN-LAIN - NYATAKAN SEBAB\n\n" +
+
+    "Kerjasama semua krew amat dihargai.\n\n" +
+
+    "Terima kasih.\n\n" +
+
+    "*PENGURUSAN SJAM KAWASAN KELANTAN UTARA*";
+
+  const url =
+    "https://wa.me/?text=" +
+    encodeURIComponent(mesej);
+
+  // Buka WhatsApp melalui tindakan admin
+  window.open(url, "_blank");
+
+}
+
+
+
+/* ==========================================
+   COPY QUESTION DAN OPTIONS POLL WHATSAPP
+   STATUS KREW ESOK SJAM
+   ========================================== */
+
+// SOALAN POLL DENGAN TARIKH AUTOMATIK
+
+function teksSoalanPollStatusSJAM(){
+
+  const tarikh =
+    tarikhEsokMalaysiaSJAM().toUpperCase();
+
+  return (
+
+    "STATUS KREW ESOK - " + tarikh + "\n\n" +
+
+    "ADAKAH ANDA BOLEH BERTUGAS ESOK " +
+    "JIKA TERDAPAT KES AMBULANS SERVICE " +
+    "LAST MINUTE (DISCAJ HOSPITAL, " +
+    "TEMUJANJI ATAU MASUK WAD)?"
+
+  );
+
+}
+
+
+// PILIHAN JAWAPAN POLL
+
+function teksOptionPollStatusSJAM(nombor){
+
+  const pilihan = {
+
+    1:
+    "🟢 ON - FREE DAN BOLEH BERTUGAS & BOLEH HUBUNGI SAYA",
+
+    2:
+    "🔴 OFF - MAAF, TIDAK FREE",
+
+    3:
+    "🟡 LAIN-LAIN - NYATAKAN SEBAB DALAM GROUP"
+
+  };
+
+  return pilihan[nombor] || "";
+
+}
+
+
+// FUNGSI SALIN TEKS
+
+async function salinTeksPollStatusSJAM(teks){
+
+  if(!teks){
+    alert("❌ Teks tidak dijumpai.");
+    return;
+  }
+
+  try {
+
+    if(navigator.clipboard &&
+       window.isSecureContext){
+
+      await navigator.clipboard.writeText(teks);
+
+    }else{
+
+      throw new Error("Clipboard tidak tersedia.");
+
+    }
+
+    alert(
+      "✅ Berjaya disalin!\n\n" +
+      "Sila Paste ke WhatsApp Poll."
+    );
+
+  }catch(error){
+
+    const textarea =
+      document.createElement("textarea");
+
+    textarea.value = teks;
+
+    textarea.style.position = "fixed";
+    textarea.style.left = "-9999px";
+
+    document.body.appendChild(textarea);
+
+    textarea.select();
+
+    const berjaya =
+      document.execCommand("copy");
+
+    textarea.remove();
+
+    if(berjaya){
+
+      alert(
+        "✅ Berjaya disalin!\n\n" +
+        "Sila Paste ke WhatsApp Poll."
+      );
+
+    }else{
+
+      alert("❌ Gagal menyalin teks.");
+
+    }
+
+  }
+
+}
+
+
+// COPY QUESTION
+
+function salinSoalanPollStatusSJAM(){
+
+  const soalan =
+    teksSoalanPollStatusSJAM();
+
+  salinTeksPollStatusSJAM(soalan);
+
+}
+
+
+// COPY OPTION 1, 2 DAN 3
+
+function salinOptionPollStatusSJAM(nombor){
+
+  const pilihan =
+    teksOptionPollStatusSJAM(nombor);
+
+  salinTeksPollStatusSJAM(pilihan);
+
+}
+
+// TAMAT COPY POLL SJAM
+
 
 </script>
 
