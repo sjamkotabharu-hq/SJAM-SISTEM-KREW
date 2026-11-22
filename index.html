@@ -1761,10 +1761,38 @@ dari: ambilResit("dariResit"),
 
 ke: ambilResit("keResit"),
 
+
 tujuan: ambilResit("tujuanResit")
 
-
 };
+
+// ==============================
+// SEMAK MAKLUMAT RESIT RASMI
+// ==============================
+
+if (jenis !== "Keluar Negeri") {
+
+  if (
+    !data.diterimaDari ||
+    !data.dari ||
+    !data.ke ||
+    !data.tujuan ||
+    !data.wangPerkataan
+  ) {
+
+    alert(
+      "❌ Sila lengkapkan semua maklumat resit rasmi."
+    );
+
+    return;
+
+  }
+
+}
+
+// ==============================
+// HANTAR TUNTUTAN KE GOOGLE SHEET
+// ==============================
 
 fetch(SCRIPT_URL,{
 
