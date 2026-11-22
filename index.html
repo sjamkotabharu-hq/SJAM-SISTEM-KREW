@@ -1750,21 +1750,19 @@ document.getElementById("pemandu").value
 :
 "",
 
-// MAKLUMAT RESIT BAHARU
+
+// MAKLUMAT RESIT RASMI
 
 diterimaDari: ambilResit("diterimaDari"),
 
-wangPerkataan: (
-document.getElementById("wangPerkataan")?.value ||
-document.getElementById("wangPerkataan")?.textContent ||
-""
-).trim(),
+wangPerkataan: nomborKePerkataanSJAM(jumlah),
 
-dari: ambilResit("dari"),
+dari: ambilResit("dariResit"),
 
-ke: ambilResit("ke"),
+ke: ambilResit("keResit"),
 
-tujuan: ambilResit("tujuan")
+tujuan: ambilResit("tujuanResit")
+
 
 };
 
