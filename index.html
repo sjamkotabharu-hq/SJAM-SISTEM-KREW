@@ -1253,14 +1253,12 @@ if(jenis!="Keluar Negeri"){
 jumlahBox=`
 
 <input
-
 id="jumlah"
-
 type="number"
-
 step="0.01"
-
-placeholder="Jumlah RM">
+min="0"
+placeholder="Jumlah RM"
+oninput="kemasKiniWangSJAM()">
 
 `;
 
@@ -1386,11 +1384,75 @@ padding:2px 5px;
 
 </div>
 <input
-
 id="resit"
-
 placeholder="No Resit">
+
 ${jumlahBox}
+
+${jenis!="Keluar Negeri" ? `
+
+<div style="
+background:#f5f9ff;
+padding:15px;
+margin-top:15px;
+border-radius:15px;
+border:1px solid #ddd;
+">
+
+<h3 style="text-align:center;">
+🧾 Maklumat Resit Rasmi
+</h3>
+
+<label>DITERIMA OLEH</label>
+<input
+id="diterimaDari"
+type="text"
+placeholder="Masukkan nama WARIS / PESAKIT">
+
+<label>
+Wang Yang Diterima (Ringgit Malaysia)
+</label>
+
+<div
+id="wangPerkataan"
+style="
+background:#eef5ff;
+padding:12px;
+margin:6px 0 15px;
+border-radius:10px;
+border:1px solid #ccc;
+min-height:25px;
+line-height:1.5;
+">
+
+Jumlah dalam perkataan akan dipaparkan secara automatik.
+
+</div>
+
+<label>DARI</label>
+
+<input
+id="dariResit"
+type="text"
+placeholder="Isi sendiri">
+
+<label>KE</label>
+
+<input
+id="keResit"
+type="text"
+placeholder="Isi sendiri">
+
+<label>TUJUAN</label>
+
+<input
+id="tujuanResit"
+type="text"
+placeholder="Isi tujuan sendiri">
+
+</div>
+
+` : ""}
 
 ${tambahan}
 
@@ -1415,6 +1477,109 @@ onclick="bukaMenu()">
 `;
 
 ambilBulanAktifBorang();
+
+}
+
+// ==============================
+// TUKAR JUMLAH RM KEPADA PERKATAAN
+// ==============================
+
+function nomborKePerkataanSJAM(n){
+
+const unit = [
+"Kosong","Satu","Dua","Tiga","Empat",
+"Lima","Enam","Tujuh","Lapan","Sembilan"
+];
+
+function kecil(x){
+
+if(x<10) return unit[x];
+
+if(x===10) return "Sepuluh";
+
+if(x===11) return "Sebelas";
+
+if(x<20){
+return unit[x-10]+" Belas";
+}
+
+if(x<100){
+return unit[Math.floor(x/10)]+" Puluh"+
+(x%10 ? " "+kecil(x%10) : "");
+}
+
+if(x<1000){
+return unit[Math.floor(x/100)]+" Ratus"+
+(x%100 ? " "+kecil(x%100) : "");
+}
+
+return "";
+
+}
+
+function besar(x){
+
+if(x<1000) return kecil(x);
+
+if(x<1000000){
+
+return (
+Math.floor(x/1000)===1
+? "Seribu"
+: besar(Math.floor(x/1000))+" Ribu"
+)+
+(x%1000 ? " "+kecil(x%1000) : "");
+
+}
+
+return besar(Math.floor(x/1000000))+
+" Juta"+
+(x%1000000 ? " "+besar(x%1000000) : "");
+
+}
+
+if(n==="" || n===null || n===undefined){
+return "";
+}
+
+const nilai=Number(n);
+
+if(!Number.isFinite(nilai) ||
+nilai<0 ||
+nilai>=1000000000){
+return "";
+}
+
+const senKeseluruhan=Math.round(nilai*100);
+
+const ringgit=Math.floor(senKeseluruhan/100);
+
+const sen=senKeseluruhan%100;
+
+return besar(ringgit)+" Ringgit"+
+(sen ? " dan "+kecil(sen)+" Sen" : "")+
+" Sahaja";
+
+}
+
+
+// ==============================
+// KEMAS KINI WANG AUTOMATIK
+// ==============================
+
+function kemasKiniWangSJAM(){
+
+const jumlah=document.getElementById("jumlah");
+
+const paparan=document.getElementById("wangPerkataan");
+
+if(!jumlah || !paparan){
+return;
+}
+
+paparan.textContent =
+nomborKePerkataanSJAM(jumlah.value) ||
+"Jumlah dalam perkataan akan dipaparkan secara automatik.";
 
 }
 
@@ -1541,6 +1706,16 @@ document.getElementById("jumlah").value;
 
 }
 
+// AMBIL MAKLUMAT RESIT RASMI
+
+const ambilResit = (id) => {
+
+const el = document.getElementById(id);
+
+return el ? el.value.trim() : "";
+
+};
+
 let data={
 
 idKrew:
@@ -1573,7 +1748,23 @@ document.getElementById("pemandu")
 ?
 document.getElementById("pemandu").value
 :
+"",
+
+// MAKLUMAT RESIT BAHARU
+
+diterimaDari: ambilResit("diterimaDari"),
+
+wangPerkataan: (
+document.getElementById("wangPerkataan")?.value ||
+document.getElementById("wangPerkataan")?.textContent ||
 ""
+).trim(),
+
+dari: ambilResit("dari"),
+
+ke: ambilResit("ke"),
+
+tujuan: ambilResit("tujuan")
 
 };
 
@@ -1874,9 +2065,9 @@ ${x.pemandu}
 
 }
 
+${paparMaklumatResitSJAM(x)}
 
 </div>
-
 
 `;
 
@@ -3465,6 +3656,76 @@ function selamatAtributTuntutan(value){
   });
 }
 
+// ==============================
+// PAPAR MAKLUMAT RESIT RASMI
+// ==============================
+
+function paparMaklumatResitSJAM(x){
+
+const selamat = selamatAtributTuntutan;
+
+const adaMaklumat = [
+  x.diterimaDari,
+  x.wangPerkataan,
+  x.dari,
+  x.ke,
+  x.tujuan
+].some(v => String(v || "").trim() !== "");
+
+if(!adaMaklumat){
+  return "";
+}
+
+return `
+
+<div style="
+background:#f2f7ff;
+border:1px solid #d6e4f5;
+border-radius:12px;
+padding:12px;
+margin-top:12px;
+line-height:1.8;
+overflow-wrap:anywhere;
+">
+
+<div style="
+color:#1565c0;
+font-weight:bold;
+text-align:center;
+margin-bottom:10px;
+">
+🧾 Maklumat Resit Rasmi
+</div>
+
+<b>DITERIMA OLEH:</b><br>
+${selamat(x.diterimaDari || "-")}
+
+<br>
+
+<b>Wang Yang Diterima:</b><br>
+${selamat(x.wangPerkataan || "-")}
+
+<br>
+
+<b>DARI:</b><br>
+${selamat(x.dari || "-")}
+
+<br>
+
+<b>KE:</b><br>
+${selamat(x.ke || "-")}
+
+<br>
+
+<b>TUJUAN:</b><br>
+${selamat(x.tujuan || "-")}
+
+</div>
+
+`;
+
+}
+
 function butangPadamTuntutan(x, idKrew){
   if(!x.idTuntutan){
     return "";
@@ -3654,6 +3915,8 @@ ${x.resit}
 
 💰 RM ${x.jumlah}
 
+${paparMaklumatResitSJAM(x)}
+
 ${butangPadamTuntutan(x, idKrew)}
 
 </div>
@@ -3734,6 +3997,8 @@ ${selamatAtributTuntutan(keluarNegeri.pemandu || "BELUM DIISI")}
 
 ` : ""}
 
+${paparMaklumatResitSJAM(x)}
+
 ${butangPadamTuntutan(x, idKrew)}
 </div>
 
@@ -3790,6 +4055,8 @@ ${x.resit}
 <br>
 
 💰 RM ${x.jumlah}
+
+${paparMaklumatResitSJAM(x)}
 
 ${butangPadamTuntutan(x, idKrew)}
 
@@ -4816,4 +5083,3 @@ setInterval(kemasKiniJamSubSJAM,1000);
 
 </body>
 </html>
-
