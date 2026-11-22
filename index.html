@@ -2769,23 +2769,21 @@ onclick="simpanBulanAktif()">
 
 </button>
 
+
 <button onclick="bukaJadualAdmin()">
 
-🚑 Buat Jadual Bertugas
+🚑 Buat Jadual Ambulans Service
 
 </button>
 
-<button onclick="lihatJadualAdmin()">
+<button
+  class="green"
+  onclick="lihatRekodJadualAmbulansSJAM()">
 
-📋 Lihat Jadual Bertugas
-
-</button>
-
-<button onclick="lihatStatusKrewAdmin()">
-
-📊 Status Respon Krew
+📚 Rekod Jadual Ambulans Service
 
 </button>
+
 
 <button
 
@@ -2932,119 +2930,611 @@ function tapisResitPusatSJAM(){
 
 }
 
+
 function bukaJadualAdmin(){
 
-jumlahKes = 1;
+  const adminArea =
+    document.getElementById("adminArea");
 
-document.getElementById("adminArea").innerHTML=`
+  if(!adminArea){
+    alert("Halaman admin tidak dijumpai.");
+    return;
+  }
 
-<div class="card">
+  // Paparan percubaan sahaja.
+  // Belum mengubah atau menyimpan Google Sheet.
 
-<h2>🚑 Buat Jadual Bertugas</h2>
+  adminArea.innerHTML = `
 
-<p style="text-align:center">
-Sediakan jadual tugasan ambulans
-</p>
+  <div class="card" id="jadualAmbulansBaharu">
 
-<input
-id="jadualTarikh"
-type="date">
+    <div style="
+      background:#123b65;
+      color:white;
+      padding:22px 15px;
+      border-radius:16px;
+      text-align:center;
+      margin-bottom:20px;
+    ">
 
-<h3>🚑 KES 1</h3>
+      <h2 style="color:white;margin:0;">
+        🚑 JADUAL AMBULANS SERVICE
+      </h2>
 
-<div id="senaraiKes">
+      <p style="margin-bottom:0;">
+        SJAM Kawasan Kelantan Utara
+      </p>
 
-<input
-id="namaPesakit1"
-placeholder="Nama Pesakit">
+    </div>
 
-<input
-id="lokasi1"
-placeholder="Lokasi Ambil Pesakit">
+    <h3>📅 Hari & Tarikh Bertugas</h3>
 
-<div id="krew1">
+    <label for="hariJadualSJAM">
+      Hari
+    </label>
 
-<p>
-<b>👥 Pilih Krew Bertugas</b>
-</p>
+    <select id="hariJadualSJAM">
 
-</div>
+      <option value="">Pilih Hari</option>
+      <option value="Isnin">Isnin</option>
+      <option value="Selasa">Selasa</option>
+      <option value="Rabu">Rabu</option>
+      <option value="Khamis">Khamis</option>
+      <option value="Jumaat">Jumaat</option>
+      <option value="Sabtu">Sabtu</option>
+      <option value="Ahad">Ahad</option>
 
-<div id="backup1">
+    </select>
 
-<p>
-<b>🆘 Pilih Krew Backup</b>
-</p>
+    <label for="tarikhJadualSJAM">
+      Tarikh
+    </label>
 
-</div>
+    <input
+      id="tarikhJadualSJAM"
+      type="date"
+      onchange="padankanHariJadualSJAM()"
+    >
 
-<input
-id="destinasi1"
-placeholder="Destinasi Hospital">
+    <div class="settingBox"
+      style="text-align:left;">
 
-<input
-id="masa1"
-placeholder="Masa Bertolak">
+      <b>📍 HOTSPOT — JADUAL SYIF</b>
 
-<input
-id="remark1"
-placeholder="Remark">
+    </div>
 
-<input
-id="ambulans1"
-placeholder="Ambulans">
+    <div class="krewBox">
 
-<input
-id="bayaran1"
-placeholder="Bayaran RM">
+      <h3>☀️ PAGI</h3>
 
-<select id="makan1">
+      <p>8:00 AM – 3:00 PM</p>
 
-<option value="">
-Donat & Air?
-</option>
+      <div id="hotspotPagiSJAM">
+        ⏳ Memuatkan senarai krew...
+      </div>
 
-<option value="ADA">
-ADA
-</option>
+    </div>
 
-<option value="TIADA">
-TIADA
-</option>
+    <div class="krewBox">
 
-</select>
+      <h3>🌇 PETANG – MALAM</h3>
 
-<br>
+      <p>3:00 PM – 10:00 PM</p>
 
-<button
-onclick="tambahKes()">
+      <div id="hotspotPetangSJAM">
+        ⏳ Memuatkan senarai krew...
+      </div>
 
-➕ Tambah Kes
+    </div>
 
-</button>
+    <div class="krewBox">
 
-<button
-onclick="simpanJadual()">
+      <h3>🌙 MALAM – PAGI</h3>
 
-💾 Simpan Jadual
+      <p>10:00 PM – 8:00 AM</p>
 
-</button>
+      <div id="hotspotMalamSJAM">
+        ⏳ Memuatkan senarai krew...
+      </div>
 
-<button
-class="back"
-onclick="bukaDashboardAdmin()">
+    </div>
 
-⬅️ Kembali Dashboard
+    <h3 style="margin-top:25px;">
+      🚑 SENARAI KES AMBULANS
+    </h3>
 
-</button>
+    <div id="senaraiKesBaharuSJAM"></div>
 
-</div>
+    <button
+      type="button"
+      onclick="tambahKesBaharuSJAM()"
+      style="background:#2e7d32;">
 
-`;
+      ➕ Tambah Kes Seterusnya
 
-ambilKrewJadual();
+    </button>
+
+    <button
+      type="button"
+      onclick="pratontonJadualBaharuSJAM()">
+
+      👁️ Lihat Pratonton Jadual
+
+    </button>
+
+    <div id="pratontonJadualSJAM"></div>
+
+    
+    <div class="settingBox"
+      style="font-size:13px;">
+
+      💾 Jadual disimpan dalam
+      localStorage pelayar ini sahaja.
+
+      <br><br>
+
+      Tidak melibatkan Google Sheet
+      atau perubahan kod GS.
+
+    </div>
+
+    <button
+      type="button"
+      class="green"
+      onclick="simpanJadualBaharuSJAM()">
+
+      💾 SAVE JADUAL HARIAN
+
+    </button>
+
+    <button
+      class="back"
+      onclick="bukaDashboardAdmin()">
+
+      ⬅️ Kembali Dashboard
+
+    </button>
+
+  </div>
+
+  `;
+
+  
+  jumlahKesBaharuSJAM = 0;
+
+  // Borang biasa bermula dengan satu kes.
+  // Borang EDIT akan membina semula kes
+  // berdasarkan rekod yang disimpan.
+  if(!window.rekodEditJadualSJAM){
+    tambahKesBaharuSJAM();
+  }
+
+  ambilKrewJadualBaharuSJAM();
+
 
 }
+
+
+let jumlahKesBaharuSJAM = 0;
+let senaraiNamaKrewBaharuSJAM = [];
+
+function padankanHariJadualSJAM(){
+
+  const input =
+    document.getElementById("tarikhJadualSJAM");
+
+  const hari =
+    document.getElementById("hariJadualSJAM");
+
+  if(!input.value){
+    hari.value = "";
+    return;
+  }
+
+  const namaHari = [
+    "Ahad","Isnin","Selasa","Rabu",
+    "Khamis","Jumaat","Sabtu"
+  ];
+
+  const pecahan = input.value.split("-").map(Number);
+
+  const tarikh = new Date(
+    pecahan[0],
+    pecahan[1]-1,
+    pecahan[2]
+  );
+
+  hari.value = namaHari[tarikh.getDay()];
+
+}
+
+function pilihanKrewBaharuSJAM(namaInput){
+
+  return senaraiNamaKrewBaharuSJAM.map(k=>{
+
+    return `
+      <label class="krewCheck">
+        <input
+          type="checkbox"
+          name="${selamatAtributTuntutan(namaInput)}"
+          value="${selamatAtributTuntutan(k.id)}"
+          data-nama="${selamatAtributTuntutan(k.nama)}"
+        >
+        <span>${selamatAtributTuntutan(k.nama)}</span>
+      </label>
+    `;
+
+  }).join("");
+
+}
+
+function isiPilihanKrewBaharuSJAM(){
+
+  const kumpulan = [
+    ["hotspotPagiSJAM","hotspotPagi"],
+    ["hotspotPetangSJAM","hotspotPetang"],
+    ["hotspotMalamSJAM","hotspotMalam"]
+  ];
+
+  kumpulan.forEach(([id,nama])=>{
+
+    const box = document.getElementById(id);
+
+    if(box){
+      box.innerHTML =
+        pilihanKrewBaharuSJAM(nama) ||
+        "Tiada krew tersedia.";
+    }
+
+  });
+
+  document.querySelectorAll(
+    ".krewKesBaharuSJAM"
+  ).forEach(box=>{
+
+    const nombor = box.dataset.kes;
+
+    box.innerHTML =
+      pilihanKrewBaharuSJAM("krewKes"+nombor);
+
+  });
+
+}
+
+function ambilKrewJadualBaharuSJAM(){
+
+  fetch(SCRIPT_URL,{
+
+    method:"POST",
+
+    body:JSON.stringify({
+      action:"senaraiKrew"
+    })
+
+  })
+
+  .then(r=>r.json())
+
+  .then(data=>{
+
+    if(!Array.isArray(data)){
+      throw new Error("Format senarai krew tidak sah.");
+    }
+
+    
+    senaraiNamaKrewBaharuSJAM = data;
+
+    isiPilihanKrewBaharuSJAM();
+
+    // Isi semula pilihan krew apabila mod EDIT
+    if(window.rekodEditJadualSJAM){
+
+      isiSemulaJadualEditSJAM(
+        window.rekodEditJadualSJAM
+      );
+
+    }
+
+
+  })
+
+  .catch(error=>{
+
+    console.error(error);
+
+    ["hotspotPagiSJAM",
+     "hotspotPetangSJAM",
+     "hotspotMalamSJAM"].forEach(id=>{
+
+      const box = document.getElementById(id);
+
+      if(box){
+        box.textContent =
+          "Gagal memuatkan senarai krew.";
+      }
+
+    });
+
+  });
+
+}
+
+function tambahKesBaharuSJAM(){
+
+  jumlahKesBaharuSJAM++;
+
+  const n = jumlahKesBaharuSJAM;
+
+  const kawasan =
+    document.getElementById("senaraiKesBaharuSJAM");
+
+  if(!kawasan){
+    return;
+  }
+
+  kawasan.insertAdjacentHTML("beforeend",`
+
+    <div class="krewBox kesBaharuSJAM"
+         data-kes="${n}"
+         style="margin-top:15px;">
+
+      <h3>🚑 KES ${n}</h3>
+
+      <label>Masa Kes</label>
+
+      <input
+        id="masaKesSJAM${n}"
+        type="time"
+      >
+
+      <label>👥 Krew Bertugas</label>
+
+      <div
+        class="krewKesBaharuSJAM"
+        data-kes="${n}">
+
+        ${pilihanKrewBaharuSJAM("krewKes"+n)}
+
+      </div>
+
+      <label>Nama Pesakit</label>
+
+      <input
+        id="pesakitKesSJAM${n}"
+        placeholder="Nama pesakit"
+      >
+
+      <label>Dari</label>
+
+      <input
+        id="dariKesSJAM${n}"
+        placeholder="Lokasi ambil pesakit"
+      >
+
+      <label>Ke Mana</label>
+
+      <input
+        id="keKesSJAM${n}"
+        placeholder="Destinasi"
+      >
+
+      <label>Tujuan</label>
+
+      <input
+        id="tujuanKesSJAM${n}"
+        placeholder="Contoh: Temujanji / Discaj"
+      >
+
+      <label>Ambulans</label>
+
+      <input
+        id="ambulansKesSJAM${n}"
+        placeholder="No. ambulans"
+      >
+
+      <label>Harga (RM)</label>
+
+      <input
+        id="hargaKesSJAM${n}"
+        type="number"
+        min="0"
+        step="0.01"
+        placeholder="0.00"
+      >
+
+      <label>Donat & Air</label>
+
+      <select id="donatKesSJAM${n}">
+        <option value="TIADA">TIADA</option>
+        <option value="ADA">ADA</option>
+      </select>
+
+      <button
+        type="button"
+        class="red"
+        onclick="buangKesBaharuSJAM(${n})">
+
+        🗑️ Buang Kes Ini
+
+      </button>
+
+    </div>
+
+  `);
+
+}
+
+function buangKesBaharuSJAM(n){
+
+  const semua =
+    document.querySelectorAll(".kesBaharuSJAM");
+
+  if(semua.length <= 1){
+
+    alert("Sekurang-kurangnya satu kes perlu ada.");
+    return;
+
+  }
+
+  const kes = document.querySelector(
+    '.kesBaharuSJAM[data-kes="'+n+'"]'
+  );
+
+  if(kes && confirm("Buang kes ini daripada borang?")){
+    kes.remove();
+  }
+
+}
+
+function namaKrewDipilihSJAM(nama){
+
+  return [...document.querySelectorAll(
+    'input[name="'+nama+'"]:checked'
+  )].map(x=>x.dataset.nama);
+
+}
+
+function kumpulJadualBaharuSJAM(){
+
+  const baca = id =>
+    document.getElementById(id)?.value.trim() || "";
+
+  const kes = [...document.querySelectorAll(
+    ".kesBaharuSJAM"
+  )].map(box=>{
+
+    const n = box.dataset.kes;
+
+    return {
+
+      masa:baca("masaKesSJAM"+n),
+
+      krew:namaKrewDipilihSJAM("krewKes"+n),
+
+      pesakit:baca("pesakitKesSJAM"+n),
+
+      dari:baca("dariKesSJAM"+n),
+
+      ke:baca("keKesSJAM"+n),
+
+      tujuan:baca("tujuanKesSJAM"+n),
+
+      ambulans:baca("ambulansKesSJAM"+n),
+
+      harga:baca("hargaKesSJAM"+n),
+
+      donat:baca("donatKesSJAM"+n)
+
+    };
+
+  });
+
+  return {
+
+    hari:baca("hariJadualSJAM"),
+
+    tarikh:baca("tarikhJadualSJAM"),
+
+    hotspot:{
+
+      pagi:namaKrewDipilihSJAM("hotspotPagi"),
+
+      petang:namaKrewDipilihSJAM("hotspotPetang"),
+
+      malam:namaKrewDipilihSJAM("hotspotMalam")
+
+    },
+
+    kes:kes
+
+  };
+
+}
+
+function pratontonJadualBaharuSJAM(){
+
+  const data = kumpulJadualBaharuSJAM();
+
+  if(!data.tarikh || !data.hari){
+
+    alert("Sila pilih hari dan tarikh.");
+    return;
+
+  }
+
+  const selamat = selamatAtributTuntutan;
+
+  const nama = senarai =>
+    selamat(senarai.join(", ") || "-");
+
+  let html = `
+
+    <div class="krewBox">
+
+      <h3>📋 Pratonton Jadual Harian</h3>
+
+      <b>${selamat(data.hari)}</b>
+      |
+      ${selamat(data.tarikh)}
+
+      <hr>
+
+      <b>📍 HOTSPOT</b>
+
+      <p>Pagi (8AM–3PM): ${nama(data.hotspot.pagi)}</p>
+
+      <p>Petang–Malam (3PM–10PM):
+        ${nama(data.hotspot.petang)}</p>
+
+      <p>Malam–Pagi (10PM–8AM):
+        ${nama(data.hotspot.malam)}</p>
+
+  `;
+
+  data.kes.forEach((x,i)=>{
+
+    html += `
+
+      <hr>
+
+      <b>🚑 KES ${i+1} | ${selamat(x.masa || "-")}</b>
+
+      <p>Krew: ${nama(x.krew)}</p>
+
+      <p>Pesakit: ${selamat(x.pesakit || "-")}</p>
+
+      <p>Dari: ${selamat(x.dari || "-")}</p>
+
+      <p>Ke: ${selamat(x.ke || "-")}</p>
+
+      <p>Tujuan: ${selamat(x.tujuan || "-")}</p>
+
+      <p>Ambulans: ${selamat(x.ambulans || "-")}</p>
+
+      <p>Harga: RM ${selamat(x.harga || "-")}</p>
+
+      <p>Donat & Air: ${selamat(x.donat)}</p>
+
+    `;
+
+  });
+
+  html += `
+
+      <hr>
+
+      <b>Pratonton sahaja — belum disimpan.</b>
+
+    </div>
+
+  `;
+
+  document.getElementById(
+    "pratontonJadualSJAM"
+  ).innerHTML = html;
+
+}
+
 
 // ==============================
 // AMBIL SENARAI KREW UNTUK DROPDOWN
@@ -6123,7 +6613,1018 @@ function tapisPusatResitSJAM(){
   });
 
 }
+
+
+// ========================================
+// SJAM - SIMPANAN JADUAL AMBULANS SERVICE
+// LOCALSTORAGE SAHAJA
+// ========================================
+
+const KUNCI_JADUAL_AMBULANS_SJAM =
+  "jadualAmbulansSJAM";
+
+// Ambil semua jadual yang telah disimpan
+function ambilSemuaJadualAmbulansSJAM(){
+
+  try {
+
+    const simpanan = localStorage.getItem(
+      KUNCI_JADUAL_AMBULANS_SJAM
+    );
+
+    const data = simpanan
+      ? JSON.parse(simpanan)
+      : [];
+
+    return Array.isArray(data) ? data : [];
+
+  } catch(error){
+
+    console.error(
+      "Ralat membaca jadual SJAM:",
+      error
+    );
+
+    return null;
+
+  }
+
+}
+
+// Simpan satu jadual harian
+function simpanRekodJadualAmbulansSJAM(jadual){
+
+  if(!jadual || !jadual.tarikh){
+
+    alert("❌ Sila pilih tarikh jadual.");
+    return false;
+
+  }
+
+  const senarai = ambilSemuaJadualAmbulansSJAM();
+
+  if(!senarai){
+
+    alert(
+      "❌ Data simpanan tidak dapat dibaca. " +
+      "Tiada perubahan dibuat."
+    );
+
+    return false;
+
+  }
+
+  const indeks = senarai.findIndex(
+    item => item.tarikh === jadual.tarikh
+  );
+
+  if(indeks >= 0){
+
+    senarai[indeks] = jadual;
+
+  }else{
+
+    senarai.push(jadual);
+
+  }
+
+  try {
+
+    localStorage.setItem(
+      KUNCI_JADUAL_AMBULANS_SJAM,
+      JSON.stringify(senarai)
+    );
+
+    return true;
+
+  }catch(error){
+
+    console.error(
+      "Ralat menyimpan jadual SJAM:",
+      error
+    );
+
+    alert(
+      "❌ Jadual gagal disimpan. " +
+      "Sila semak ruang storan pelayar."
+    );
+
+    return false;
+
+  }
+
+}
+
+// Dapatkan jadual berdasarkan tarikh
+function cariJadualAmbulansSJAM(tarikh){
+
+  const senarai = ambilSemuaJadualAmbulansSJAM();
+
+  if(!senarai){
+    return null;
+  }
+
+  return senarai.find(
+    item => item.tarikh === tarikh
+  ) || null;
+
+}
+
+
+// ========================================
+// SAVE JADUAL AMBULANS SERVICE SJAM
+// LOCALSTORAGE SAHAJA
+// ========================================
+
+function simpanJadualBaharuSJAM(){
+
+  // Ambil semua maklumat borang
+  const data = kumpulJadualBaharuSJAM();
+
+  // Semak hari dan tarikh
+  if(!data.hari || !data.tarikh){
+
+    alert(
+      "❌ Sila pilih Hari dan Tarikh Bertugas."
+    );
+
+    return;
+
+  }
+
+  // Pastikan hari sepadan dengan tarikh
+  const namaHari = [
+    "Ahad",
+    "Isnin",
+    "Selasa",
+    "Rabu",
+    "Khamis",
+    "Jumaat",
+    "Sabtu"
+  ];
+
+  const pecahan = data.tarikh
+    .split("-")
+    .map(Number);
+
+  if(
+    pecahan.length !== 3 ||
+    pecahan.some(n => !Number.isInteger(n))
+  ){
+
+    alert("❌ Format tarikh tidak sah.");
+    return;
+
+  }
+
+  const tarikhSemak = new Date(
+    pecahan[0],
+    pecahan[1] - 1,
+    pecahan[2]
+  );
+
+  if(
+    tarikhSemak.getFullYear() !== pecahan[0] ||
+    tarikhSemak.getMonth() !== pecahan[1] - 1 ||
+    tarikhSemak.getDate() !== pecahan[2]
+  ){
+
+    alert("❌ Tarikh tidak sah.");
+    return;
+
+  }
+
+  if(namaHari[tarikhSemak.getDay()] !== data.hari){
+
+    alert(
+      "❌ Hari tidak sepadan dengan tarikh.\n" +
+      "Sila semak pilihan Hari & Tarikh."
+    );
+
+    return;
+
+  }
+
+  // Semak sekurang-kurangnya satu kes
+  if(!data.kes || data.kes.length === 0){
+
+    alert(
+      "❌ Sila masukkan sekurang-kurangnya satu kes."
+    );
+
+    return;
+
+  }
+
+  // Semak maklumat wajib setiap kes
+  for(let i = 0; i < data.kes.length; i++){
+
+    const kes = data.kes[i];
+
+    if(
+      !kes.masa ||
+      !kes.krew.length ||
+      !kes.pesakit ||
+      !kes.dari ||
+      !kes.ke ||
+      !kes.tujuan ||
+      !kes.ambulans ||
+      kes.harga === ""
+    ){
+
+      alert(
+        "❌ Sila lengkapkan maklumat KES " +
+        (i + 1) +
+        ".\n\n" +
+        "Masa, Krew, Pesakit, Dari, Ke, " +
+        "Tujuan, Ambulans dan Harga diperlukan."
+      );
+
+      return;
+
+    }
+
+    if(
+      !Number.isFinite(Number(kes.harga)) ||
+      Number(kes.harga) < 0
+    ){
+
+      alert(
+        "❌ Harga KES " +
+        (i + 1) +
+        " tidak sah."
+      );
+
+      return;
+
+    }
+
+  }
+
+  // Semak jadual sedia ada
+  const senaraiLama =
+    ambilSemuaJadualAmbulansSJAM();
+
+  if(senaraiLama === null){
+
+    alert(
+      "❌ Simpanan lama tidak dapat dibaca.\n" +
+      "Jadual tidak disimpan."
+    );
+
+    return;
+
+  }
+
+  const rekodLama = senaraiLama.find(
+    item => item.tarikh === data.tarikh
+  );
+
+  if(rekodLama){
+
+    const setuju = confirm(
+      "⚠️ Jadual untuk " +
+      data.tarikh +
+      " sudah wujud.\n\n" +
+      "Adakah anda mahu menggantikan " +
+      "jadual lama dengan jadual ini?"
+    );
+
+    if(!setuju){
+      return;
+    }
+
+  }
+
+  // Simpan metadata kemas kini
+  data.dikemasKini =
+    new Date().toISOString();
+
+  // Simpan menggunakan fungsi sedia ada
+  const berjaya =
+    simpanRekodJadualAmbulansSJAM(data);
+
+  if(!berjaya){
+    return;
+  }
+
+  alert(
+    "✅ JADUAL BERJAYA DISIMPAN!\n\n" +
+    "Hari: " + data.hari + "\n" +
+    "Tarikh: " + data.tarikh + "\n" +
+    "Jumlah Kes: " + data.kes.length +
+    "\n\n" +
+    "Simpanan: localStorage"
+  );
+
+}
+
+
+// ==========================================
+// LANGKAH 3 - REKOD JADUAL AMBULANS SJAM
+// ==========================================
+
+function formatTarikhJadualSJAM(tarikh){
+
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(tarikh || "")){
+    return tarikh || "-";
+  }
+
+  const [tahun,bulan,hari] = tarikh.split("-");
+
+  return hari + "/" + bulan + "/" + tahun;
+
+}
+
+// Paparkan teks dengan selamat dalam HTML
+function teksSelamatJadualSJAM(teks){
+
+  return selamatAtributTuntutan(teks ?? "");
+
+}
+
+// Format nama krew
+function paparNamaKrewJadualSJAM(senarai){
+
+  if(!Array.isArray(senarai) || !senarai.length){
+    return "-";
+  }
+
+  return senarai.map(teksSelamatJadualSJAM).join(", ");
+
+}
+
+// ==========================================
+// LIHAT SEMUA REKOD
+// ==========================================
+
+function lihatRekodJadualAmbulansSJAM(){
+
+  const kawasan = document.getElementById("adminArea");
+
+  if(!kawasan){
+    alert("❌ Halaman admin tidak dijumpai.");
+    return;
+  }
+
+  const senarai = ambilSemuaJadualAmbulansSJAM();
+
+  if(senarai === null){
+    alert("❌ Rekod localStorage tidak dapat dibaca.");
+    return;
+  }
+
+  senarai.sort((a,b)=>
+    String(b.tarikh || "").localeCompare(
+      String(a.tarikh || "")
+    )
+  );
+
+  let html = `
+
+    <div class="card">
+
+      <h2>📚 Rekod Jadual Ambulans Service</h2>
+
+      <p style="text-align:center;color:#666;">
+        SJAM Kawasan Kelantan Utara
+      </p>
+
+      <div class="settingBox">
+        Jumlah Jadual Harian
+        <h2>${senarai.length}</h2>
+      </div>
+
+      <input
+        type="search"
+        id="cariRekodJadualSJAM"
+        placeholder="🔎 Cari hari atau tarikh..."
+        oninput="tapisRekodJadualSJAM()"
+      >
+
+      <div id="senaraiRekodJadualSJAM">
+
+  `;
+
+  if(senarai.length === 0){
+
+    html += `
+      <div class="settingBox">
+        Tiada jadual harian disimpan.
+      </div>
+    `;
+
+  }
+
+  senarai.forEach(jadual=>{
+
+    const tarikh = String(jadual.tarikh || "");
+
+    const hari = teksSelamatJadualSJAM(
+      jadual.hari || "-"
+    );
+
+    const jumlahKes = Array.isArray(jadual.kes)
+      ? jadual.kes.length
+      : 0;
+
+    html += `
+
+      <div
+        class="krewBox rekodJadualSJAM"
+        data-carian="${teksSelamatJadualSJAM(
+          (jadual.hari || "") + " " + tarikh +
+          " " + formatTarikhJadualSJAM(tarikh)
+        )}"
+      >
+
+        <h3>📅 ${hari}</h3>
+
+        <b>
+          ${teksSelamatJadualSJAM(
+            formatTarikhJadualSJAM(tarikh)
+          )}
+        </b>
+
+        <p>🚑 Jumlah Kes: ${jumlahKes}</p>
+
+        <button
+          type="button"
+          data-tarikh="${teksSelamatJadualSJAM(tarikh)}"
+          onclick="lihatButiranJadualSJAM(this.dataset.tarikh)">
+
+          👁️ LIHAT
+
+        </button>
+
+        <button
+          type="button"
+          class="green"
+          data-tarikh="${teksSelamatJadualSJAM(tarikh)}"
+          onclick="editJadualAmbulansSJAM(this.dataset.tarikh)">
+
+          ✏️ EDIT
+
+        </button>
+
+        <button
+          type="button"
+          style="background:#128c7e;"
+          data-tarikh="${teksSelamatJadualSJAM(tarikh)}"
+          onclick="kongsiJadualWhatsAppSJAM(this.dataset.tarikh)">
+
+          📲 KONGSI WHATSAPP
+
+        </button>
+
+        <button
+          type="button"
+          class="red"
+          data-tarikh="${teksSelamatJadualSJAM(tarikh)}"
+          onclick="padamJadualAmbulansSJAM(this.dataset.tarikh)">
+
+          🗑️ PADAM
+
+        </button>
+
+      </div>
+
+    `;
+
+  });
+
+  html += `
+
+      </div>
+
+      <button
+        class="back"
+        onclick="bukaDashboardAdmin()">
+        ⬅️ Dashboard
+      </button>
+
+    </div>
+
+  `;
+
+  kawasan.innerHTML = html;
+
+}
+
+// ==========================================
+// CARI REKOD
+// ==========================================
+
+function tapisRekodJadualSJAM(){
+
+  const carian = (
+    document.getElementById("cariRekodJadualSJAM")
+      ?.value || ""
+  ).trim().toLowerCase();
+
+  document.querySelectorAll(
+    ".rekodJadualSJAM"
+  ).forEach(box=>{
+
+    const teks = (
+      box.dataset.carian || ""
+    ).toLowerCase();
+
+    box.style.display =
+      teks.includes(carian) ? "" : "none";
+
+  });
+
+}
+
+
+
+// ==========================================
+// LIHAT BUTIRAN SATU JADUAL
+// ==========================================
+
+function lihatButiranJadualSJAM(tarikh){
+
+  const jadual = cariJadualAmbulansSJAM(tarikh);
+
+  if(!jadual){
+    alert("❌ Rekod jadual tidak dijumpai.");
+    return;
+  }
+
+  const selamat = teksSelamatJadualSJAM;
+
+  const hotspot = jadual.hotspot || {};
+
+  const kes = Array.isArray(jadual.kes)
+    ? jadual.kes
+    : [];
+
+  let html = `
+
+    <div class="card">
+
+      <div style="
+        background:#123b65;
+        color:white;
+        padding:20px;
+        border-radius:15px;
+        text-align:center;
+      ">
+
+        <h2 style="color:white;margin:0;">
+          🚑 JADUAL AMBULANS SERVICE
+        </h2>
+
+        <p>SJAM Kawasan Kelantan Utara</p>
+
+      </div>
+
+      <h3>📅 Hari & Tarikh</h3>
+
+      <div class="krewBox">
+
+        <b>${selamat(jadual.hari || "-")}</b>
+
+        <br>
+
+        ${selamat(formatTarikhJadualSJAM(tarikh))}
+
+      </div>
+
+      <h3>📍 HOTSPOT — JADUAL SYIF</h3>
+
+      <div class="krewBox">
+
+        <b>☀️ PAGI (8AM–3PM)</b>
+
+        <p>${paparNamaKrewJadualSJAM(hotspot.pagi)}</p>
+
+        <hr>
+
+        <b>🌇 PETANG–MALAM (3PM–10PM)</b>
+
+        <p>${paparNamaKrewJadualSJAM(hotspot.petang)}</p>
+
+        <hr>
+
+        <b>🌙 MALAM–PAGI (10PM–8AM)</b>
+
+        <p>${paparNamaKrewJadualSJAM(hotspot.malam)}</p>
+
+      </div>
+
+      <h3>🚑 SENARAI KES AMBULANS</h3>
+
+  `;
+
+  if(kes.length === 0){
+
+    html += `
+      <div class="settingBox">
+        Tiada kes direkodkan.
+      </div>
+    `;
+
+  }
+
+  kes.forEach((x,i)=>{
+
+    html += `
+
+      <div class="krewBox">
+
+        <h3>🚑 KES ${i+1}</h3>
+
+        <b>⏰ Masa:</b>
+        ${selamat(x.masa || "-")}
+
+        <br><br>
+
+        <b>👥 Krew:</b><br>
+        ${paparNamaKrewJadualSJAM(x.krew)}
+
+        <br><br>
+
+        <b>👤 Nama Pesakit:</b><br>
+        ${selamat(x.pesakit || "-")}
+
+        <br><br>
+
+        <b>📍 Dari:</b>
+        ${selamat(x.dari || "-")}
+
+        <br>
+
+        <b>🏥 Ke:</b>
+        ${selamat(x.ke || "-")}
+
+        <br>
+
+        <b>📝 Tujuan:</b>
+        ${selamat(x.tujuan || "-")}
+
+        <br>
+
+        <b>🚑 Ambulans:</b>
+        ${selamat(x.ambulans || "-")}
+
+        <br>
+
+        <b>💰 Harga:</b>
+        RM ${selamat(x.harga || "0.00")}
+
+        <br>
+
+        <b>🍩 Donat & Air:</b>
+        ${selamat(x.donat || "-")}
+
+      </div>
+
+    `;
+
+  });
+
+  html += `
+
+      <button
+        type="button"
+        class="green"
+        data-tarikh="${selamat(tarikh)}"
+        onclick="editJadualAmbulansSJAM(this.dataset.tarikh)">
+
+        ✏️ EDIT JADUAL
+
+      </button>
+
+      <button
+        type="button"
+        style="background:#128c7e;"
+        data-tarikh="${selamat(tarikh)}"
+        onclick="kongsiJadualWhatsAppSJAM(this.dataset.tarikh)">
+
+        📲 KONGSI KE WHATSAPP
+
+      </button>
+
+      <button
+        class="back"
+        onclick="lihatRekodJadualAmbulansSJAM()">
+
+        ⬅️ Kembali ke Senarai
+
+      </button>
+
+    </div>
+
+  `;
+
+  
+  document.getElementById("adminArea").innerHTML = html;
+
+}
+
+// ==========================================
+// EDIT JADUAL AMBULANS
+// ==========================================
+
+function editJadualAmbulansSJAM(tarikh){
+
+  const jadual = cariJadualAmbulansSJAM(tarikh);
+
+  if(!jadual){
+
+    alert("❌ Rekod tidak dijumpai.");
+    return;
+
+  }
+
+  // Simpan sementara rekod yang hendak diedit
+  window.rekodEditJadualSJAM = jadual;
+
+  // Buka borang sedia ada
+  bukaJadualAdmin();
+
+}
+
+// ==========================================
+// ISI SEMULA BORANG EDIT
+// ==========================================
+
+function isiSemulaJadualEditSJAM(jadual){
+
+  const isi = (id,nilai)=>{
+
+    const input = document.getElementById(id);
+
+    if(input){
+      input.value = nilai ?? "";
+    }
+
+  };
+
+  isi("hariJadualSJAM",jadual.hari);
+  isi("tarikhJadualSJAM",jadual.tarikh);
+
+  // Tandakan semula checkbox krew
+  function pilihKrew(namaInput,senarai){
+
+    if(!Array.isArray(senarai)){
+      return;
+    }
+
+    document.querySelectorAll(
+      'input[name="'+namaInput+'"]'
+    ).forEach(checkbox=>{
+
+      checkbox.checked =
+        senarai.includes(checkbox.dataset.nama);
+
+    });
+
+  }
+
+  const hotspot = jadual.hotspot || {};
+
+  pilihKrew("hotspotPagi",hotspot.pagi);
+  pilihKrew("hotspotPetang",hotspot.petang);
+  pilihKrew("hotspotMalam",hotspot.malam);
+
+  // Bina semula semua kes
+  const kawasan =
+    document.getElementById("senaraiKesBaharuSJAM");
+
+  if(!kawasan){
+    return;
+  }
+
+  kawasan.innerHTML = "";
+
+  jumlahKesBaharuSJAM = 0;
+
+  const kes = Array.isArray(jadual.kes)
+    ? jadual.kes
+    : [];
+
+  kes.forEach(x=>{
+
+    tambahKesBaharuSJAM();
+
+    const n = jumlahKesBaharuSJAM;
+
+    isi("masaKesSJAM"+n,x.masa);
+    isi("pesakitKesSJAM"+n,x.pesakit);
+    isi("dariKesSJAM"+n,x.dari);
+    isi("keKesSJAM"+n,x.ke);
+    isi("tujuanKesSJAM"+n,x.tujuan);
+    isi("ambulansKesSJAM"+n,x.ambulans);
+    isi("hargaKesSJAM"+n,x.harga);
+    isi("donatKesSJAM"+n,x.donat);
+
+    pilihKrew("krewKes"+n,x.krew);
+
+  });
+
+  if(kes.length === 0){
+    tambahKesBaharuSJAM();
+  }
+
+  // Selesai mengisi semula borang
+  
+  window.rekodEditJadualSJAM = null;
+
+}
+
+// ==========================================
+// KONGSI JADUAL AMBULANS KE WHATSAPP
+// ==========================================
+
+function kongsiJadualWhatsAppSJAM(tarikh){
+
+  const jadual = cariJadualAmbulansSJAM(tarikh);
+
+  if(!jadual){
+
+    alert("❌ Rekod jadual tidak dijumpai.");
+    return;
+
+  }
+
+  const hotspot = jadual.hotspot || {};
+
+  const kes = Array.isArray(jadual.kes)
+    ? jadual.kes
+    : [];
+
+  const namaKrew = senarai =>
+    Array.isArray(senarai) && senarai.length
+      ? senarai.join(", ")
+      : "-";
+
+  let mesej =
+    "🚑 *JADUAL AMBULANS SERVICE*\n" +
+    "*SJAM KAWASAN KELANTAN UTARA*\n\n" +
+
+    "📅 *HARI:* " + (jadual.hari || "-") + "\n" +
+    "📆 *TARIKH:* " +
+    formatTarikhJadualSJAM(jadual.tarikh) + "\n\n" +
+
+    "📍 *HOTSPOT - JADUAL SYIF*\n\n" +
+
+    "☀️ *PAGI (8AM - 3PM)*\n" +
+    namaKrew(hotspot.pagi) + "\n\n" +
+
+    "🌇 *PETANG - MALAM (3PM - 10PM)*\n" +
+    namaKrew(hotspot.petang) + "\n\n" +
+
+    "🌙 *MALAM - PAGI (10PM - 8AM)*\n" +
+    namaKrew(hotspot.malam) + "\n\n" +
+
+    "━━━━━━━━━━━━━━\n" +
+    "🚑 *SENARAI KES AMBULANS*\n" +
+    "━━━━━━━━━━━━━━\n";
+
+  kes.forEach((x,i)=>{
+
+    const harga = Number(x.harga);
+
+    mesej +=
+
+      "\n🚑 *KES " + (i+1) + "*\n\n" +
+
+      "⏰ *Masa:* " + (x.masa || "-") + "\n" +
+
+      "👥 *Krew:* " + namaKrew(x.krew) + "\n" +
+
+      "👤 *Pesakit:* " + (x.pesakit || "-") + "\n" +
+
+      "📍 *Dari:* " + (x.dari || "-") + "\n" +
+
+      "🏥 *Ke:* " + (x.ke || "-") + "\n" +
+
+      "📝 *Tujuan:* " + (x.tujuan || "-") + "\n" +
+
+      "🚑 *Ambulans:* " + (x.ambulans || "-") + "\n" +
+
+      "💰 *Harga:* RM " +
+      (
+        x.harga !== "" &&
+        x.harga !== null &&
+        x.harga !== undefined &&
+        Number.isFinite(harga)
+          ? harga.toFixed(2)
+          : "-"
+      ) + "\n" +
+
+      "🍩 *Donat & Air:* " +
+      (x.donat || "-") + "\n\n" +
+
+      "━━━━━━━━━━━━━━\n";
+
+  });
+
+  mesej +=
+    "\n*SJAM KAWASAN KELANTAN UTARA*\n" +
+    "🚑 RAJINLAH KITA MENCARI REZEKI ALLAH SWT, JANGAN MALAS, INGAT KITA ADA BNYAK TANGGUNGAN";
+
+  const url =
+    "https://wa.me/?text=" +
+    encodeURIComponent(mesej);
+
+  
+  // Buka WhatsApp selepas pengguna menekan butang
+  window.location.href = url;
+
+}
+
+
+// ==========================================
+// PADAM REKOD JADUAL AMBULANS SERVICE
+// LOCALSTORAGE SAHAJA
+// ==========================================
+
+function padamJadualAmbulansSJAM(tarikh){
+
+  // Semak tarikh yang diterima
+  if(!tarikh){
+    alert("❌ Tarikh jadual tidak sah.");
+    return;
+  }
+
+  // Ambil rekod daripada localStorage
+  const senarai = ambilSemuaJadualAmbulansSJAM();
+
+  if(senarai === null){
+    alert("❌ Gagal membaca rekod jadual.");
+    return;
+  }
+
+  // Pastikan jadual wujud
+  const jadual = senarai.find(
+    item => item.tarikh === tarikh
+  );
+
+  if(!jadual){
+    alert("❌ Jadual tidak dijumpai.");
+    return;
+  }
+
+  // Minta pengesahan admin
+  const setuju = confirm(
+    "⚠️ PADAM JADUAL AMBULANS?\n\n" +
+    "Hari: " + (jadual.hari || "-") + "\n" +
+    "Tarikh: " +
+    formatTarikhJadualSJAM(tarikh) + "\n\n" +
+    "Semua kes dan jadual syif bagi " +
+    "tarikh ini akan dipadam.\n\n" +
+    "Tindakan ini tidak boleh dibatalkan.\n\n" +
+    "Teruskan?"
+  );
+
+  if(!setuju){
+    return;
+  }
+
+  // Buang rekod bagi tarikh dipilih sahaja
+  const senaraiBaharu = senarai.filter(
+    item => item.tarikh !== tarikh
+  );
+
+  try{
+
+    // Simpan semula rekod yang tinggal
+    localStorage.setItem(
+      KUNCI_JADUAL_AMBULANS_SJAM,
+      JSON.stringify(senaraiBaharu)
+    );
+
+    alert(
+      "✅ JADUAL BERJAYA DIPADAM!\n\n" +
+      "Tarikh: " +
+      formatTarikhJadualSJAM(tarikh)
+    );
+
+    // Segarkan paparan rekod
+    lihatRekodJadualAmbulansSJAM();
+
+  }catch(error){
+
+    console.error(
+      "Ralat padam jadual SJAM:",
+      error
+    );
+
+    alert(
+      "❌ Jadual gagal dipadam.\n" +
+      "Tiada perubahan berjaya disimpan."
+    );
+
+  }
+
+}
+
 </script>
+
 </div> <!-- tutup container -->
 <!-- =============================== -->
 <!-- AKHIR HTML -->
