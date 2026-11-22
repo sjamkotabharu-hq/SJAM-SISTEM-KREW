@@ -1407,7 +1407,9 @@ border:1px solid #ddd;
 <input
 id="diterimaDari"
 type="text"
-placeholder="Masukkan nama WARIS / PESAKIT">
+placeholder="Masukkan nama WARIS / PESAKIT"
+style="text-transform:uppercase;"
+oninput="this.value=this.value.toUpperCase();">
 
 <label>
 Wang Yang Diterima (Ringgit Malaysia)
@@ -1434,21 +1436,27 @@ Jumlah dalam perkataan akan dipaparkan secara automatik.
 <input
 id="dariResit"
 type="text"
-placeholder="Isi sendiri">
+placeholder="Isi sendiri"
+style="text-transform:uppercase;"
+oninput="this.value=this.value.toUpperCase();">
 
 <label>KE</label>
 
 <input
 id="keResit"
 type="text"
-placeholder="Isi sendiri">
+placeholder="Isi sendiri"
+style="text-transform:uppercase;"
+oninput="this.value=this.value.toUpperCase();">
 
 <label>TUJUAN</label>
 
 <input
 id="tujuanResit"
 type="text"
-placeholder="Isi tujuan sendiri">
+placeholder="Isi tujuan sendiri"
+style="text-transform:uppercase;"
+oninput="this.value=this.value.toUpperCase();">
 
 </div>
 
@@ -1578,7 +1586,7 @@ return;
 }
 
 paparan.textContent =
-nomborKePerkataanSJAM(jumlah.value) ||
+nomborKePerkataanSJAM(jumlah.value).toUpperCase() ||
 "Jumlah dalam perkataan akan dipaparkan secara automatik.";
 
 }
