@@ -3771,10 +3771,478 @@ function butangPadamTuntutan(x, idKrew){
       style="width:auto;padding:8px 12px;font-size:14px;">
       🗑️ Padam
     </button>
+  
   `;
 }
 
+// ==============================
+// BUTANG CETAK RESIT RASMI SJAM
+// ==============================
+
+function butangCetakResitSJAM(x){
+
+  if(
+    !x.diterimaDari &&
+    !x.wangPerkataan &&
+    !x.dari &&
+    !x.ke &&
+    !x.tujuan
+  ){
+    return "";
+  }
+
+  const dataResit = encodeURIComponent(
+    JSON.stringify({
+      tarikh: x.tarikh || "",
+      resit: x.resit || "",
+      jumlah: x.jumlah || "",
+      diterimaDari: x.diterimaDari || "",
+      wangPerkataan: x.wangPerkataan || "",
+      dari: x.dari || "",
+      ke: x.ke || "",
+      tujuan: x.tujuan || ""
+    })
+  );
+
+  return `
+    <button
+      type="button"
+      class="noPrint"
+      data-resit-cetak="${selamatAtributTuntutan(dataResit)}"
+      onclick="cetakResitRasmiSJAM(this)"
+      style="
+        width:auto;
+        padding:8px 12px;
+        font-size:14px;
+        background:#1565c0;
+        margin-left:5px;
+      ">
+      🖨️ Cetak Resit Rasmi
+    </button>
+  `;
+
+}
+
+
+
+function cetakResitRasmiSJAM(button){
+
+  try {
+
+    const data = JSON.parse(
+      decodeURIComponent(button.dataset.resitCetak)
+    );
+
+    // Gunakan fungsi keselamatan yang sudah ada
+    const selamat = selamatAtributTuntutan;
+
+    const noResit = selamat(data.resit || "-");
+    const tarikh = selamat(
+      data.tarikh ? formatTarikh(data.tarikh) : "-"
+    );
+
+    const jumlahNombor = Number(data.jumlah);
+
+    const jumlah = Number.isFinite(jumlahNombor)
+      ? jumlahNombor.toLocaleString("en-MY", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        })
+      : "-";
+
+    const diterimaDari = selamat(
+      data.diterimaDari || "-"
+    );
+
+    const wangPerkataan = selamat(
+      data.wangPerkataan || "-"
+    );
+
+    const dari = selamat(data.dari || "-");
+    const ke = selamat(data.ke || "-");
+    const tujuan = selamat(data.tujuan || "-");
+
+    // Buka tetingkap cetakan berasingan
+    const tetingkap = window.open(
+      "",
+      "_blank",
+      "width=1100,height=800"
+    );
+
+    if(!tetingkap){
+      alert(
+        "❌ Tetingkap cetakan disekat. " +
+        "Sila benarkan pop-up untuk laman SJAM."
+      );
+      return;
+    }
+
+    const htmlResit = `<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<title>Resit Rasmi SJAM - ${noResit}</title>
+
+<style>
+
+@page {
+  size: A4 landscape;
+  margin: 10mm;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 20px;
+  background: #f0f3f7;
+  color: #111;
+}
+
+.resit {
+  width: 100%;
+  max-width: 1050px;
+  margin: auto;
+  padding: 25px;
+  background: white;
+  border: 2px solid #111;
+}
+
+.tajuk {
+  text-align: center;
+  border-bottom: 3px double #111;
+  padding-bottom: 14px;
+}
+
+.tajuk h1 {
+  font-size: 25px;
+  margin: 0 0 10px;
+}
+
+.tajuk h2 {
+  font-size: 19px;
+  margin: 5px 0;
+}
+
+.tajuk p {
+  font-size: 13px;
+  margin: 5px 0;
+}
+
+.butiranAtas {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 20px;
+  margin-bottom: 15px;
+  font-size: 16px;
+}
+
+.baris {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin: 12px 0;
+  font-size: 15px;
+}
+
+.label {
+  width: 230px;
+  flex-shrink: 0;
+  font-weight: bold;
+}
+
+.nilai {
+  flex: 1;
+  min-width: 0;
+  border-bottom: 1px dotted #555;
+  padding-bottom: 5px;
+  overflow-wrap: anywhere;
+}
+
+.perjalanan {
+  display: flex;
+  gap: 20px;
+  margin-top: 15px;
+}
+
+.perjalanan .baris {
+  flex: 1;
+}
+
+.perjalanan .label {
+  width: 60px;
+}
+
+.jumlahBox {
+  border: 2px solid #111;
+  padding: 12px;
+  font-size: 21px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 25px;
+  margin-top: 28px;
+}
+
+.nota {
+  flex: 2;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.tandatangan {
+  flex: 1;
+  text-align: center;
+  font-size: 12px;
+  padding-top: 45px;
+}
+
+.garisTandatangan {
+  border-top: 1px solid #111;
+  padding-top: 7px;
+}
+
+.slogan {
+  text-align: center;
+  font-size: 15px;
+  font-weight: bold;
+  margin-top: 25px;
+}
+
+.kawalan {
+  text-align: center;
+  margin: 20px;
+}
+
+.kawalan button {
+  padding: 12px 25px;
+  background: #1565c0;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+@media print {
+
+  body {
+    background: white;
+    padding: 0;
+  }
+
+  .resit {
+    border: 2px solid #111;
+    max-width: none;
+    padding: 15px;
+  }
+
+  .kawalan {
+    display: none !important;
+  }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="kawalan">
+  <button onclick="window.print()">
+    🖨️ CETAK RESIT RASMI
+  </button>
+</div>
+
+<div class="resit">
+
+  <div class="tajuk">
+
+    <h1>RESIT RASMI</h1>
+
+    <h2>ST. JOHN AMBULANS MALAYSIA (SJAM)</h2>
+
+    <h2>KAWASAN KELANTAN UTARA (KOTA BHARU)</h2>
+
+    <p>
+      Peti Surat 218, 15720 Kota Bharu, KELANTAN
+    </p>
+
+    <p>
+      Hot Line SJAM: 011-5364 9991
+    </p>
+
+  </div>
+
+  <div class="butiranAtas">
+
+    <div>
+      <b>No. Resit:</b> ${noResit}
+    </div>
+
+    <div>
+      <b>Tarikh:</b> ${tarikh}
+    </div>
+
+  </div>
+
+  <div class="baris">
+
+    <div class="label">
+  DITERIMA OLEH:
+</div>
+
+    <div class="nilai">
+      ${diterimaDari}
+    </div>
+
+  </div>
+
+  <div class="baris">
+
+    <div class="label">
+      Wang yang Diterima
+      (Ringgit Malaysia):
+    </div>
+
+    <div class="nilai">
+      ${wangPerkataan}
+    </div>
+
+  </div>
+
+  <div class="baris">
+
+    <div class="label">
+      Untuk Bayaran / In Payment of:
+    </div>
+
+    <div class="nilai">
+      PERKHIDMATAN AMBULANS DAN PARAMEDIK
+    </div>
+
+  </div>
+
+  <div class="perjalanan">
+
+    <div class="baris">
+      <div class="label">DARI:</div>
+      <div class="nilai">${dari}</div>
+    </div>
+
+    <div class="baris">
+      <div class="label">KE:</div>
+      <div class="nilai">${ke}</div>
+    </div>
+
+  </div>
+
+  <div class="baris">
+
+    <div class="label">
+      Program / Tujuan:
+    </div>
+
+    <div class="nilai">
+      ${tujuan}
+    </div>
+
+  </div>
+
+  <div class="baris">
+
+    <div class="label">
+      Jumlah Bayaran:
+    </div>
+
+    <div class="jumlahBox">
+      RM ${jumlah}
+    </div>
+
+  </div>
+
+  <div class="footer">
+
+    <div class="nota">
+
+      <b>Nota:</b>
+
+      <p>
+        Pihak kami tidak bertanggungjawab
+        di atas apa-apa yang berlaku sebelum
+        dan selepas menggunakan perkhidmatan ini.
+      </p>
+
+      <p>
+        (Kemalangan, kecacatan, kecederaan,
+        kesakitan, kematian atau lain-lain
+        kecederaan atau penyakit)
+      </p>
+
+      <p>
+        Terima kasih / Thank You.
+      </p>
+
+      <p>
+        Tunai / No. Cek: __________________
+      </p>
+
+      <p>
+        Bank In: __________________
+      </p>
+
+    </div>
+
+    <div class="tandatangan">
+
+      <div class="garisTandatangan">
+        Setiausaha / Bendahari Kehormat
+        <br>
+        SJAM Kawasan Kelantan Utara
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="slogan">
+    "BANTULAH KAMI UNTUK MENOLONG ANDA"
+  </div>
+
+</div>
+
+</body>
+</html>`;
+
+    tetingkap.document.open();
+    tetingkap.document.write(htmlResit);
+    tetingkap.document.close();
+
+    tetingkap.focus();
+
+  } catch(error){
+
+    console.error(error);
+
+    alert(
+      "❌ Gagal menyediakan cetakan resit rasmi."
+    );
+
+  }
+
+}
+
+
 async function padamTuntutan(button){
+
   if(button.disabled){
     return;
   }
@@ -3943,7 +4411,19 @@ ${x.resit}
 
 ${paparMaklumatResitSJAM(x)}
 
+<div class="noPrint" style="
+display:flex;
+flex-wrap:wrap;
+align-items:center;
+gap:6px;
+margin-top:10px;
+">
+
 ${butangPadamTuntutan(x, idKrew)}
+
+${butangCetakResitSJAM(x)}
+
+</div>
 
 </div>
 
@@ -4025,9 +4505,21 @@ ${selamatAtributTuntutan(keluarNegeri.pemandu || "BELUM DIISI")}
 
 ${paparMaklumatResitSJAM(x)}
 
+<div class="noPrint" style="
+display:flex;
+flex-wrap:wrap;
+align-items:center;
+gap:6px;
+margin-top:10px;
+">
+
 ${butangPadamTuntutan(x, idKrew)}
+
+${butangCetakResitSJAM(x)}
+
 </div>
 
+</div>
 `;
 
 });
@@ -4084,8 +4576,19 @@ ${x.resit}
 
 ${paparMaklumatResitSJAM(x)}
 
+<div class="noPrint" style="
+display:flex;
+flex-wrap:wrap;
+align-items:center;
+gap:6px;
+margin-top:10px;
+">
+
 ${butangPadamTuntutan(x, idKrew)}
 
+${butangCetakResitSJAM(x)}
+
+</div>
 </div>
 
 `;
@@ -4946,9 +5449,7 @@ year:"numeric"
 
 }
 
-kemasKiniJamSJAM();
 
-setInterval(kemasKiniJamSJAM,1000);
 
 // TAMAT JAM SJAM
 // ==============================
