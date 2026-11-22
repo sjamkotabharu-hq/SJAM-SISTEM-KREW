@@ -802,7 +802,7 @@ let user =
 JSON.parse(localStorage.getItem("krew"));
 
 let admin =
-localStorage.getItem("admin");
+sessionStorage.getItem("tokenAdminSJAM");
 
 if(user){
 
@@ -854,7 +854,43 @@ kiraJadualBaru();
 
 else if(admin){
 
-bukaDashboardAdmin();
+  fetch(SCRIPT_URL,{
+
+    method:"POST",
+
+    body:JSON.stringify({
+
+      action:"semakSesiAdminSJAM",
+      tokenAdmin:admin
+
+    })
+
+  })
+
+  .then(r=>r.json())
+
+  .then(res=>{
+
+    if(res.success){
+
+      bukaDashboardAdmin();
+
+    }else{
+
+      sessionStorage.removeItem("tokenAdminSJAM");
+      localStorage.removeItem("admin");
+
+    }
+
+  })
+
+  .catch(error=>{
+
+    console.error(error);
+
+    alert("❌ Tidak dapat mengesahkan sesi admin.");
+
+  });
 
 }
 
@@ -2491,65 +2527,113 @@ alert("❌ Sistem tidak dapat dihubungi");
 
 function adminLogin(){
 
-let username =
-prompt("Username Admin");
+  const username = prompt("Username Admin");
 
-let password =
-prompt("Password Admin");
+  if(username === null){
+    return;
+  }
 
-fetch(SCRIPT_URL,{
+  const password = prompt("Password Admin");
 
-method:"POST",
+  if(password === null){
+    return;
+  }
 
-body:JSON.stringify({
+  if(!username.trim() || !password){
 
-action:"admin",
+    alert("❌ Sila isi username dan password.");
+    return;
 
-username:username,
+  }
 
-password:password
+  fetch(SCRIPT_URL,{
 
-})
+    method:"POST",
 
-})
+    body:JSON.stringify({
 
-.then(r=>r.json())
+      action:"admin",
+      username:username.trim(),
+      password:password
 
-.then(res=>{
+    })
 
-if(res.success){
+  })
 
-localStorage.setItem(
-"admin",
-"true"
-);
+  .then(async response=>{
 
-localStorage.removeItem("krew");
+    if(!response.ok){
 
-bukaDashboardAdmin();
+      throw new Error(
+        "HTTP " + response.status
+      );
+
+    }
+
+    return await response.json();
+
+  })
+
+  .then(res=>{
+
+    // Jangan paparkan token atau maklumat sulit
+    console.log("Status login admin:", {
+      success:res.success,
+      adaToken:!!res.tokenAdmin,
+      message:res.message || ""
+    });
+
+    if(res.success === true && res.tokenAdmin){
+
+      sessionStorage.setItem(
+        "tokenAdminSJAM",
+        res.tokenAdmin
+      );
+
+      localStorage.removeItem("admin");
+      localStorage.removeItem("krew");
+
+      currentUser = null;
+
+      bukaDashboardAdmin();
+
+      return;
+
+    }
+
+    if(res.success === true && !res.tokenAdmin){
+
+      alert(
+        "❌ Username dan password mungkin telah " +
+        "disahkan oleh GS, tetapi token sesi admin " +
+        "tidak diterima.\n\n" +
+        "Sila semak fungsi login admin dalam kod GS."
+      );
+
+      return;
+
+    }
+
+    alert(
+      "❌ Login Admin gagal.\n\n" +
+      "Maklum balas GS: " +
+      (res.message || "Pengesahan ditolak.")
+    );
+
+  })
+
+  .catch(error=>{
+
+    console.error("Ralat login admin:",error);
+
+    alert(
+      "❌ Ralat sambungan atau respons GS.\n\n" +
+      error.message
+    );
+
+  });
 
 }
-
-else{
-
-alert("❌ Login Admin gagal");
-
-}
-
-})
-
-.catch(error=>{
-
-console.error(error);
-
-alert(
-"❌ Sistem tidak dapat dihubungi."
-);
-
-});
-
-}
-
 // ==============================
 // DASHBOARD ADMIN
 // ==============================
@@ -2677,6 +2761,14 @@ onclick="simpanBulanAktif()">
 
 </button>
 
+<!-- MENU PUSAT RESIT RASMI SJAM -->
+
+<button onclick="bukaPusatResitSJAM()">
+
+🧾 Pusat Resit Rasmi SJAM
+
+</button>
+
 <button onclick="bukaJadualAdmin()">
 
 🚑 Buat Jadual Bertugas
@@ -2712,6 +2804,131 @@ onclick="logoutAdmin()">
 `;
 
 paparBulanAdmin();
+
+}
+
+// ==============================
+// PUSAT RESIT RASMI SJAM
+// ==============================
+
+function bukaPusatResitSJAM(){
+
+  const adminArea =
+    document.getElementById("adminArea");
+
+  if(!adminArea){
+    alert("❌ Halaman admin tidak dijumpai.");
+    return;
+  }
+
+  adminArea.innerHTML = `
+
+    <div class="card">
+
+      <h2>
+        🧾 Pusat Resit Rasmi SJAM
+      </h2>
+
+      <p style="
+        text-align:center;
+        color:#666;
+      ">
+        Kawasan Kelantan Utara
+        <br>
+        Arkib Resit Digital
+      </p>
+
+      <div class="settingBox">
+
+        🧾 Jumlah Resit
+
+        <h2 id="jumlahResitPusatSJAM">
+          -
+        </h2>
+
+      </div>
+
+      <h3>🔎 Cari Resit</h3>
+
+      <input
+        id="carianResitSJAM"
+        type="search"
+        placeholder="No Resit / Nama Waris / Lokasi"
+        oninput="tapisResitPusatSJAM()"
+      >
+
+      <label>Tahun</label>
+
+      <select
+        id="tahunResitSJAM"
+        onchange="tapisResitPusatSJAM()">
+
+        <option value="">
+          Semua Tahun
+        </option>
+
+      </select>
+
+      <label>Bulan</label>
+
+      <select
+        id="bulanResitSJAM"
+        onchange="tapisResitPusatSJAM()">
+
+        <option value="">
+          Semua Bulan
+        </option>
+
+        <option value="01">Januari</option>
+        <option value="02">Februari</option>
+        <option value="03">Mac</option>
+        <option value="04">April</option>
+        <option value="05">Mei</option>
+        <option value="06">Jun</option>
+        <option value="07">Julai</option>
+        <option value="08">Ogos</option>
+        <option value="09">September</option>
+        <option value="10">Oktober</option>
+        <option value="11">November</option>
+        <option value="12">Disember</option>
+
+      </select>
+
+      <h3>📚 Senarai Resit</h3>
+
+      <div id="senaraiResitPusatSJAM">
+
+        <div class="settingBox">
+          Pusat Resit telah dibuka.
+          <br>
+          Sambungan Google Sheet belum diaktifkan.
+        </div>
+
+      </div>
+
+      <button
+        class="back"
+        onclick="bukaDashboardAdmin()">
+
+        ⬅️ Kembali Dashboard
+
+      </button>
+
+    </div>
+
+  `;
+
+}
+
+
+// ==============================
+// TAPIS RESIT PUSAT SJAM
+// ==============================
+
+function tapisResitPusatSJAM(){
+
+  // Fungsi carian akan diaktifkan
+  // selepas sambungan Google Sheet disediakan.
 
 }
 
@@ -4820,23 +5037,43 @@ alert("❌ Gagal simpan bulan");
 
 function logoutAdmin(){
 
-localStorage.removeItem("admin");
+  const token =
+    sessionStorage.getItem("tokenAdminSJAM");
 
-document.getElementById("content").innerHTML="";
+  sessionStorage.removeItem("tokenAdminSJAM");
+  localStorage.removeItem("admin");
 
-document.getElementById("loginPage")
-.classList.remove("hide");
+  if(token){
 
-document.getElementById("daftarPage")
-.classList.add("hide");
+    fetch(SCRIPT_URL,{
 
-document.getElementById("menuPage")
-.classList.add("hide");
+      method:"POST",
 
-alert("✅ Admin Logout");
+      body:JSON.stringify({
+
+        action:"logoutSesiAdminSJAM",
+        tokenAdmin:token
+
+      })
+
+    }).catch(console.error);
+
+  }
+
+  document.getElementById("content").innerHTML="";
+
+  document.getElementById("loginPage")
+    .classList.remove("hide");
+
+  document.getElementById("daftarPage")
+    .classList.add("hide");
+
+  document.getElementById("menuPage")
+    .classList.add("hide");
+
+  alert("✅ Admin Logout");
 
 }
-
 // ==============================
 // LOGOUT KREW
 // ==============================
@@ -5610,6 +5847,282 @@ setInterval(kemasKiniJamSubSJAM,1000);
 
 // TAMAT JAM SEMUA SUBHALAMAN
 
+// ==============================
+// PUSAT RESIT RASMI SJAM
+// ==============================
+
+let arkibResitSJAM = [];
+
+function bukaPusatResitSJAM(){
+
+  const token =
+    sessionStorage.getItem("tokenAdminSJAM");
+
+  if(!token){
+
+    alert("❌ Sila login semula sebagai admin.");
+    return;
+
+  }
+
+  document.getElementById("adminArea").innerHTML = `
+
+    <div class="card">
+
+      <h2>🧾 Pusat Resit Rasmi SJAM</h2>
+
+      <p style="text-align:center;color:#666;">
+        Kawasan Kelantan Utara<br>
+        Arkib Resit Digital
+      </p>
+
+      <div class="settingBox">
+        🧾 Jumlah Resit
+        <h2 id="jumlahResitSJAM">-</h2>
+      </div>
+
+      <h3>🔎 Cari Resit</h3>
+
+      <input
+        id="cariResitSJAM"
+        placeholder="No Resit / Nama Waris / Lokasi"
+        oninput="tapisPusatResitSJAM()"
+      >
+
+      <label>Tahun</label>
+
+      <select
+        id="tahunResitSJAM"
+        onchange="tapisPusatResitSJAM()">
+
+        <option value="">Semua Tahun</option>
+
+      </select>
+
+      <label>Bulan</label>
+
+      <select
+        id="bulanResitSJAM"
+        onchange="tapisPusatResitSJAM()">
+
+        <option value="">Semua Bulan</option>
+
+      </select>
+
+      <h3>📚 Senarai Resit</h3>
+
+      <div id="senaraiResitSJAM" class="settingBox">
+        ⏳ Sedang mengambil rekod...
+      </div>
+
+      <button class="back"
+        onclick="bukaDashboardAdmin()">
+        ⬅️ Dashboard
+      </button>
+
+    </div>
+
+  `;
+
+  fetch(SCRIPT_URL,{
+
+    method:"POST",
+
+    body:JSON.stringify({
+
+      action:"pusatResitSJAM",
+      tokenAdmin:token
+
+    })
+
+  })
+
+  .then(r=>r.json())
+
+  .then(res=>{
+
+    if(!res.success){
+
+      throw new Error(
+        res.message || "Gagal mengambil resit."
+      );
+
+    }
+
+    arkibResitSJAM = res.data || [];
+
+    const tahun = [...new Set(
+      arkibResitSJAM
+        .map(x=>String(x.tarikh || "").slice(0,4))
+        .filter(x=>/^\d{4}$/.test(x))
+    )].sort().reverse();
+
+    const tahunBox =
+      document.getElementById("tahunResitSJAM");
+
+    tahun.forEach(t=>{
+
+      tahunBox.add(new Option(t,t));
+
+    });
+
+    const bulanBox =
+      document.getElementById("bulanResitSJAM");
+
+    const namaBulan = [
+      "Januari","Februari","Mac","April",
+      "Mei","Jun","Julai","Ogos",
+      "September","Oktober","November","Disember"
+    ];
+
+    namaBulan.forEach((nama,i)=>{
+
+      bulanBox.add(
+        new Option(
+          nama,
+          String(i+1).padStart(2,"0")
+        )
+      );
+
+    });
+
+    tapisPusatResitSJAM();
+
+  })
+
+  .catch(error=>{
+
+    console.error(error);
+
+    document.getElementById("senaraiResitSJAM")
+      .textContent = "❌ " + error.message;
+
+  });
+
+}
+
+
+// ==============================
+// CARI DAN TAPIS RESIT
+// ==============================
+
+function tapisPusatResitSJAM(){
+
+  const carian = (
+    document.getElementById("cariResitSJAM")?.value || ""
+  ).trim().toLowerCase();
+
+  const tahun =
+    document.getElementById("tahunResitSJAM")?.value || "";
+
+  const bulan =
+    document.getElementById("bulanResitSJAM")?.value || "";
+
+  const hasil = arkibResitSJAM.filter(x=>{
+
+    const teks = [
+      x.resit,
+      x.namaKrew,
+      x.diterimaDari,
+      x.dari,
+      x.ke,
+      x.tujuan
+    ].join(" ").toLowerCase();
+
+    const tarikh = String(x.tarikh || "");
+
+    return (
+      teks.includes(carian) &&
+      (!tahun || tarikh.slice(0,4) === tahun) &&
+      (!bulan || tarikh.slice(5,7) === bulan)
+    );
+
+  });
+
+  document.getElementById("jumlahResitSJAM")
+    .textContent = hasil.length;
+
+  const kawasan =
+    document.getElementById("senaraiResitSJAM");
+
+  kawasan.innerHTML = "";
+
+  if(hasil.length === 0){
+
+    kawasan.textContent = "Tiada resit ditemui.";
+    return;
+
+  }
+
+  hasil.forEach(x=>{
+
+    const kotak = document.createElement("div");
+
+    kotak.className = "sejarahItem";
+    kotak.style.textAlign = "left";
+
+    const tarikh = /^\d{4}-\d{2}-\d{2}$/.test(x.tarikh)
+      ? x.tarikh.slice(8,10) + "/" +
+        x.tarikh.slice(5,7) + "/" +
+        x.tarikh.slice(0,4)
+      : "-";
+
+    const jumlah = Number(x.jumlah);
+
+    const teks = document.createElement("div");
+
+    teks.style.whiteSpace = "pre-line";
+    teks.style.overflowWrap = "anywhere";
+
+    teks.textContent =
+  "🧾 No. Resit: " + (x.resit || "-") + "\n" +
+  "📅 Tarikh: " + tarikh + "\n" +
+  "👤 Nama Waris: " + (x.diterimaDari || "-") + "\n" +
+  "📍 Dari: " + (x.dari || "-") + "\n" +
+  "📍 Ke: " + (x.ke || "-") + "\n" +
+  "📝 Tujuan: " + (x.tujuan || "-") + "\n" +
+  "💰 RM " + (
+    Number.isFinite(jumlah)
+      ? jumlah.toFixed(2)
+      : "-"
+  );
+    const butang = document.createElement("button");
+
+    butang.type = "button";
+    butang.textContent = "🖨️ Cetak Semula Resit";
+
+    butang.onclick = function(){
+
+      const dataCetak = {
+        tarikh:x.tarikh,
+        resit:x.resit,
+        jumlah:x.jumlah,
+        diterimaDari:x.diterimaDari,
+        wangPerkataan:x.wangPerkataan,
+        dari:x.dari,
+        ke:x.ke,
+        tujuan:x.tujuan
+      };
+
+      const butangSementara =
+        document.createElement("button");
+
+      butangSementara.dataset.resitCetak =
+        encodeURIComponent(
+          JSON.stringify(dataCetak)
+        );
+
+      cetakResitRasmiSJAM(butangSementara);
+
+    };
+
+    kotak.appendChild(teks);
+    kotak.appendChild(butang);
+    kawasan.appendChild(kotak);
+
+  });
+
+}
 </script>
 </div> <!-- tutup container -->
 <!-- =============================== -->
