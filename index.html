@@ -2932,7 +2932,7 @@ function bukaStatistikOperasiSJAM(){
    return;
  }
 
- const token = sessionStorage.getItem("tokenAdminSJAM");
+ const token = localStorage.getItem("tokenAdminSJAM");
 
  if(!token){
    alert("Sila login semula sebagai admin.");
@@ -3237,7 +3237,7 @@ async function paparStatistikOperasi(){
 
 window.laporanStatistikSJAM = null;
 
-  const token = sessionStorage.getItem("tokenAdminSJAM");
+  const token = localStorage.getItem("tokenAdminSJAM");
 
   if(!token){
     alert("Sesi admin tamat. Sila login semula.");
@@ -6501,18 +6501,25 @@ alert("❌ Gagal simpan bulan");
 
 }
 
+
 // ==============================
-// LOGOUT ADMIN
+// LOGOUT ADMIN SJAM
+// PADAM TOKEN DARIPADA LOCALSTORAGE
 // ==============================
 
 function logoutAdmin(){
 
   const token =
-    sessionStorage.getItem("tokenAdminSJAM");
+    localStorage.getItem("tokenAdminSJAM");
 
-  sessionStorage.removeItem("tokenAdminSJAM");
+  // Padam token daripada pelayar
+  localStorage.removeItem("tokenAdminSJAM");
+
   localStorage.removeItem("admin");
 
+  currentUser = null;
+
+  // Tamatkan sesi pada Google Apps Script
   if(token){
 
     fetch(SCRIPT_URL,{
@@ -6522,15 +6529,37 @@ function logoutAdmin(){
       body:JSON.stringify({
 
         action:"logoutSesiAdminSJAM",
+
         tokenAdmin:token
 
       })
 
-    }).catch(console.error);
+    })
+
+    .then(r=>r.json())
+
+    .then(res=>{
+
+      console.log(
+        "Status logout Admin:",
+        res.success
+      );
+
+    })
+
+    .catch(error=>{
+
+      console.error(
+        "Ralat logout Admin:",
+        error
+      );
+
+    });
 
   }
 
-  document.getElementById("content").innerHTML="";
+  // Kembali ke halaman login
+  document.getElementById("content").innerHTML = "";
 
   document.getElementById("loginPage")
     .classList.remove("hide");
@@ -6541,7 +6570,7 @@ function logoutAdmin(){
   document.getElementById("menuPage")
     .classList.add("hide");
 
-  alert("✅ Admin Logout");
+  alert("✅ Admin berjaya Logout.");
 
 }
 // ==============================
@@ -7326,7 +7355,7 @@ let arkibResitSJAM = [];
 function bukaPusatResitSJAM(){
 
   const token =
-    sessionStorage.getItem("tokenAdminSJAM");
+    localStorage.getItem("tokenAdminSJAM");
 
   if(!token){
 
@@ -8939,7 +8968,7 @@ function bukaKewanganSJAM(){
 
   const kawasan = document.getElementById("adminArea");
 
-  const token = sessionStorage.getItem(
+  const token = localStorage.getItem(
     "tokenAdminSJAM"
   );
 
@@ -9668,7 +9697,7 @@ function kiraJumlahKewanganSJAM(){
 
 async function simpanKewanganHTMLSJAM(){
 
-  const token = sessionStorage.getItem(
+  const token = localStorage.getItem(
     "tokenAdminSJAM"
   );
 
@@ -9963,7 +9992,7 @@ function batalEditKewanganSJAM(){
 
 async function muatKewanganSJAM(){
 
-  const token = sessionStorage.getItem(
+  const token = localStorage.getItem(
     "tokenAdminSJAM"
   );
 
@@ -10251,7 +10280,7 @@ function paparSenaraiKewanganSJAM(data){
 
 async function viewKewanganHTMLSJAM(id){
 
-  const token = sessionStorage.getItem(
+  const token = localStorage.getItem(
     "tokenAdminSJAM"
   );
 
@@ -10438,7 +10467,7 @@ async function viewKewanganHTMLSJAM(id){
 
 async function editKewanganHTMLSJAM(id){
 
-  const token = sessionStorage.getItem(
+  const token = localStorage.getItem(
     "tokenAdminSJAM"
   );
 
@@ -10594,7 +10623,7 @@ async function editKewanganHTMLSJAM(id){
 
 async function padamKewanganHTMLSJAM(id){
 
-  const token = sessionStorage.getItem(
+  const token = localStorage.getItem(
     "tokenAdminSJAM"
   );
 
@@ -10959,7 +10988,7 @@ function paparAnalisisKewanganSJAM(res){
 function cetakLaporanKewanganSJAM(){
 
   // SEMAK SESI ADMIN
-  const token = sessionStorage.getItem(
+  const token = localStorage.getItem(
     "tokenAdminSJAM"
   );
 
@@ -12025,7 +12054,7 @@ function bukaLaporanTahunanSJAM(){
 
 async function muatLaporanTahunanSJAM(){
 
-  const token = sessionStorage.getItem("tokenAdminSJAM");
+  const token = localStorage.getItem("tokenAdminSJAM");
 
   const tahun = document.getElementById(
     "kwTahunTahunanSJAM"
