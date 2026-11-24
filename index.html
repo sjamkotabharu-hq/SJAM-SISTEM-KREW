@@ -773,105 +773,200 @@ localStorage.getItem("admin") || null;
 // AUTO LOGIN
 // ==============================
 
-window.onload=function(){
 
-let user =
-JSON.parse(localStorage.getItem("krew"));
+window.onload = function(){
 
-let admin =
-sessionStorage.getItem("tokenAdminSJAM");
+  // =================================
+  // AMBIL DATA LOGIN TERSIMPAN
+  // =================================
 
-if(user){
+  let user = JSON.parse(
+    localStorage.getItem("krew")
+  );
 
-currentUser=user;
+  let admin = localStorage.getItem(
+    "tokenAdminSJAM"
+  );
 
-if(Notification.permission=="granted" &&
-localStorage.getItem("notifAktif")=="YA"){
 
-autoSimpanTokenSJAM();
+  // =================================
+  // KEUTAMAAN PERTAMA: ADMIN
+  // =================================
 
-}
+  if(admin){
 
-if(localStorage.getItem("audioAktif")=="YES"){
+    // Sembunyikan halaman login sementara
+    document.getElementById("loginPage")
+      .classList.add("hide");
 
-aktifkanAudio();
+    document.getElementById("daftarPage")
+      .classList.add("hide");
 
-}
+    document.getElementById("menuPage")
+      .classList.add("hide");
 
-document.getElementById("namaKrew").innerHTML =
-currentUser.nama.toUpperCase();
+    document.getElementById("content").innerHTML = `
+      <div class="card">
+        <h2>👨‍💼 Admin SJAM</h2>
+        <div class="settingBox">
+          ⏳ Sedang mengesahkan sesi Admin...
+        </div>
+      </div>
+    `;
 
-document.getElementById("loginPage")
-.classList.add("hide");
+    fetch(SCRIPT_URL,{
 
-document.getElementById("daftarPage")
-.classList.add("hide");
+      method:"POST",
 
-document.getElementById("menuPage")
-.classList.remove("hide");
+      body:JSON.stringify({
 
-updateKadarMenu();
+        action:"semakSesiAdminSJAM",
 
-document.getElementById("content").innerHTML="";
+        tokenAdmin:admin
 
-// Papar menu dahulu
-document.getElementById("paparBulanKrew").innerHTML =
-"⏳ Semak bulan...";
-
-// Ambil data belakang tab
-setTimeout(()=>{
-
-ambilBulanAktif();
-
-kiraJadualBaru();
-
-},100);
-
-}
-
-else if(admin){
-
-  fetch(SCRIPT_URL,{
-
-    method:"POST",
-
-    body:JSON.stringify({
-
-      action:"semakSesiAdminSJAM",
-      tokenAdmin:admin
+      })
 
     })
 
-  })
+    .then(r=>r.json())
 
-  .then(r=>r.json())
+    .then(res=>{
 
-  .then(res=>{
+      if(res.success){
 
-    if(res.success){
+        // ADMIN MASIH SAH
+        currentUser = null;
 
-      bukaDashboardAdmin();
+        bukaDashboardAdmin();
 
-    }else{
+      }else{
 
-      sessionStorage.removeItem("tokenAdminSJAM");
-      localStorage.removeItem("admin");
+        // TOKEN TIDAK SAH
+        localStorage.removeItem(
+          "tokenAdminSJAM"
+        );
+
+        localStorage.removeItem("admin");
+
+        document.getElementById("content").innerHTML = "";
+
+        document.getElementById("loginPage")
+          .classList.remove("hide");
+
+        alert(
+          "Sesi Admin tidak sah. Sila login semula."
+        );
+
+      }
+
+    })
+
+    .catch(error=>{
+
+      console.error(error);
+
+      // JANGAN PADAM TOKEN JIKA INTERNET TERPUTUS
+      document.getElementById("content").innerHTML = `
+
+        <div class="card">
+
+          <h2>⚠️ Sambungan Admin</h2>
+
+          <div class="settingBox">
+            Tidak dapat menghubungi Google Apps Script.
+            <br><br>
+            Sesi Admin masih disimpan.
+          </div>
+
+          <button onclick="window.location.reload()">
+            🔄 CUBA SEMULA
+          </button>
+
+        </div>
+
+      `;
+
+    });
+
+    return;
+
+  }
+
+
+  // =================================
+  // KEUTAMAAN KEDUA: KREW
+  // =================================
+
+  if(user){
+
+    currentUser = user;
+
+    if(
+      Notification.permission=="granted" &&
+      localStorage.getItem("notifAktif")=="YA"
+    ){
+
+      autoSimpanTokenSJAM();
 
     }
 
-  })
+    if(
+      localStorage.getItem("audioAktif")=="YES"
+    ){
 
-  .catch(error=>{
+      aktifkanAudio();
 
-    console.error(error);
+    }
 
-    alert("❌ Tidak dapat mengesahkan sesi admin.");
+    document.getElementById("namaKrew").innerHTML =
+      currentUser.nama.toUpperCase();
 
-  });
+    document.getElementById("loginPage")
+      .classList.add("hide");
 
-}
+    document.getElementById("daftarPage")
+      .classList.add("hide");
+
+    document.getElementById("menuPage")
+      .classList.remove("hide");
+
+    updateKadarMenu();
+
+    document.getElementById("content").innerHTML = "";
+
+    document.getElementById("paparBulanKrew").innerHTML =
+      "⏳ Semak bulan...";
+
+    setTimeout(()=>{
+
+      ambilBulanAktif();
+
+      kiraJadualBaru();
+
+    },100);
+
+    return;
+
+  }
+
+
+  // =================================
+  // TIADA ADMIN ATAU KREW LOGIN
+  // =================================
+
+  document.getElementById("loginPage")
+    .classList.remove("hide");
+
+  document.getElementById("daftarPage")
+    .classList.add("hide");
+
+  document.getElementById("menuPage")
+    .classList.add("hide");
+
+  document.getElementById("content").innerHTML = "";
 
 };
+
 
 // ==============================
 // AMBIL BULAN AKTIF
@@ -2562,7 +2657,7 @@ function adminLogin(){
 
     if(res.success === true && res.tokenAdmin){
 
-      sessionStorage.setItem(
+      localStorage.setItem(
         "tokenAdminSJAM",
         res.tokenAdmin
       );
@@ -2784,6 +2879,26 @@ onclick="simpanBulanAktif()">
 👥 Status Krew Esok
 
 </button>
+
+
+<!-- MENU PENDAPATAN DAN PERBELANJAAN SJAM -->
+
+<button
+  type="button"
+  class="noPrint"
+  style="
+    background:linear-gradient(135deg,#2e7d32,#1b5e20);
+    color:white;
+    font-weight:bold;
+    padding:16px;
+    border-radius:15px;
+  "
+  onclick="bukaKewanganSJAM()">
+
+  💰 PENDAPATAN & PERBELANJAAN
+
+</button>
+
 
 
 <button
@@ -8752,6 +8867,3892 @@ function salinOptionPollStatusSJAM(nombor){
 
 // TAMAT COPY POLL SJAM
 
+
+// ======================================================
+// MODUL KEWANGAN SJAM
+// PENDAPATAN & PERBELANJAAN
+// ======================================================
+
+const BULAN_KEWANGAN_SJAM = [
+  "Januari","Februari","Mac","April",
+  "Mei","Jun","Julai","Ogos",
+  "September","Oktober","November","Disember"
+];
+
+
+// ID REKOD KEWANGAN YANG SEDANG DIEDIT
+let idKewanganSedangEditSJAM = "";
+
+// SIMPAN DATA KEWANGAN SEMASA UNTUK LAPORAN
+let dataKewanganSemasaSJAM = [];
+
+
+
+
+// ======================================================
+// FORMAT DUIT RM
+// ======================================================
+
+function formatRMKewanganSJAM(nilai){
+
+  return "RM " + (Number(nilai) || 0).toLocaleString(
+    "en-MY",
+    {
+      minimumFractionDigits:2,
+      maximumFractionDigits:2
+    }
+  );
+
+}
+
+
+// ======================================================
+// TARIKH HARI INI ZON MALAYSIA
+// ======================================================
+
+function tarikhHariIniKewanganSJAM(){
+
+  const bahagian = new Intl.DateTimeFormat(
+    "en-CA",
+    {
+      timeZone:"Asia/Kuala_Lumpur",
+      year:"numeric",
+      month:"2-digit",
+      day:"2-digit"
+    }
+  ).formatToParts(new Date());
+
+  const tahun = bahagian.find(x=>x.type==="year").value;
+  const bulan = bahagian.find(x=>x.type==="month").value;
+  const hari = bahagian.find(x=>x.type==="day").value;
+
+  return tahun+"-"+bulan+"-"+hari;
+
+}
+
+
+// ======================================================
+// BUKA HALAMAN KEWANGAN
+// ======================================================
+
+function bukaKewanganSJAM(){
+
+  const kawasan = document.getElementById("adminArea");
+
+  const token = sessionStorage.getItem(
+    "tokenAdminSJAM"
+  );
+
+  if(!token){
+
+    alert("❌ Sesi admin tamat. Sila login semula.");
+
+    return;
+
+  }
+
+  if(!kawasan){
+
+    alert("❌ Halaman admin tidak dijumpai.");
+
+    return;
+
+  }
+
+  const sekarang = new Date(
+    new Date().toLocaleString(
+      "en-US",
+      {timeZone:"Asia/Kuala_Lumpur"}
+    )
+  );
+
+  const bulanSemasa = BULAN_KEWANGAN_SJAM[
+    sekarang.getMonth()
+  ];
+
+  const tahunSemasa = sekarang.getFullYear();
+
+  kawasan.innerHTML = `
+
+  <div class="card">
+
+    <!-- HEADER KEWANGAN -->
+
+    <div style="
+      background:linear-gradient(135deg,#2e7d32,#1b5e20);
+      color:white;
+      padding:23px 15px;
+      border-radius:17px;
+      text-align:center;
+      margin-bottom:20px;
+      box-shadow:0 4px 12px #ccc;
+    ">
+
+      <div style="font-size:35px;">💰</div>
+
+      <h2 style="color:white;margin:8px 0;">
+        PENDAPATAN & PERBELANJAAN
+      </h2>
+
+      <p style="margin:0;">
+        SJAM Kawasan Kelantan Utara
+      </p>
+
+    </div>
+
+
+    <!-- PILIH BULAN DAN TAHUN -->
+
+    <div style="
+      background:#e8f5e9;
+      padding:17px;
+      border-radius:15px;
+      border:1px solid #c8e6c9;
+    ">
+
+      <h3 style="color:#2e7d32;text-align:center;">
+        📅 PILIH TEMPOH KEWANGAN
+      </h3>
+
+      <label>Bulan</label>
+
+      <select id="bulanKewanganSJAM">
+
+        ${BULAN_KEWANGAN_SJAM.map(b=>
+          `<option value="${b}" ${
+            b===bulanSemasa?"selected":""
+          }>${b}</option>`
+        ).join("")}
+
+      </select>
+
+      <label>Tahun</label>
+
+      <select id="tahunKewanganSJAM">
+
+        ${Array.from(
+          {length:15},
+          (_,i)=>tahunSemasa-5+i
+        ).map(t=>
+          `<option value="${t}" ${
+            t===tahunSemasa?"selected":""
+          }>${t}</option>`
+        ).join("")}
+
+      </select>
+
+      <button
+        type="button"
+        class="green"
+        onclick="muatKewanganSJAM()">
+
+        🔄 PAPAR KEWANGAN
+
+      </button>
+
+    </div>
+
+
+    <!-- RINGKASAN BULANAN -->
+
+    <h3 style="margin-top:25px;">
+      📊 RINGKASAN BULANAN
+    </h3>
+
+    <div style="
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    ">
+
+      <div style="
+        background:#e8f5e9;
+        padding:15px;
+        border-radius:13px;
+        border-left:5px solid #2e7d32;
+      ">
+
+        <small>JUMLAH PENDAPATAN</small>
+
+        <h3 id="kwPendapatanBulan" style="color:#2e7d32;">
+          RM 0.00
+        </h3>
+
+      </div>
+
+      <div style="
+        background:#ffebee;
+        padding:15px;
+        border-radius:13px;
+        border-left:5px solid #c62828;
+      ">
+
+        <small>JUMLAH PERBELANJAAN</small>
+
+        <h3 id="kwPerbelanjaanBulan" style="color:#c62828;">
+          RM 0.00
+        </h3>
+
+      </div>
+
+    </div>
+
+    <div style="
+      background:#e3f2fd;
+      padding:19px;
+      border-radius:15px;
+      margin-top:12px;
+      text-align:center;
+      border:2px solid #90caf9;
+    ">
+
+      <b style="color:#1565c0;">
+        💰 BAKI BULANAN
+      </b>
+
+      <h1 id="kwBakiBulan"
+        style="color:#1565c0;margin:10px 0;">
+        RM 0.00
+      </h1>
+
+    </div>
+
+
+    <!-- RINGKASAN KESELURUHAN -->
+
+    <h3 style="margin-top:25px;">
+      🏦 RINGKASAN BAKI TERKUMPUL
+    </h3>
+
+    <div style="
+      background:#f3e5f5;
+      padding:17px;
+      border-radius:15px;
+      border:1px solid #ce93d8;
+    ">
+
+      <div style="margin-bottom:12px;">
+        <small>SEMUA PENDAPATAN</small>
+
+        <h3 id="kwPendapatanSemua"
+          style="color:#2e7d32;margin:5px 0;">
+          RM 0.00
+        </h3>
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <small>SEMUA PERBELANJAAN</small>
+
+        <h3 id="kwPerbelanjaanSemua"
+          style="color:#c62828;margin:5px 0;">
+          RM 0.00
+        </h3>
+      </div>
+
+      <hr>
+
+      <div style="text-align:center;">
+
+        <b>💰 JUMLAH BAKI KESELURUHAN</b>
+
+        <h1 id="kwBakiSemua"
+          style="color:#6a1b9a;font-size:32px;">
+          RM 0.00
+        </h1>
+
+      </div>
+
+    </div>
+
+
+<!-- ==========================================
+     ANALISIS KEWANGAN BULANAN SJAM
+     ========================================== -->
+
+<div id="analisisKewanganSJAM" style="
+  margin-top:25px;
+  background:#ffffff;
+  padding:16px;
+  border-radius:17px;
+  border:1px solid #cfd8dc;
+  box-shadow:0 3px 10px #ddd;
+">
+
+  <div style="
+    background:linear-gradient(135deg,#1565c0,#0d47a1);
+    color:white;
+    padding:17px;
+    border-radius:13px;
+    text-align:center;
+  ">
+
+    <h2 style="color:white;margin:0;">
+      📊 ANALISIS KEWANGAN
+    </h2>
+
+    <p id="kwTempohAnalisis" style="margin:8px 0 0;">
+      Menunggu data...
+    </p>
+
+  </div>
+
+  <h3 style="margin-top:22px;">
+    💰 ANALISIS PENDAPATAN
+  </h3>
+
+  <div style="
+    background:#e8f5e9;
+    border-left:6px solid #2e7d32;
+    padding:15px;
+    border-radius:12px;
+  ">
+
+    <small>JUMLAH PENDAPATAN</small>
+
+    <h2 id="kwAnalisisPendapatan"
+      style="color:#2e7d32;margin:8px 0;">
+      RM 0.00
+    </h2>
+
+  </div>
+
+  <h3 style="margin-top:22px;">
+    📉 PECAHAN PERBELANJAAN
+  </h3>
+
+  <div id="kwGrafPerbelanjaanSJAM">
+
+    <div class="settingBox">
+      Menunggu data perbelanjaan...
+    </div>
+
+  </div>
+
+  <h3 style="margin-top:22px;">
+    📋 RINGKASAN SETIAP KATEGORI
+  </h3>
+
+  <div id="kwPecahanKategoriSJAM">
+
+    <div class="settingBox">
+      Menunggu data...
+    </div>
+
+  </div>
+
+  <h3 style="margin-top:22px;">
+    📊 PRESTASI KEWANGAN
+  </h3>
+
+  <div style="
+    background:#e3f2fd;
+    padding:15px;
+    border-radius:13px;
+    border-left:6px solid #1565c0;
+  ">
+
+    <small>JUMLAH PERBELANJAAN</small>
+
+    <h2 id="kwAnalisisPerbelanjaan"
+      style="color:#c62828;margin:8px 0;">
+      RM 0.00
+    </h2>
+
+    <hr>
+
+    <small>BAKI BERSIH BULANAN</small>
+
+    <h2 id="kwAnalisisBaki"
+      style="color:#1565c0;margin:8px 0;">
+      RM 0.00
+    </h2>
+
+    <small id="kwAnalisisPeratus">
+      Penggunaan pendapatan: 0%
+    </small>
+
+  </div>
+
+  <div id="kwAnalisisKesimpulan" style="
+    background:#fff8e1;
+    padding:15px;
+    border-radius:12px;
+    margin-top:15px;
+    line-height:1.7;
+    border-left:5px solid #f9a825;
+  ">
+
+    Analisis akan dijana berdasarkan rekod kewangan.
+
+  </div>
+
+</div>
+
+<!-- TAMAT ANALISIS KEWANGAN -->
+
+
+
+    <!-- BORANG TRANSAKSI -->
+
+    <h3 style="margin-top:28px;">
+      📝 TAMBAH REKOD KEWANGAN
+    </h3>
+
+    <div style="
+      background:#f5f9ff;
+      padding:16px;
+      border-radius:15px;
+      border:1px solid #bbdefb;
+    ">
+
+      <label>📅 Tarikh</label>
+
+      <input
+        id="kwTarikh"
+        type="date"
+        value="${tarikhHariIniKewanganSJAM()}"
+      >
+
+      <label>💰 Pendapatan (RM)</label>
+
+      <input
+        id="kwPendapatan"
+        type="number"
+        min="0"
+        step="0.01"
+        placeholder="Masukkan pendapatan"
+      >
+
+      <hr>
+
+      <h3 style="color:#c62828;">
+        📉 BUTIRAN PERBELANJAAN
+      </h3>
+
+      <label>⛽ Minyak (RM)</label>
+
+      <input
+        id="kwMinyak"
+        type="number"
+        min="0"
+        step="0.01"
+        value="0"
+        oninput="kiraJumlahKewanganSJAM()"
+      >
+
+      <label>🍽️ Makan / Minum (RM)</label>
+
+      <input
+        id="kwMakan"
+        type="number"
+        min="0"
+        step="0.01"
+        value="0"
+        oninput="kiraJumlahKewanganSJAM()"
+      >
+
+      <label>📦 Lain-lain (RM)</label>
+
+      <input
+        id="kwLain"
+        type="number"
+        min="0"
+        step="0.01"
+        value="0"
+        oninput="kiraJumlahKewanganSJAM()"
+      >
+
+      <label>🏨 Penginapan (RM)</label>
+
+      <input
+        id="kwPenginapan"
+        type="number"
+        min="0"
+        step="0.01"
+        value="0"
+        oninput="kiraJumlahKewanganSJAM()"
+      >
+
+      <!-- JUMLAH AUTO -->
+
+      <div style="
+        background:#ffebee;
+        border:1px solid #ef9a9a;
+        padding:14px;
+        border-radius:12px;
+        margin-top:15px;
+      ">
+
+        <b style="color:#b71c1c;">
+          JUMLAH PERBELANJAAN
+        </b>
+
+        <h2 id="kwJumlahBelanja"
+          style="color:#c62828;margin:8px 0;">
+          RM 0.00
+        </h2>
+
+      </div>
+
+
+      <!-- BAKI AUTO -->
+
+      <div style="
+        background:#e8f5e9;
+        border:1px solid #a5d6a7;
+        padding:14px;
+        border-radius:12px;
+        margin-top:12px;
+      ">
+
+        <b style="color:#1b5e20;">
+          BAKI TRANSAKSI
+        </b>
+
+        <h2 id="kwBakiTransaksi"
+          style="color:#2e7d32;margin:8px 0;">
+          RM 0.00
+        </h2>
+
+      </div>
+
+
+      <hr>
+
+      <h3>🧾 MAKLUMAT RESIT & PERJALANAN</h3>
+
+      <label>No. Resit</label>
+
+      <input
+        id="kwNoResit"
+        placeholder="Masukkan nombor resit"
+      >
+
+      <label>📍 Dari mana</label>
+
+      <input
+        id="kwDari"
+        placeholder="Lokasi permulaan"
+      >
+
+      <label>📍 Ke mana</label>
+
+      <input
+        id="kwKe"
+        placeholder="Lokasi destinasi"
+      >
+
+      <label>🎯 Tujuan</label>
+
+      <input
+        id="kwTujuan"
+        placeholder="Nyatakan tujuan perjalanan"
+      >
+
+      <label>💳 Kaedah Pembayaran</label>
+
+      <select id="kwKaedah">
+
+        <option value="">
+          Pilih kaedah pembayaran
+        </option>
+
+        <option value="Tunai">
+          Tunai
+        </option>
+
+        <option value="Bank In">
+          Bank In
+        </option>
+
+      </select>
+
+
+      <button
+        type="button"
+        id="btnSimpanKewanganSJAM"
+        class="green"
+        style="
+          padding:16px;
+          font-weight:bold;
+        "
+        onclick="simpanKewanganHTMLSJAM()">
+
+        💾 SIMPAN REKOD KEWANGAN
+
+      </button>
+
+    </div>
+
+
+<!-- ==========================================
+     MENU LAPORAN KEWANGAN BULANAN
+     ========================================== -->
+
+<div style="
+  background:#e8f0fe;
+  border:1px solid #90caf9;
+  border-radius:15px;
+  padding:16px;
+  margin-top:25px;
+">
+
+  <h3 style="
+    color:#1565c0;
+    text-align:center;
+  ">
+    📑 LAPORAN KEWANGAN BULANAN
+  </h3>
+
+  <p style="
+    text-align:center;
+    color:#555;
+    font-size:13px;
+    line-height:1.6;
+  ">
+    Jana laporan rasmi berdasarkan bulan dan tahun
+    yang dipilih di atas.
+  </p>
+
+  <button
+    type="button"
+    style="
+      background:#1565c0;
+      font-weight:bold;
+      padding:15px;
+    "
+    onclick="cetakLaporanKewanganSJAM()">
+
+    🖨️ CETAK / SIMPAN LAPORAN PDF
+
+  </button>
+
+</div>
+
+<!-- TAMAT MENU LAPORAN -->
+
+
+<!-- ==========================================
+     LAPORAN KEWANGAN TAHUNAN SJAM
+     ========================================== -->
+
+<div style="
+  background:#e8f5e9;
+  border:1px solid #a5d6a7;
+  border-radius:15px;
+  padding:16px;
+  margin-top:15px;
+">
+
+  <h3 style="
+    color:#2e7d32;
+    text-align:center;
+  ">
+    📈 LAPORAN KEWANGAN TAHUNAN
+  </h3>
+
+  <p style="
+    text-align:center;
+    color:#555;
+    font-size:13px;
+  ">
+    Analisis dan perbandingan prestasi kewangan
+    sepanjang tahun.
+  </p>
+
+  <button
+    type="button"
+    class="green"
+    style="font-weight:bold;padding:15px;"
+    onclick="bukaLaporanTahunanSJAM()">
+
+    📊 ANALISIS KEWANGAN TAHUNAN
+
+  </button>
+
+</div>
+
+<!-- TAMAT LAPORAN KEWANGAN TAHUNAN -->
+
+
+    <!-- SENARAI REKOD -->
+
+    <h3 style="margin-top:28px;">
+      📚 SEJARAH TRANSAKSI
+    </h3>
+
+    <div id="senaraiKewanganSJAM">
+
+      <div class="settingBox">
+        ⏳ Memuatkan rekod kewangan...
+      </div>
+
+    </div>
+
+
+    <button
+      type="button"
+      class="back"
+      onclick="bukaDashboardAdmin()">
+
+      ⬅️ KEMBALI DASHBOARD
+
+    </button>
+
+  </div>
+
+  `;
+
+  kiraJumlahKewanganSJAM();
+
+  muatKewanganSJAM();
+
+  kawasan.scrollIntoView({
+    behavior:"smooth",
+    block:"start"
+  });
+
+}
+
+
+// ======================================================
+// KIRA JUMLAH PERBELANJAAN DAN BAKI TRANSAKSI
+// ======================================================
+
+function kiraJumlahKewanganSJAM(){
+
+  const baca = id => {
+
+    const nilai = document.getElementById(id)?.value;
+
+    if(nilai === "" || nilai === null || nilai === undefined){
+      return 0;
+    }
+
+    return Number(nilai);
+
+  };
+
+  const minyak = baca("kwMinyak");
+  const makan = baca("kwMakan");
+  const lain = baca("kwLain");
+  const penginapan = baca("kwPenginapan");
+  const pendapatan = baca("kwPendapatan");
+
+  const jumlah =
+    minyak + makan + lain + penginapan;
+
+  const baki = pendapatan - jumlah;
+
+  const papar = (id,nilai)=>{
+
+    const box = document.getElementById(id);
+
+    if(box){
+      box.textContent = formatRMKewanganSJAM(nilai);
+    }
+
+  };
+
+  papar("kwJumlahBelanja",jumlah);
+
+  papar("kwBakiTransaksi",baki);
+
+}
+
+
+
+// ======================================================
+// SIMPAN / EDIT REKOD KEWANGAN SJAM
+// ======================================================
+
+async function simpanKewanganHTMLSJAM(){
+
+  const token = sessionStorage.getItem(
+    "tokenAdminSJAM"
+  );
+
+  if(!token){
+
+    alert("❌ Sesi admin tamat. Sila login semula.");
+    return;
+
+  }
+
+  const ambil = id =>
+    document.getElementById(id)?.value.trim() || "";
+
+  const sedangEdit = Boolean(
+    idKewanganSedangEditSJAM
+  );
+
+  const data = {
+
+    tarikh:ambil("kwTarikh"),
+
+    pendapatan:ambil("kwPendapatan"),
+
+    minyak:ambil("kwMinyak"),
+
+    makanMinum:ambil("kwMakan"),
+
+    lainLain:ambil("kwLain"),
+
+    penginapan:ambil("kwPenginapan"),
+
+    noResit:ambil("kwNoResit"),
+
+    dari:ambil("kwDari"),
+
+    ke:ambil("kwKe"),
+
+    tujuan:ambil("kwTujuan"),
+
+    kaedahPembayaran:ambil("kwKaedah")
+
+  };
+
+  // ID UNTUK EDIT SAHAJA
+  if(sedangEdit){
+
+    data.idKewangan = idKewanganSedangEditSJAM;
+
+  }
+
+  if(!data.tarikh){
+
+    alert("❌ Sila pilih tarikh transaksi.");
+    return;
+
+  }
+
+  const nilai = [
+    data.pendapatan,
+    data.minyak,
+    data.makanMinum,
+    data.lainLain,
+    data.penginapan
+  ];
+
+  if(nilai.every(x=>x==="")){
+
+    alert("❌ Sila masukkan sekurang-kurangnya satu nilai kewangan.");
+    return;
+
+  }
+
+  if(nilai.some(x=>
+    x!=="" &&
+    (!Number.isFinite(Number(x)) || Number(x)<0)
+  )){
+
+    alert("❌ Nilai kewangan tidak sah.");
+    return;
+
+  }
+
+  if(!data.kaedahPembayaran){
+
+    alert("❌ Sila pilih Tunai atau Bank In.");
+    return;
+
+  }
+
+  const tindakan = sedangEdit
+    ? "editKewangan"
+    : "simpanKewangan";
+
+  const pengesahan = sedangEdit
+    ? "Kemaskini rekod kewangan ini?"
+    : "Simpan rekod kewangan baharu?";
+
+  if(!confirm(pengesahan)){
+    return;
+  }
+
+  const butang = document.getElementById(
+    "btnSimpanKewanganSJAM"
+  );
+
+  butang.disabled = true;
+
+  butang.textContent = sedangEdit
+    ? "⏳ SEDANG MENGEMASKINI..."
+    : "⏳ SEDANG MENYIMPAN...";
+
+  try{
+
+    const response = await fetch(SCRIPT_URL,{
+
+      method:"POST",
+
+      body:JSON.stringify({
+
+        action:tindakan,
+
+        tokenAdmin:token,
+
+        data:data
+
+      })
+
+    });
+
+    const res = await response.json();
+
+    if(!res.success){
+
+      throw new Error(
+        res.message || "Operasi gagal."
+      );
+
+    }
+
+    alert(
+      sedangEdit
+      ? "✅ REKOD BERJAYA DIKEMASKINI!"
+      : "✅ REKOD BERJAYA DISIMPAN!"
+    );
+
+    // RESET MOD EDIT
+    idKewanganSedangEditSJAM = "";
+
+    // KOSONGKAN BORANG
+    kosongkanBorangKewanganSJAM();
+
+    // KEMBALIKAN PAPARAN BUTANG
+    butang.textContent =
+      "💾 SIMPAN REKOD KEWANGAN";
+
+    // BUANG BUTANG BATAL EDIT JIKA ADA
+    const butangBatal = document.getElementById(
+      "btnBatalEditKewanganSJAM"
+    );
+
+    if(butangBatal){
+      butangBatal.remove();
+    }
+
+    // KEMASKINI RINGKASAN DAN SEJARAH
+    await muatKewanganSJAM();
+
+  }catch(error){
+
+    console.error(error);
+
+    alert("❌ " + error.message);
+
+  }finally{
+
+    butang.disabled = false;
+
+    if(idKewanganSedangEditSJAM){
+
+      butang.textContent =
+        "✏️ KEMASKINI REKOD KEWANGAN";
+
+    }else{
+
+      butang.textContent =
+        "💾 SIMPAN REKOD KEWANGAN";
+
+    }
+
+  }
+
+}
+
+
+// ======================================================
+// KOSONGKAN BORANG KEWANGAN
+// ======================================================
+
+function kosongkanBorangKewanganSJAM(){
+
+  const medan = [
+    "kwPendapatan",
+    "kwNoResit",
+    "kwDari",
+    "kwKe",
+    "kwTujuan"
+  ];
+
+  medan.forEach(id=>{
+
+    const el = document.getElementById(id);
+
+    if(el){
+      el.value = "";
+    }
+
+  });
+
+  [
+    "kwMinyak",
+    "kwMakan",
+    "kwLain",
+    "kwPenginapan"
+  ].forEach(id=>{
+
+    const el = document.getElementById(id);
+
+    if(el){
+      el.value = "0";
+    }
+
+  });
+
+  const tarikh = document.getElementById("kwTarikh");
+
+  if(tarikh){
+    tarikh.value = tarikhHariIniKewanganSJAM();
+  }
+
+  const kaedah = document.getElementById("kwKaedah");
+
+  if(kaedah){
+    kaedah.value = "";
+  }
+
+  kiraJumlahKewanganSJAM();
+
+}
+
+
+// ======================================================
+// BATAL MOD EDIT
+// ======================================================
+
+function batalEditKewanganSJAM(){
+
+  if(!confirm("Batalkan proses edit rekod ini?")){
+    return;
+  }
+
+  idKewanganSedangEditSJAM = "";
+
+  kosongkanBorangKewanganSJAM();
+
+  const butang = document.getElementById(
+    "btnSimpanKewanganSJAM"
+  );
+
+  if(butang){
+
+    butang.textContent =
+      "💾 SIMPAN REKOD KEWANGAN";
+
+  }
+
+  const butangBatal = document.getElementById(
+    "btnBatalEditKewanganSJAM"
+  );
+
+  if(butangBatal){
+    butangBatal.remove();
+  }
+
+  alert("✅ Mod edit dibatalkan.");
+
+}
+
+
+// ======================================================
+// AMBIL REKOD KEWANGAN DARIPADA GS
+// ======================================================
+
+async function muatKewanganSJAM(){
+
+  const token = sessionStorage.getItem(
+    "tokenAdminSJAM"
+  );
+
+  if(!token){
+
+    alert("Sila login semula sebagai admin.");
+
+    return;
+
+  }
+
+  const bulan = document.getElementById(
+    "bulanKewanganSJAM"
+  )?.value;
+
+  const tahun = document.getElementById(
+    "tahunKewanganSJAM"
+  )?.value;
+
+  const senarai = document.getElementById(
+    "senaraiKewanganSJAM"
+  );
+
+  if(!senarai){
+    return;
+  }
+
+  senarai.innerHTML = `
+    <div class="settingBox">
+      ⏳ Sedang mengambil rekod kewangan...
+    </div>
+  `;
+
+  try{
+
+    const response = await fetch(SCRIPT_URL,{
+
+      method:"POST",
+
+      body:JSON.stringify({
+
+        action:"senaraiKewangan",
+
+        tokenAdmin:token,
+
+        bulan:bulan,
+
+        tahun:tahun
+
+      })
+
+    });
+
+    const res = await response.json();
+
+    if(!res.success){
+
+      throw new Error(
+        res.message || "Gagal mengambil rekod."
+      );
+
+    }
+
+    // RINGKASAN BULANAN
+
+    document.getElementById(
+      "kwPendapatanBulan"
+    ).textContent =
+      formatRMKewanganSJAM(res.ringkasan.pendapatan);
+
+    document.getElementById(
+      "kwPerbelanjaanBulan"
+    ).textContent =
+      formatRMKewanganSJAM(res.ringkasan.perbelanjaan);
+
+    document.getElementById(
+      "kwBakiBulan"
+    ).textContent =
+      formatRMKewanganSJAM(res.ringkasan.baki);
+
+    // RINGKASAN KESELURUHAN
+
+    document.getElementById(
+      "kwPendapatanSemua"
+    ).textContent =
+      formatRMKewanganSJAM(res.keseluruhan.pendapatan);
+
+    document.getElementById(
+      "kwPerbelanjaanSemua"
+    ).textContent =
+      formatRMKewanganSJAM(res.keseluruhan.perbelanjaan);
+
+    document.getElementById(
+      "kwBakiSemua"
+    ).textContent =
+      formatRMKewanganSJAM(res.keseluruhan.baki);
+
+    
+dataKewanganSemasaSJAM = res.data || [];
+
+paparSenaraiKewanganSJAM(dataKewanganSemasaSJAM);
+
+paparAnalisisKewanganSJAM(res);
+
+  }catch(error){
+
+    console.error(error);
+
+    senarai.innerHTML = `
+      <div class="settingBox" style="color:red;">
+        ❌ ${selamatAtributTuntutan(error.message)}
+      </div>
+    `;
+
+  }
+
+}
+
+
+
+// ======================================================
+// PAPAR SEJARAH TRANSAKSI KEWANGAN SJAM
+// VIEW - EDIT - PADAM
+// ======================================================
+
+function paparSenaraiKewanganSJAM(data){
+
+  const kawasan = document.getElementById(
+    "senaraiKewanganSJAM"
+  );
+
+  if(!kawasan){
+    return;
+  }
+
+  kawasan.innerHTML = "";
+
+  if(!Array.isArray(data) || data.length === 0){
+
+    kawasan.innerHTML = `
+      <div class="settingBox">
+        Tiada transaksi kewangan bagi bulan dan tahun ini.
+      </div>
+    `;
+
+    return;
+
+  }
+
+  data.forEach(x=>{
+
+    const kotak = document.createElement("div");
+
+    kotak.className = "sejarahItem";
+    kotak.style.textAlign = "left";
+    kotak.style.marginBottom = "15px";
+
+    // TAJUK REKOD
+    const tajuk = document.createElement("h3");
+
+    tajuk.style.color = "#1565c0";
+    tajuk.textContent = "💰 REKOD KEWANGAN";
+
+    kotak.appendChild(tajuk);
+
+    // MAKLUMAT TRANSAKSI
+    const teks = document.createElement("div");
+
+    teks.style.whiteSpace = "pre-line";
+    teks.style.overflowWrap = "anywhere";
+    teks.style.lineHeight = "1.7";
+
+    const tarikh = x.tarikh
+      ? x.tarikh.slice(8,10)+"/"+
+        x.tarikh.slice(5,7)+"/"+
+        x.tarikh.slice(0,4)
+      : "-";
+
+    teks.textContent =
+
+      "📅 Tarikh: " + tarikh + "\n" +
+
+      "💰 Pendapatan: " +
+      formatRMKewanganSJAM(x.pendapatan) + "\n" +
+
+      "⛽ Minyak: " +
+      formatRMKewanganSJAM(x.minyak) + "\n" +
+
+      "🍽️ Makan/Minum: " +
+      formatRMKewanganSJAM(x.makanMinum) + "\n" +
+
+      "📦 Lain-lain: " +
+      formatRMKewanganSJAM(x.lainLain) + "\n" +
+
+      "🏨 Penginapan: " +
+      formatRMKewanganSJAM(x.penginapan) + "\n" +
+
+      "📉 Jumlah Perbelanjaan: " +
+      formatRMKewanganSJAM(x.jumlahPerbelanjaan) + "\n" +
+
+      "💵 Baki Transaksi: " +
+      formatRMKewanganSJAM(x.bakiTransaksi) + "\n" +
+
+      "🧾 No Resit: " + (x.noResit || "-") + "\n" +
+
+      "📍 Dari: " + (x.dari || "-") + "\n" +
+
+      "📍 Ke: " + (x.ke || "-") + "\n" +
+
+      "🎯 Tujuan: " + (x.tujuan || "-") + "\n" +
+
+      "💳 Pembayaran: " + (x.kaedahPembayaran || "-");
+
+    kotak.appendChild(teks);
+
+    // RUANG BUTANG
+    const butangBox = document.createElement("div");
+
+    butangBox.style.display = "grid";
+    butangBox.style.gridTemplateColumns = "1fr 1fr 1fr";
+    butangBox.style.gap = "7px";
+    butangBox.style.marginTop = "15px";
+
+    // FUNGSI CIPTA BUTANG
+    function ciptaButang(teks,warna,aksi){
+
+      const butang = document.createElement("button");
+
+      butang.type = "button";
+      butang.textContent = teks;
+      butang.style.background = warna;
+      butang.style.padding = "11px 3px";
+      butang.style.marginTop = "0";
+      butang.style.fontSize = "13px";
+      butang.style.fontWeight = "bold";
+
+      butang.addEventListener("click",aksi);
+
+      butangBox.appendChild(butang);
+
+    }
+
+    // VIEW
+    ciptaButang(
+      "👁️ VIEW",
+      "#1565c0",
+      ()=>viewKewanganHTMLSJAM(x.idKewangan)
+    );
+
+    // EDIT
+    ciptaButang(
+      "✏️ EDIT",
+      "#ef6c00",
+      ()=>editKewanganHTMLSJAM(x.idKewangan)
+    );
+
+    // PADAM
+    ciptaButang(
+      "🗑️ PADAM",
+      "#c62828",
+      ()=>padamKewanganHTMLSJAM(x.idKewangan)
+    );
+
+    kotak.appendChild(butangBox);
+
+    kawasan.appendChild(kotak);
+
+  });
+
+}
+
+
+// ======================================================
+// TAMAT PAPAR SEJARAH KEWANGAN
+// ======================================================
+
+// ======================================================
+// TAMAT MODUL KEWANGAN SJAM
+// ======================================================
+
+
+// ======================================================
+// VIEW MAKLUMAT KEWANGAN SJAM
+// ======================================================
+
+async function viewKewanganHTMLSJAM(id){
+
+  const token = sessionStorage.getItem(
+    "tokenAdminSJAM"
+  );
+
+  if(!token){
+    alert("Sila login semula sebagai admin.");
+    return;
+  }
+
+  try{
+
+    const response = await fetch(SCRIPT_URL,{
+
+      method:"POST",
+
+      body:JSON.stringify({
+
+        action:"viewKewangan",
+
+        tokenAdmin:token,
+
+        idKewangan:id
+
+      })
+
+    });
+
+    const res = await response.json();
+
+    if(!res.success){
+
+      throw new Error(res.message);
+
+    }
+
+    const x = res.data;
+
+    const tarikh = x.tarikh
+      ? x.tarikh.slice(8,10)+"/"+
+        x.tarikh.slice(5,7)+"/"+
+        x.tarikh.slice(0,4)
+      : "-";
+
+    // BUANG MODAL LAMA JIKA ADA
+    document.getElementById(
+      "modalViewKewanganSJAM"
+    )?.remove();
+
+    // CIPTA MODAL
+    const modal = document.createElement("div");
+
+    modal.id = "modalViewKewanganSJAM";
+
+    modal.style.cssText = `
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.65);
+      z-index:99999;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding:15px;
+      overflow-y:auto;
+    `;
+
+    const kad = document.createElement("div");
+
+    kad.style.cssText = `
+      background:white;
+      width:100%;
+      max-width:450px;
+      max-height:90vh;
+      overflow-y:auto;
+      padding:20px;
+      border-radius:18px;
+      box-shadow:0 5px 25px #222;
+    `;
+
+    const tajuk = document.createElement("h2");
+
+    tajuk.style.color = "#1565c0";
+    tajuk.textContent = "👁️ MAKLUMAT TRANSAKSI";
+
+    kad.appendChild(tajuk);
+
+    const butiran = document.createElement("div");
+
+    butiran.style.cssText = `
+      white-space:pre-line;
+      line-height:1.9;
+      overflow-wrap:anywhere;
+      font-size:15px;
+      background:#f5f9ff;
+      padding:15px;
+      border-radius:12px;
+    `;
+
+    butiran.textContent =
+
+      "ID Rekod: " + x.idKewangan + "\n" +
+
+      "Tarikh: " + tarikh + "\n" +
+
+      "Bulan: " + x.bulan + "\n" +
+
+      "Tahun: " + x.tahun + "\n\n" +
+
+      "PENDAPATAN\n" +
+      formatRMKewanganSJAM(x.pendapatan) + "\n\n" +
+
+      "PERBELANJAAN\n" +
+
+      "Minyak: " +
+      formatRMKewanganSJAM(x.minyak) + "\n" +
+
+      "Makan/Minum: " +
+      formatRMKewanganSJAM(x.makanMinum) + "\n" +
+
+      "Lain-lain: " +
+      formatRMKewanganSJAM(x.lainLain) + "\n" +
+
+      "Penginapan: " +
+      formatRMKewanganSJAM(x.penginapan) + "\n\n" +
+
+      "Jumlah Perbelanjaan: " +
+      formatRMKewanganSJAM(x.jumlahPerbelanjaan) + "\n" +
+
+      "Baki Transaksi: " +
+      formatRMKewanganSJAM(x.bakiTransaksi) + "\n\n" +
+
+      "No Resit: " + (x.noResit || "-") + "\n" +
+
+      "Dari: " + (x.dari || "-") + "\n" +
+
+      "Ke: " + (x.ke || "-") + "\n" +
+
+      "Tujuan: " + (x.tujuan || "-") + "\n" +
+
+      "Pembayaran: " + (x.kaedahPembayaran || "-") + "\n\n" +
+
+      "Masa Rekod: " + (x.masaRekod || "-");
+
+    kad.appendChild(butiran);
+
+    const tutup = document.createElement("button");
+
+    tutup.type = "button";
+    tutup.className = "back";
+    tutup.textContent = "⬅️ TUTUP";
+
+    tutup.onclick = ()=>modal.remove();
+
+    kad.appendChild(tutup);
+
+    modal.appendChild(kad);
+
+    modal.addEventListener("click",function(e){
+
+      if(e.target === modal){
+        modal.remove();
+      }
+
+    });
+
+    document.body.appendChild(modal);
+
+  }catch(error){
+
+    console.error(error);
+
+    alert("❌ Gagal melihat rekod: "+error.message);
+
+  }
+
+}
+
+
+// ======================================================
+// TAMAT VIEW KEWANGAN
+// ======================================================
+
+// ======================================================
+// EDIT MAKLUMAT KEWANGAN SJAM
+// ======================================================
+
+async function editKewanganHTMLSJAM(id){
+
+  const token = sessionStorage.getItem(
+    "tokenAdminSJAM"
+  );
+
+  if(!token){
+    alert("Sila login semula sebagai admin.");
+    return;
+  }
+
+  if(idKewanganSedangEditSJAM){
+
+    if(!confirm(
+      "Anda sedang mengedit rekod lain. Batalkan edit lama?"
+    )){
+      return;
+    }
+
+    idKewanganSedangEditSJAM = "";
+
+  }
+
+  try{
+
+    const response = await fetch(SCRIPT_URL,{
+
+      method:"POST",
+
+      body:JSON.stringify({
+
+        action:"viewKewangan",
+
+        tokenAdmin:token,
+
+        idKewangan:id
+
+      })
+
+    });
+
+    const res = await response.json();
+
+    if(!res.success){
+
+      throw new Error(res.message);
+
+    }
+
+    const x = res.data;
+
+    // SIMPAN ID REKOD ASAL
+    idKewanganSedangEditSJAM = x.idKewangan;
+
+    // MASUKKAN SEMULA DATA DALAM BORANG
+    const isi = (id,nilai)=>{
+
+      const el = document.getElementById(id);
+
+      if(el){
+        el.value = nilai ?? "";
+      }
+
+    };
+
+    isi("kwTarikh",x.tarikh);
+
+    isi("kwPendapatan",x.pendapatan);
+
+    isi("kwMinyak",x.minyak);
+
+    isi("kwMakan",x.makanMinum);
+
+    isi("kwLain",x.lainLain);
+
+    isi("kwPenginapan",x.penginapan);
+
+    isi("kwNoResit",x.noResit);
+
+    isi("kwDari",x.dari);
+
+    isi("kwKe",x.ke);
+
+    isi("kwTujuan",x.tujuan);
+
+    isi("kwKaedah",x.kaedahPembayaran);
+
+    // TUKAR BUTANG SIMPAN KEPADA EDIT
+    const butang = document.getElementById(
+      "btnSimpanKewanganSJAM"
+    );
+
+    if(!butang){
+
+      throw new Error("Borang kewangan tidak dijumpai.");
+
+    }
+
+    butang.textContent =
+      "✏️ KEMASKINI REKOD KEWANGAN";
+
+    // TAMBAH BUTANG BATAL EDIT
+    document.getElementById(
+      "btnBatalEditKewanganSJAM"
+    )?.remove();
+
+    const batal = document.createElement("button");
+
+    batal.type = "button";
+
+    batal.id = "btnBatalEditKewanganSJAM";
+
+    batal.className = "back";
+
+    batal.textContent = "❌ BATAL EDIT";
+
+    batal.onclick = batalEditKewanganSJAM;
+
+    butang.insertAdjacentElement("afterend",batal);
+
+    // KIRA SEMULA JUMLAH DAN BAKI
+    kiraJumlahKewanganSJAM();
+
+    alert(
+      "✏️ Rekod berjaya dimuatkan ke dalam borang.\n\n" +
+      "Sila ubah maklumat yang diperlukan dan tekan " +
+      "KEMASKINI REKOD KEWANGAN."
+    );
+
+    // SCROLL KE BORANG
+    document.getElementById("kwTarikh")
+      .scrollIntoView({
+        behavior:"smooth",
+        block:"center"
+      });
+
+  }catch(error){
+
+    console.error(error);
+
+    alert("❌ Gagal membuka rekod edit: "+error.message);
+
+  }
+
+}
+
+
+// ======================================================
+// TAMAT EDIT KEWANGAN
+// ======================================================
+
+// ======================================================
+// PADAM REKOD KEWANGAN SJAM
+// PADAM DARIPADA GOOGLE SHEET
+// ======================================================
+
+async function padamKewanganHTMLSJAM(id){
+
+  const token = sessionStorage.getItem(
+    "tokenAdminSJAM"
+  );
+
+  if(!token){
+
+    alert("❌ Sesi admin tamat. Sila login semula.");
+
+    return;
+
+  }
+
+  if(idKewanganSedangEditSJAM === id){
+
+    alert(
+      "❌ Rekod ini sedang dalam mod EDIT.\n\n" +
+      "Sila batalkan EDIT dahulu sebelum memadam."
+    );
+
+    return;
+
+  }
+
+  const setuju = confirm(
+    "⚠️ PADAM REKOD KEWANGAN?\n\n" +
+
+    "ID Rekod: "+id+"\n\n" +
+
+    "Rekod ini akan dipadam secara kekal daripada:\n" +
+
+    "1. Web App SJAM\n" +
+
+    "2. Google Sheet KEWANGAN\n\n" +
+
+    "Tindakan ini tidak boleh dibatalkan.\n\n" +
+
+    "Adakah anda pasti mahu meneruskan?"
+  );
+
+  if(!setuju){
+    return;
+  }
+
+  try{
+
+    const response = await fetch(SCRIPT_URL,{
+
+      method:"POST",
+
+      body:JSON.stringify({
+
+        action:"padamKewangan",
+
+        tokenAdmin:token,
+
+        idKewangan:id
+
+      })
+
+    });
+
+    const res = await response.json();
+
+    if(!res.success){
+
+      throw new Error(
+        res.message || "Rekod gagal dipadam."
+      );
+
+    }
+
+    alert(
+      "✅ REKOD BERJAYA DIPADAM!\n\n" +
+
+      "ID: "+id+"\n\n" +
+
+      "Rekod telah dipadam daripada Google Sheet KEWANGAN."
+    );
+
+    // KIRA SEMULA SEMUA JUMLAH
+    await muatKewanganSJAM();
+
+  }catch(error){
+
+    console.error(error);
+
+    alert(
+      "❌ Gagal memadam rekod.\n\n"+
+      error.message
+    );
+
+  }
+
+}
+
+
+// ======================================================
+// TAMAT PADAM KEWANGAN
+// ======================================================
+
+
+// ======================================================
+// ANALISIS KEWANGAN AUTOMATIK SJAM
+// ======================================================
+
+function paparAnalisisKewanganSJAM(res){
+
+  const graf = document.getElementById(
+    "kwGrafPerbelanjaanSJAM"
+  );
+
+  const pecahan = document.getElementById(
+    "kwPecahanKategoriSJAM"
+  );
+
+  if(!graf || !pecahan){
+    return;
+  }
+
+  const data = Array.isArray(res.data)
+    ? res.data
+    : [];
+
+  const ringkasan = res.ringkasan || {};
+
+  const pendapatan = Number(
+    ringkasan.pendapatan
+  ) || 0;
+
+  const perbelanjaan = Number(
+    ringkasan.perbelanjaan
+  ) || 0;
+
+  const baki = Number(
+    ringkasan.baki
+  ) || 0;
+
+  // JUMLAH SETIAP KATEGORI
+  const kategori = [
+
+    {
+      nama:"Minyak",
+      nilai:data.reduce(
+        (jumlah,x)=>jumlah+(Number(x.minyak)||0),0
+      ),
+      warna:"#1565c0",
+      emoji:"⛽"
+    },
+
+    {
+      nama:"Makan / Minum",
+      nilai:data.reduce(
+        (jumlah,x)=>jumlah+(Number(x.makanMinum)||0),0
+      ),
+      warna:"#ef6c00",
+      emoji:"🍽️"
+    },
+
+    {
+      nama:"Lain-lain",
+      nilai:data.reduce(
+        (jumlah,x)=>jumlah+(Number(x.lainLain)||0),0
+      ),
+      warna:"#7b1fa2",
+      emoji:"📦"
+    },
+
+    {
+      nama:"Penginapan",
+      nilai:data.reduce(
+        (jumlah,x)=>jumlah+(Number(x.penginapan)||0),0
+      ),
+      warna:"#00897b",
+      emoji:"🏨"
+    }
+
+  ];
+
+  const jumlahKategori = kategori.reduce(
+    (jumlah,x)=>jumlah+x.nilai,0
+  );
+
+  const tempohBulan = document.getElementById(
+    "bulanKewanganSJAM"
+  )?.value || "";
+
+  const tempohTahun = document.getElementById(
+    "tahunKewanganSJAM"
+  )?.value || "";
+
+  const papar = (id,nilai)=>{
+
+    const el = document.getElementById(id);
+
+    if(el){
+      el.textContent = formatRMKewanganSJAM(nilai);
+    }
+
+  };
+
+  // PAPAR TEMPOH
+  document.getElementById(
+    "kwTempohAnalisis"
+  ).textContent = tempohBulan+" "+tempohTahun;
+
+  // PAPAR JUMLAH
+  papar("kwAnalisisPendapatan",pendapatan);
+
+  papar("kwAnalisisPerbelanjaan",perbelanjaan);
+
+  papar("kwAnalisisBaki",baki);
+
+  // PERATUS PERBELANJAAN
+  const peratus = pendapatan > 0
+    ? (perbelanjaan/pendapatan)*100
+    : 0;
+
+  document.getElementById(
+    "kwAnalisisPeratus"
+  ).textContent =
+    "Penggunaan pendapatan: "+peratus.toFixed(1)+"%";
+
+  // GRAF PERBELANJAAN
+  graf.innerHTML = "";
+
+  kategori.forEach(item=>{
+
+    const peratusKategori = jumlahKategori > 0
+      ? (item.nilai/jumlahKategori)*100
+      : 0;
+
+    const baris = document.createElement("div");
+
+    baris.style.marginBottom = "19px";
+
+    const tajuk = document.createElement("div");
+
+    tajuk.style.display = "flex";
+    tajuk.style.justifyContent = "space-between";
+    tajuk.style.gap = "8px";
+    tajuk.style.marginBottom = "7px";
+    tajuk.style.fontSize = "13px";
+
+    const nama = document.createElement("b");
+    nama.textContent = item.emoji+" "+item.nama;
+
+    const jumlah = document.createElement("b");
+    jumlah.textContent =
+      formatRMKewanganSJAM(item.nilai);
+
+    tajuk.appendChild(nama);
+    tajuk.appendChild(jumlah);
+
+    const latar = document.createElement("div");
+
+    latar.style.background = "#eeeeee";
+    latar.style.height = "17px";
+    latar.style.borderRadius = "10px";
+    latar.style.overflow = "hidden";
+
+    const bar = document.createElement("div");
+
+    bar.style.background = item.warna;
+    bar.style.width = peratusKategori+"%";
+    bar.style.height = "100%";
+    bar.style.borderRadius = "10px";
+    bar.style.transition = "width 0.5s";
+
+    latar.appendChild(bar);
+
+    const label = document.createElement("small");
+
+    label.style.color = "#666";
+    label.textContent =
+      peratusKategori.toFixed(1)+"% daripada jumlah perbelanjaan";
+
+    baris.appendChild(tajuk);
+    baris.appendChild(latar);
+    baris.appendChild(label);
+
+    graf.appendChild(baris);
+
+  });
+
+  // PECAHAN KATEGORI
+  pecahan.innerHTML = "";
+
+  kategori.forEach(item=>{
+
+    const baris = document.createElement("div");
+
+    baris.style.display = "flex";
+    baris.style.justifyContent = "space-between";
+    baris.style.alignItems = "center";
+    baris.style.padding = "12px 5px";
+    baris.style.borderBottom = "1px solid #ddd";
+    baris.style.gap = "8px";
+
+    const nama = document.createElement("b");
+    nama.textContent = item.emoji+" "+item.nama;
+
+    const jumlah = document.createElement("b");
+    jumlah.textContent =
+      formatRMKewanganSJAM(item.nilai);
+
+    baris.appendChild(nama);
+    baris.appendChild(jumlah);
+
+    pecahan.appendChild(baris);
+
+  });
+
+  // KESIMPULAN AUTOMATIK
+  const kesimpulan = document.getElementById(
+    "kwAnalisisKesimpulan"
+  );
+
+  if(pendapatan === 0 && perbelanjaan === 0){
+
+    kesimpulan.textContent =
+      "Belum terdapat rekod pendapatan atau perbelanjaan bagi tempoh yang dipilih.";
+
+  }
+
+  else if(baki > 0){
+
+    kesimpulan.textContent =
+      "✅ Kedudukan kewangan adalah positif. " +
+      "Baki bersih bagi tempoh "+tempohBulan+
+      " "+tempohTahun+" ialah "+
+      formatRMKewanganSJAM(baki)+".";
+
+  }
+
+  else if(baki < 0){
+
+    kesimpulan.textContent =
+      "⚠️ Perbelanjaan melebihi pendapatan sebanyak "+
+      formatRMKewanganSJAM(Math.abs(baki))+
+      ". Sila semak kedudukan kewangan bagi tempoh ini.";
+
+  }
+
+  else{
+
+    kesimpulan.textContent =
+      "Kedudukan kewangan adalah seimbang. " +
+      "Pendapatan dan perbelanjaan adalah sama.";
+
+  }
+
+}
+
+// ======================================================
+// TAMAT ANALISIS KEWANGAN SJAM
+// ======================================================
+
+// ======================================================
+// CETAK / SIMPAN LAPORAN KEWANGAN SJAM
+// FORMAT RASMI A4
+// ======================================================
+
+function cetakLaporanKewanganSJAM(){
+
+  // SEMAK SESI ADMIN
+  const token = sessionStorage.getItem(
+    "tokenAdminSJAM"
+  );
+
+  if(!token){
+
+    alert("❌ Sila login semula sebagai admin.");
+
+    return;
+
+  }
+
+  // AMBIL PILIHAN BULAN DAN TAHUN
+  const bulan = document.getElementById(
+    "bulanKewanganSJAM"
+  )?.value || "";
+
+  const tahun = document.getElementById(
+    "tahunKewanganSJAM"
+  )?.value || "";
+
+  // AMBIL DATA TRANSAKSI
+  const data = dataKewanganSemasaSJAM;
+
+  if(!Array.isArray(data) || data.length===0){
+
+    alert(
+      "❌ Tiada transaksi untuk laporan ini.\n\n" +
+      "Sila pilih bulan dan tahun yang mempunyai rekod."
+    );
+
+    return;
+
+  }
+
+  // PASTIKAN DATA SEPADAN DENGAN PILIHAN
+  const padanan = data.every(x=>
+    String(x.bulan).toLowerCase() ===
+      bulan.toLowerCase() &&
+    String(x.tahun) === String(tahun)
+  );
+
+  if(!padanan){
+
+    alert(
+      "❌ Data laporan tidak sepadan dengan pilihan.\n\n" +
+      "Sila tekan PAPAR KEWANGAN terlebih dahulu."
+    );
+
+    return;
+
+  }
+
+  // KIRA RINGKASAN DARIPADA REKOD
+  const jumlah = {
+
+    pendapatan:0,
+    minyak:0,
+    makan:0,
+    lain:0,
+    penginapan:0,
+    perbelanjaan:0,
+    baki:0
+
+  };
+
+  data.forEach(x=>{
+
+    jumlah.pendapatan += Number(x.pendapatan)||0;
+
+    jumlah.minyak += Number(x.minyak)||0;
+
+    jumlah.makan += Number(x.makanMinum)||0;
+
+    jumlah.lain += Number(x.lainLain)||0;
+
+    jumlah.penginapan += Number(x.penginapan)||0;
+
+    jumlah.perbelanjaan +=
+      Number(x.jumlahPerbelanjaan)||0;
+
+  });
+
+  jumlah.baki =
+    jumlah.pendapatan-jumlah.perbelanjaan;
+
+  // FORMAT RM
+  const rm = nilai=>
+    "RM "+Number(nilai||0).toLocaleString(
+      "en-MY",
+      {
+        minimumFractionDigits:2,
+        maximumFractionDigits:2
+      }
+    );
+
+  // ESCAPE TEKS
+  const esc = nilai=>
+    String(nilai??"").replace(/[&<>"']/g,c=>({
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;",
+      "'":"&#39;"
+    })[c]);
+
+  // BUKA TETINGKAP CETAKAN
+  const laporan = window.open(
+    "",
+    "_blank",
+    "width=1100,height=850"
+  );
+
+  if(!laporan){
+
+    alert(
+      "❌ Pop-up disekat.\n\n" +
+      "Sila benarkan pop-up untuk Web App SJAM."
+    );
+
+    return;
+
+  }
+
+  // JANA BARIS TRANSAKSI
+  let baris = "";
+
+  data.forEach((x,i)=>{
+
+    const tarikh = x.tarikh
+      ? x.tarikh.slice(8,10)+"/"+
+        x.tarikh.slice(5,7)+"/"+
+        x.tarikh.slice(0,4)
+      : "-";
+
+    baris += `
+
+      <tr>
+
+        <td>${i+1}</td>
+
+        <td>${esc(tarikh)}</td>
+
+        <td>${rm(x.pendapatan)}</td>
+
+        <td>${rm(x.minyak)}</td>
+
+        <td>${rm(x.makanMinum)}</td>
+
+        <td>${rm(x.lainLain)}</td>
+
+        <td>${rm(x.penginapan)}</td>
+
+        <td>${rm(x.jumlahPerbelanjaan)}</td>
+
+        <td>${rm(x.bakiTransaksi)}</td>
+
+        <td>${esc(x.noResit||"-")}</td>
+
+      </tr>
+
+    `;
+
+  });
+
+  // JANA LAPORAN
+  const html = `
+
+<!DOCTYPE html>
+
+<html lang="ms">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>
+Laporan Kewangan SJAM ${esc(bulan)} ${esc(tahun)}
+</title>
+
+<style>
+
+@page{
+
+  size:A4 landscape;
+
+  margin:10mm;
+
+}
+
+*{
+
+  box-sizing:border-box;
+
+}
+
+body{
+
+  font-family:Arial,sans-serif;
+
+  color:#222;
+
+  margin:0;
+
+  padding:15px;
+
+  font-size:11px;
+
+}
+
+.header{
+
+  text-align:center;
+
+  border-bottom:3px double #123b65;
+
+  padding-bottom:15px;
+
+}
+
+.header h1{
+
+  font-size:22px;
+
+  color:#123b65;
+
+  margin:0 0 8px;
+
+}
+
+.header h2{
+
+  font-size:16px;
+
+  margin:5px 0;
+
+}
+
+.header p{
+
+  margin:5px 0;
+
+}
+
+.tempoh{
+
+  text-align:center;
+
+  margin:20px 0;
+
+}
+
+.tempoh h2{
+
+  color:#1565c0;
+
+  font-size:19px;
+
+}
+
+.ringkasan{
+
+  display:grid;
+
+  grid-template-columns:repeat(3,1fr);
+
+  gap:12px;
+
+  margin:20px 0;
+
+}
+
+.kotak{
+
+  border:1px solid #ccc;
+
+  border-radius:8px;
+
+  padding:13px;
+
+  text-align:center;
+
+}
+
+.kotak small{
+
+  font-weight:bold;
+
+  font-size:10px;
+
+}
+
+.kotak h2{
+
+  font-size:17px;
+
+  margin:10px 0 0;
+
+}
+
+.pendapatan{
+
+  background:#e8f5e9;
+
+  color:#216b35;
+
+}
+
+.perbelanjaan{
+
+  background:#ffebee;
+
+  color:#b71c1c;
+
+}
+
+.baki{
+
+  background:#e3f2fd;
+
+  color:#1565c0;
+
+}
+
+h3{
+
+  color:#123b65;
+
+  margin-top:22px;
+
+}
+
+table{
+
+  width:100%;
+
+  border-collapse:collapse;
+
+  margin-top:12px;
+
+  font-size:9px;
+
+}
+
+th,td{
+
+  border:1px solid #bbb;
+
+  padding:7px 5px;
+
+  text-align:center;
+
+}
+
+th{
+
+  background:#123b65;
+
+  color:white;
+
+}
+
+tfoot{
+
+  background:#e3f2fd;
+
+  font-weight:bold;
+
+}
+
+.pecahan{
+
+  width:65%;
+
+  margin-top:15px;
+
+}
+
+.pecahan td:first-child{
+
+  text-align:left;
+
+}
+
+.footer{
+
+  margin-top:30px;
+
+  border-top:1px solid #bbb;
+
+  padding-top:12px;
+
+  display:flex;
+
+  justify-content:space-between;
+
+  gap:30px;
+
+}
+
+.tandatangan{
+
+  width:250px;
+
+  text-align:center;
+
+  padding-top:35px;
+
+}
+
+.garis{
+
+  border-top:1px solid #222;
+
+  padding-top:8px;
+
+}
+
+.kawalan{
+
+  text-align:center;
+
+  margin:20px;
+
+}
+
+.kawalan button{
+
+  background:#1565c0;
+
+  color:white;
+
+  border:0;
+
+  padding:13px 25px;
+
+  border-radius:8px;
+
+  font-weight:bold;
+
+  cursor:pointer;
+
+}
+
+@media print{
+
+  .kawalan{
+
+    display:none!important;
+
+  }
+
+  body{
+
+    padding:0;
+
+  }
+
+  tr{
+
+    break-inside:avoid;
+
+  }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="kawalan">
+
+  <button onclick="window.print()">
+    🖨️ CETAK / SIMPAN PDF
+  </button>
+
+</div>
+
+<div class="header">
+
+  <h1>
+    ST. JOHN AMBULANCE OF MALAYSIA
+  </h1>
+
+  <h2>
+    SJAM KAWASAN KELANTAN UTARA
+  </h2>
+
+  <p>
+    LAPORAN RASMI PENDAPATAN DAN PERBELANJAAN
+  </p>
+
+</div>
+
+<div class="tempoh">
+
+  <h2>
+    ${esc(bulan).toUpperCase()} ${esc(tahun)}
+  </h2>
+
+  <p>
+    Laporan Kewangan Bulanan
+  </p>
+
+</div>
+
+<div class="ringkasan">
+
+  <div class="kotak pendapatan">
+
+    <small>JUMLAH PENDAPATAN</small>
+
+    <h2>${rm(jumlah.pendapatan)}</h2>
+
+  </div>
+
+  <div class="kotak perbelanjaan">
+
+    <small>JUMLAH PERBELANJAAN</small>
+
+    <h2>${rm(jumlah.perbelanjaan)}</h2>
+
+  </div>
+
+  <div class="kotak baki">
+
+    <small>BAKI BERSIH</small>
+
+    <h2>${rm(jumlah.baki)}</h2>
+
+  </div>
+
+</div>
+
+<h3>1. PECAHAN PERBELANJAAN</h3>
+
+<table class="pecahan">
+
+  <thead>
+
+    <tr>
+
+      <th>Kategori</th>
+
+      <th>Jumlah (RM)</th>
+
+    </tr>
+
+  </thead>
+
+  <tbody>
+
+    <tr>
+      <td>Minyak</td>
+      <td>${rm(jumlah.minyak)}</td>
+    </tr>
+
+    <tr>
+      <td>Makan / Minum</td>
+      <td>${rm(jumlah.makan)}</td>
+    </tr>
+
+    <tr>
+      <td>Lain-lain</td>
+      <td>${rm(jumlah.lain)}</td>
+    </tr>
+
+    <tr>
+      <td>Penginapan</td>
+      <td>${rm(jumlah.penginapan)}</td>
+    </tr>
+
+  </tbody>
+
+  <tfoot>
+
+    <tr>
+
+      <td>JUMLAH PERBELANJAAN</td>
+
+      <td>${rm(jumlah.perbelanjaan)}</td>
+
+    </tr>
+
+  </tfoot>
+
+</table>
+
+<h3>2. SENARAI TRANSAKSI KEWANGAN</h3>
+
+<table>
+
+  <thead>
+
+    <tr>
+
+      <th>Bil.</th>
+
+      <th>Tarikh</th>
+
+      <th>Pendapatan</th>
+
+      <th>Minyak</th>
+
+      <th>Makan</th>
+
+      <th>Lain-lain</th>
+
+      <th>Penginapan</th>
+
+      <th>Jumlah Belanja</th>
+
+      <th>Baki</th>
+
+      <th>No. Resit</th>
+
+    </tr>
+
+  </thead>
+
+  <tbody>
+
+    ${baris}
+
+  </tbody>
+
+  <tfoot>
+
+    <tr>
+
+      <td colspan="2">JUMLAH</td>
+
+      <td>${rm(jumlah.pendapatan)}</td>
+
+      <td>${rm(jumlah.minyak)}</td>
+
+      <td>${rm(jumlah.makan)}</td>
+
+      <td>${rm(jumlah.lain)}</td>
+
+      <td>${rm(jumlah.penginapan)}</td>
+
+      <td>${rm(jumlah.perbelanjaan)}</td>
+
+      <td>${rm(jumlah.baki)}</td>
+
+      <td>-</td>
+
+    </tr>
+
+  </tfoot>
+
+</table>
+
+<h3>3. MAKLUMAT TRANSAKSI TAMBAHAN</h3>
+
+<table>
+
+  <thead>
+
+    <tr>
+
+      <th>Bil.</th>
+
+      <th>Tarikh</th>
+
+      <th>Dari</th>
+
+      <th>Ke</th>
+
+      <th>Tujuan</th>
+
+      <th>Kaedah Pembayaran</th>
+
+    </tr>
+
+  </thead>
+
+  <tbody>
+
+    ${data.map((x,i)=>{
+
+      const tarikh = x.tarikh
+        ? x.tarikh.slice(8,10)+"/"+
+          x.tarikh.slice(5,7)+"/"+
+          x.tarikh.slice(0,4)
+        : "-";
+
+      return `
+
+        <tr>
+
+          <td>${i+1}</td>
+
+          <td>${esc(tarikh)}</td>
+
+          <td>${esc(x.dari||"-")}</td>
+
+          <td>${esc(x.ke||"-")}</td>
+
+          <td>${esc(x.tujuan||"-")}</td>
+
+          <td>${esc(x.kaedahPembayaran||"-")}</td>
+
+        </tr>
+
+      `;
+
+    }).join("")}
+
+  </tbody>
+
+</table>
+
+<div class="footer">
+
+  <div>
+
+    <b>Disediakan oleh:</b>
+
+    <p>Pengurusan SJAM Kawasan Kelantan Utara</p>
+
+    <p>Tarikh cetakan: ${
+      new Date().toLocaleDateString("ms-MY",{
+        timeZone:"Asia/Kuala_Lumpur"
+      })
+    }</p>
+
+  </div>
+
+  <div class="tandatangan">
+
+    <div class="garis">
+
+      Tandatangan / Pengesahan
+
+      <br>
+
+      SJAM Kawasan Kelantan Utara
+
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+
+</html>
+
+`;
+
+  laporan.document.open();
+
+  laporan.document.write(html);
+
+  laporan.document.close();
+
+  laporan.focus();
+
+}
+
+// ======================================================
+// TAMAT CETAK LAPORAN KEWANGAN SJAM
+// ======================================================
+
+
+// ======================================================
+// LAPORAN KEWANGAN TAHUNAN SJAM
+// ======================================================
+
+let dataLaporanTahunanSJAM = [];
+
+
+// ======================================================
+// BUKA HALAMAN LAPORAN TAHUNAN
+// ======================================================
+
+function bukaLaporanTahunanSJAM(){
+
+  const kawasan = document.getElementById("adminArea");
+
+  const token = localStorage.getItem("tokenAdminSJAM");
+
+  if(!token){
+    alert("Sila login semula sebagai admin.");
+    return;
+  }
+
+  if(!kawasan){
+    alert("Halaman admin tidak dijumpai.");
+    return;
+  }
+
+  const tahunSemasa = new Date().getFullYear();
+
+  kawasan.innerHTML = `
+
+    <div class="card">
+
+      <div style="
+        background:linear-gradient(135deg,#123b65,#1565c0);
+        color:white;
+        padding:22px 15px;
+        border-radius:16px;
+        text-align:center;
+      ">
+
+        <div style="font-size:35px;">📊</div>
+
+        <h2 style="color:white;margin:8px 0;">
+          LAPORAN KEWANGAN TAHUNAN
+        </h2>
+
+        <p style="margin:0;">
+          SJAM Kawasan Kelantan Utara
+        </p>
+
+      </div>
+
+      <div class="settingBox">
+
+        <label>PILIH TAHUN LAPORAN</label>
+
+        <select id="kwTahunTahunanSJAM">
+
+          ${Array.from(
+            {length:15},
+            (_,i)=>tahunSemasa-5+i
+          ).map(t=>`
+            <option value="${t}" ${
+              t===tahunSemasa?"selected":""
+            }>
+              ${t}
+            </option>
+          `).join("")}
+
+        </select>
+
+        <button
+          type="button"
+          class="green"
+          onclick="muatLaporanTahunanSJAM()">
+
+          🔄 PAPAR LAPORAN TAHUNAN
+
+        </button>
+
+      </div>
+
+      <!-- RINGKASAN TAHUNAN -->
+
+      <h3>💰 RINGKASAN KEWANGAN TAHUNAN</h3>
+
+      <div style="
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:10px;
+      ">
+
+        <div style="
+          background:#e8f5e9;
+          padding:14px;
+          border-radius:12px;
+        ">
+
+          <small>PENDAPATAN</small>
+
+          <h3 id="kwTahunanPendapatan"
+            style="color:#2e7d32;">
+            RM 0.00
+          </h3>
+
+        </div>
+
+        <div style="
+          background:#ffebee;
+          padding:14px;
+          border-radius:12px;
+        ">
+
+          <small>PERBELANJAAN</small>
+
+          <h3 id="kwTahunanBelanja"
+            style="color:#c62828;">
+            RM 0.00
+          </h3>
+
+        </div>
+
+      </div>
+
+      <div style="
+        background:#e3f2fd;
+        border-radius:13px;
+        padding:17px;
+        text-align:center;
+        margin-top:12px;
+      ">
+
+        <b>💰 BAKI BERSIH TAHUNAN</b>
+
+        <h1 id="kwTahunanBaki"
+          style="color:#1565c0;">
+          RM 0.00
+        </h1>
+
+      </div>
+
+      <div class="settingBox">
+
+        Jumlah Transaksi
+
+        <h2 id="kwTahunanBilangan">
+          0
+        </h2>
+
+      </div>
+
+
+      <!-- PERBANDINGAN BULAN -->
+
+      <h3 style="margin-top:25px;">
+        📈 PERBANDINGAN PENDAPATAN & PERBELANJAAN
+      </h3>
+
+      <div id="kwGrafTahunanSJAM"
+        class="settingBox">
+
+        Menunggu data tahunan...
+
+      </div>
+
+
+      <!-- JADUAL 12 BULAN -->
+
+      <h3 style="margin-top:25px;">
+        📋 JADUAL KEWANGAN 12 BULAN
+      </h3>
+
+      <div style="
+        overflow-x:auto;
+        width:100%;
+      ">
+
+        <table style="
+          width:100%;
+          border-collapse:collapse;
+          font-size:12px;
+          min-width:440px;
+        ">
+
+          <thead>
+
+            <tr style="
+              background:#123b65;
+              color:white;
+            ">
+
+              <th style="padding:10px;">Bulan</th>
+
+              <th style="padding:10px;">Pendapatan</th>
+
+              <th style="padding:10px;">Belanja</th>
+
+              <th style="padding:10px;">Baki</th>
+
+            </tr>
+
+          </thead>
+
+          <tbody id="kwJadualTahunanSJAM">
+
+            <tr>
+              <td colspan="4" style="padding:15px;text-align:center;">
+                Menunggu data...
+              </td>
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+
+      <!-- PECAHAN PERBELANJAAN -->
+
+      <h3 style="margin-top:25px;">
+        📉 PECAHAN PERBELANJAAN TAHUNAN
+      </h3>
+
+      <div id="kwPecahanTahunanSJAM"
+        class="settingBox">
+
+        Menunggu data...
+
+      </div>
+
+
+      <!-- ANALISIS TAHUNAN -->
+
+      <h3 style="margin-top:25px;">
+        🔍 ANALISIS PRESTASI TAHUNAN
+      </h3>
+
+      <div id="kwAnalisisTahunanSJAM"
+        class="settingBox"
+        style="line-height:1.8;text-align:left;">
+
+        Analisis akan dijana berdasarkan data sebenar.
+
+      </div>
+
+
+      <!-- CETAK PDF -->
+
+      <button
+        type="button"
+        style="
+          background:#1565c0;
+          font-weight:bold;
+          padding:15px;
+        "
+        onclick="cetakLaporanTahunanSJAM()">
+
+        🖨️ CETAK / SIMPAN LAPORAN TAHUNAN PDF
+
+      </button>
+
+
+      <button
+        type="button"
+        class="back"
+        onclick="bukaKewanganSJAM()">
+
+        ⬅️ KEMBALI KE KEWANGAN
+
+      </button>
+
+      <button
+        type="button"
+        class="back"
+        onclick="bukaDashboardAdmin()">
+
+        ⬅️ KEMBALI DASHBOARD
+
+      </button>
+
+    </div>
+
+  `;
+
+  muatLaporanTahunanSJAM();
+
+}
+
+
+// ======================================================
+// AMBIL DATA KEWANGAN SETAHUN
+// ======================================================
+
+async function muatLaporanTahunanSJAM(){
+
+  const token = sessionStorage.getItem("tokenAdminSJAM");
+
+  const tahun = document.getElementById(
+    "kwTahunTahunanSJAM"
+  )?.value;
+
+  if(!token){
+    alert("Sesi admin tamat.");
+    return;
+  }
+
+  const graf = document.getElementById("kwGrafTahunanSJAM");
+
+  graf.textContent = "⏳ Sedang mengambil data tahunan...";
+
+  try{
+
+    const response = await fetch(SCRIPT_URL,{
+
+      method:"POST",
+
+      body:JSON.stringify({
+
+        action:"senaraiKewangan",
+
+        tokenAdmin:token,
+
+        bulan:"",
+
+        tahun:tahun
+
+      })
+
+    });
+
+    const res = await response.json();
+
+    if(!res.success){
+
+      throw new Error(res.message || "Gagal mengambil data tahunan.");
+
+    }
+
+    dataLaporanTahunanSJAM = res.data || [];
+
+    paparLaporanTahunanSJAM(res,tahun);
+
+  }catch(error){
+
+    console.error(error);
+
+    graf.textContent = "❌ "+error.message;
+
+    alert("❌ "+error.message);
+
+  }
+
+}
+
+
+// ======================================================
+// PAPAR LAPORAN TAHUNAN
+// ======================================================
+
+function paparLaporanTahunanSJAM(res,tahun){
+
+  const data = res.data || [];
+
+  const pendapatan = Number(
+    res.ringkasan.pendapatan
+  ) || 0;
+
+  const belanja = Number(
+    res.ringkasan.perbelanjaan
+  ) || 0;
+
+  const baki = Number(
+    res.ringkasan.baki
+  ) || 0;
+
+  const rm = formatRMKewanganSJAM;
+
+  document.getElementById(
+    "kwTahunanPendapatan"
+  ).textContent = rm(pendapatan);
+
+  document.getElementById(
+    "kwTahunanBelanja"
+  ).textContent = rm(belanja);
+
+  document.getElementById(
+    "kwTahunanBaki"
+  ).textContent = rm(baki);
+
+  document.getElementById(
+    "kwTahunanBilangan"
+  ).textContent = data.length;
+
+
+  // NAMA BULAN
+  const bulan = [
+    "Januari","Februari","Mac","April",
+    "Mei","Jun","Julai","Ogos",
+    "September","Oktober","November","Disember"
+  ];
+
+  const ringkasanBulan = bulan.map((nama,i)=>({
+
+    nama:nama,
+
+    pendapatan:0,
+
+    belanja:0,
+
+    baki:0
+
+  }));
+
+
+  // KUMPUL DATA MENGIKUT BULAN
+  data.forEach(x=>{
+
+    const tarikh = String(x.tarikh || "");
+
+    const nomborBulan = Number(
+      tarikh.substring(5,7)
+    );
+
+    if(nomborBulan<1 || nomborBulan>12){
+      return;
+    }
+
+    const item = ringkasanBulan[nomborBulan-1];
+
+    item.pendapatan += Number(x.pendapatan)||0;
+
+    item.belanja += Number(x.jumlahPerbelanjaan)||0;
+
+  });
+
+
+  ringkasanBulan.forEach(x=>{
+
+    x.baki = x.pendapatan-x.belanja;
+
+  });
+
+
+  // JADUAL 12 BULAN
+  const jadual = document.getElementById(
+    "kwJadualTahunanSJAM"
+  );
+
+  jadual.innerHTML = "";
+
+  ringkasanBulan.forEach(x=>{
+
+    const tr = document.createElement("tr");
+
+    const nilai = [
+      x.nama,
+      rm(x.pendapatan),
+      rm(x.belanja),
+      rm(x.baki)
+    ];
+
+    nilai.forEach((v,i)=>{
+
+      const td = document.createElement("td");
+
+      td.textContent = v;
+
+      td.style.padding = "9px 5px";
+
+      td.style.borderBottom = "1px solid #ddd";
+
+      td.style.textAlign = i===0?"left":"right";
+
+      if(i===3){
+
+        td.style.fontWeight = "bold";
+
+        td.style.color = x.baki<0?"#c62828":"#2e7d32";
+
+      }
+
+      tr.appendChild(td);
+
+    });
+
+    jadual.appendChild(tr);
+
+  });
+
+
+  // GRAF PERBANDINGAN
+  const graf = document.getElementById(
+    "kwGrafTahunanSJAM"
+  );
+
+  graf.innerHTML = "";
+
+  const maksimum = Math.max(
+    1,
+    ...ringkasanBulan.flatMap(x=>[
+      x.pendapatan,
+      x.belanja
+    ])
+  );
+
+  ringkasanBulan.forEach(x=>{
+
+    const baris = document.createElement("div");
+
+    baris.style.marginBottom = "16px";
+    baris.style.textAlign = "left";
+
+    const tajuk = document.createElement("b");
+
+    tajuk.textContent = x.nama;
+
+    baris.appendChild(tajuk);
+
+    [
+      {
+        nama:"Pendapatan",
+        nilai:x.pendapatan,
+        warna:"#2e7d32"
+      },
+      {
+        nama:"Perbelanjaan",
+        nilai:x.belanja,
+        warna:"#c62828"
+      }
+    ].forEach(item=>{
+
+      const label = document.createElement("div");
+
+      label.style.display = "flex";
+      label.style.justifyContent = "space-between";
+      label.style.fontSize = "11px";
+      label.style.marginTop = "5px";
+
+      const nama = document.createElement("span");
+      nama.textContent = item.nama;
+
+      const jumlah = document.createElement("b");
+      jumlah.textContent = rm(item.nilai);
+
+      label.appendChild(nama);
+      label.appendChild(jumlah);
+
+      const latar = document.createElement("div");
+
+      latar.style.background = "#eeeeee";
+      latar.style.height = "10px";
+      latar.style.borderRadius = "10px";
+      latar.style.overflow = "hidden";
+
+      const bar = document.createElement("div");
+
+      bar.style.background = item.warna;
+      bar.style.width =
+        (item.nilai/maksimum*100)+"%";
+      bar.style.height = "100%";
+
+      latar.appendChild(bar);
+
+      baris.appendChild(label);
+      baris.appendChild(latar);
+
+    });
+
+    graf.appendChild(baris);
+
+  });
+
+
+  // PECAHAN PERBELANJAAN
+  const kategori = [
+
+    {
+      nama:"Minyak",
+      nilai:data.reduce((s,x)=>s+(Number(x.minyak)||0),0)
+    },
+
+    {
+      nama:"Makan / Minum",
+      nilai:data.reduce((s,x)=>s+(Number(x.makanMinum)||0),0)
+    },
+
+    {
+      nama:"Lain-lain",
+      nilai:data.reduce((s,x)=>s+(Number(x.lainLain)||0),0)
+    },
+
+    {
+      nama:"Penginapan",
+      nilai:data.reduce((s,x)=>s+(Number(x.penginapan)||0),0)
+    }
+
+  ];
+
+  const pecahan = document.getElementById(
+    "kwPecahanTahunanSJAM"
+  );
+
+  pecahan.innerHTML = "";
+
+  kategori.forEach(x=>{
+
+    const baris = document.createElement("div");
+
+    baris.style.display = "flex";
+    baris.style.justifyContent = "space-between";
+    baris.style.padding = "10px 0";
+    baris.style.borderBottom = "1px solid #ddd";
+
+    const nama = document.createElement("b");
+    nama.textContent = x.nama;
+
+    const jumlah = document.createElement("span");
+    jumlah.textContent = rm(x.nilai);
+
+    baris.appendChild(nama);
+    baris.appendChild(jumlah);
+
+    pecahan.appendChild(baris);
+
+  });
+
+
+  // ANALISIS TAHUNAN
+  const tertinggiPendapatan = [...ringkasanBulan]
+    .sort((a,b)=>b.pendapatan-a.pendapatan)[0];
+
+  const tertinggiBelanja = [...ringkasanBulan]
+    .sort((a,b)=>b.belanja-a.belanja)[0];
+
+  const analisis = document.getElementById(
+    "kwAnalisisTahunanSJAM"
+  );
+
+  const peratus = pendapatan>0
+    ? belanja/pendapatan*100
+    : 0;
+
+  analisis.textContent =
+
+    "📅 Tahun laporan: "+tahun+"\n\n"+
+
+    "💰 Jumlah pendapatan: "+rm(pendapatan)+"\n\n"+
+
+    "📉 Jumlah perbelanjaan: "+rm(belanja)+"\n\n"+
+
+    "💵 Baki bersih tahunan: "+rm(baki)+"\n\n"+
+
+    "📊 Penggunaan pendapatan: "+peratus.toFixed(1)+"%\n\n"+
+
+    "🏆 Bulan pendapatan tertinggi: "+
+    tertinggiPendapatan.nama+
+    " ("+rm(tertinggiPendapatan.pendapatan)+")\n\n"+
+
+    "📉 Bulan perbelanjaan tertinggi: "+
+    tertinggiBelanja.nama+
+    " ("+rm(tertinggiBelanja.belanja)+")";
+
+}
+
+
+// ======================================================
+// CETAK LAPORAN TAHUNAN SJAM
+// ======================================================
+
+function cetakLaporanTahunanSJAM(){
+
+  const tahun = document.getElementById(
+    "kwTahunTahunanSJAM"
+  )?.value;
+
+  const data = dataLaporanTahunanSJAM;
+
+  if(!Array.isArray(data) || data.length===0){
+
+    alert("Tiada data untuk dicetak.");
+    return;
+
+  }
+
+  if(!data.every(x=>String(x.tahun)===String(tahun))){
+
+    alert("Sila papar semula laporan bagi tahun yang dipilih.");
+    return;
+
+  }
+
+  const rm = formatRMKewanganSJAM;
+
+  const jumlah = {
+
+    pendapatan:data.reduce((s,x)=>s+(Number(x.pendapatan)||0),0),
+
+    belanja:data.reduce((s,x)=>s+(Number(x.jumlahPerbelanjaan)||0),0)
+
+  };
+
+  jumlah.baki = jumlah.pendapatan-jumlah.belanja;
+
+  const esc = nilai=>
+    String(nilai??"").replace(/[&<>"']/g,c=>({
+      "&":"&amp;","<":"&lt;",">":"&gt;",
+      '"':"&quot;","'":"&#39;"
+    })[c]);
+
+  const bulan = [
+    "Januari","Februari","Mac","April",
+    "Mei","Jun","Julai","Ogos",
+    "September","Oktober","November","Disember"
+  ];
+
+  const laporan = window.open(
+    "",
+    "_blank",
+    "width=1100,height=850"
+  );
+
+  if(!laporan){
+
+    alert("Sila benarkan pop-up untuk mencetak laporan.");
+    return;
+
+  }
+
+  const bulanan = bulan.map((nama,i)=>{
+
+    const rekod = data.filter(x=>
+      Number(String(x.tarikh).substring(5,7))===i+1
+    );
+
+    const pendapatan = rekod.reduce(
+      (s,x)=>s+(Number(x.pendapatan)||0),0
+    );
+
+    const belanja = rekod.reduce(
+      (s,x)=>s+(Number(x.jumlahPerbelanjaan)||0),0
+    );
+
+    return {nama,pendapatan,belanja,baki:pendapatan-belanja};
+
+  });
+
+  const barisBulanan = bulanan.map(x=>`
+
+    <tr>
+      <td>${x.nama}</td>
+      <td>${rm(x.pendapatan)}</td>
+      <td>${rm(x.belanja)}</td>
+      <td>${rm(x.baki)}</td>
+    </tr>
+
+  `).join("");
+
+  const barisTransaksi = data.map((x,i)=>{
+
+    const tarikh = String(x.tarikh||"");
+
+    return `
+
+      <tr>
+
+        <td>${i+1}</td>
+
+        <td>${esc(tarikh.slice(8,10)+"/"+tarikh.slice(5,7)+"/"+tarikh.slice(0,4))}</td>
+
+        <td>${rm(x.pendapatan)}</td>
+
+        <td>${rm(x.jumlahPerbelanjaan)}</td>
+
+        <td>${rm(x.bakiTransaksi)}</td>
+
+        <td>${esc(x.noResit||"-")}</td>
+
+      </tr>
+
+    `;
+
+  }).join("");
+
+  laporan.document.open();
+
+  laporan.document.write(`
+
+    <!DOCTYPE html>
+
+    <html lang="ms">
+
+    <head>
+
+      <meta charset="UTF-8">
+
+      <title>Laporan Kewangan Tahunan ${esc(tahun)}</title>
+
+      <style>
+
+        @page{
+          size:A4 landscape;
+          margin:12mm;
+        }
+
+        body{
+          font-family:Arial,sans-serif;
+          font-size:11px;
+          color:#222;
+        }
+
+        h1,h2,h3{
+          color:#123b65;
+        }
+
+        .header{
+          text-align:center;
+          border-bottom:3px double #123b65;
+          padding-bottom:12px;
+        }
+
+        .ringkasan{
+          display:grid;
+          grid-template-columns:repeat(3,1fr);
+          gap:12px;
+          margin:20px 0;
+        }
+
+        .kotak{
+          border:1px solid #ccc;
+          padding:13px;
+          text-align:center;
+          border-radius:8px;
+        }
+
+        table{
+          width:100%;
+          border-collapse:collapse;
+          margin:12px 0 25px;
+        }
+
+        th,td{
+          border:1px solid #bbb;
+          padding:7px;
+          text-align:center;
+        }
+
+        th{
+          background:#123b65;
+          color:white;
+        }
+
+        tfoot{
+          font-weight:bold;
+          background:#e3f2fd;
+        }
+
+        .footer{
+          margin-top:25px;
+          border-top:1px solid #aaa;
+          padding-top:12px;
+        }
+
+        .kawalan{
+          text-align:center;
+          margin:15px;
+        }
+
+        .kawalan button{
+          padding:12px 25px;
+          background:#1565c0;
+          color:white;
+          border:0;
+          border-radius:8px;
+        }
+
+        @media print{
+          .kawalan{display:none;}
+          tr{break-inside:avoid;}
+        }
+
+      </style>
+
+    </head>
+
+    <body>
+
+      <div class="kawalan">
+
+        <button onclick="window.print()">
+          🖨️ CETAK / SIMPAN PDF
+        </button>
+
+      </div>
+
+      <div class="header">
+
+        <h1>ST. JOHN AMBULANCE OF MALAYSIA</h1>
+
+        <h2>SJAM KAWASAN KELANTAN UTARA</h2>
+
+        <p>LAPORAN KEWANGAN TAHUNAN</p>
+
+        <h2>${esc(tahun)}</h2>
+
+      </div>
+
+      <div class="ringkasan">
+
+        <div class="kotak" style="background:#e8f5e9;">
+
+          <b>JUMLAH PENDAPATAN</b>
+
+          <h2>${rm(jumlah.pendapatan)}</h2>
+
+        </div>
+
+        <div class="kotak" style="background:#ffebee;">
+
+          <b>JUMLAH PERBELANJAAN</b>
+
+          <h2>${rm(jumlah.belanja)}</h2>
+
+        </div>
+
+        <div class="kotak" style="background:#e3f2fd;">
+
+          <b>BAKI BERSIH TAHUNAN</b>
+
+          <h2>${rm(jumlah.baki)}</h2>
+
+        </div>
+
+      </div>
+
+      <h3>1. PERBANDINGAN KEWANGAN BULANAN</h3>
+
+      <table>
+
+        <thead>
+
+          <tr>
+            <th>Bulan</th>
+            <th>Pendapatan</th>
+            <th>Perbelanjaan</th>
+            <th>Baki</th>
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+          ${barisBulanan}
+
+        </tbody>
+
+        <tfoot>
+
+          <tr>
+            <td>JUMLAH TAHUNAN</td>
+            <td>${rm(jumlah.pendapatan)}</td>
+            <td>${rm(jumlah.belanja)}</td>
+            <td>${rm(jumlah.baki)}</td>
+          </tr>
+
+        </tfoot>
+
+      </table>
+
+      <h3>2. SENARAI TRANSAKSI TAHUNAN</h3>
+
+      <table>
+
+        <thead>
+
+          <tr>
+            <th>Bil.</th>
+            <th>Tarikh</th>
+            <th>Pendapatan</th>
+            <th>Perbelanjaan</th>
+            <th>Baki Transaksi</th>
+            <th>No. Resit</th>
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+          ${barisTransaksi}
+
+        </tbody>
+
+      </table>
+
+      <div class="footer">
+
+        <b>Disediakan oleh:</b>
+
+        <p>Pengurusan SJAM Kawasan Kelantan Utara</p>
+
+        <p>Tarikh cetakan: ${
+          new Date().toLocaleDateString(
+            "ms-MY",
+            {timeZone:"Asia/Kuala_Lumpur"}
+          )
+        }</p>
+
+      </div>
+
+    </body>
+
+    </html>
+
+  `);
+
+  laporan.document.close();
+
+  laporan.focus();
+
+}
+
+// ======================================================
+// TAMAT LAPORAN TAHUNAN SJAM
+// ======================================================
 
 </script>
 
