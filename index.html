@@ -2761,6 +2761,17 @@ onclick="simpanBulanAktif()">
 
 </button>
 
+<!-- MENU STATISTIK OPERASI SJAM -->
+
+<button
+ type="button"
+ class="noPrint"
+ style="background:#ef6c00;"
+ onclick="bukaStatistikOperasiSJAM()">
+
+ 📊 Statistik & Analisis Operasi
+
+</button>
 
 <!-- MENU STATUS KREW ESOK -->
 
@@ -2793,6 +2804,188 @@ paparBulanAdmin();
 
 }
 
+// ==========================================
+// HALAMAN STATISTIK & ANALISIS OPERASI SJAM
+// ==========================================
+
+function bukaStatistikOperasiSJAM(){
+
+ const kawasan = document.getElementById("adminArea");
+
+ if(!kawasan){
+   alert("Halaman admin tidak dijumpai.");
+   return;
+ }
+
+ const token = sessionStorage.getItem("tokenAdminSJAM");
+
+ if(!token){
+   alert("Sila login semula sebagai admin.");
+   return;
+ }
+
+ kawasan.innerHTML = `
+
+ <div class="card" id="statistikOperasiSJAM">
+
+ <div style="
+ background:#ef6c00;
+ color:white;
+ padding:22px 15px;
+ border-radius:15px;
+ text-align:center;
+ margin-bottom:20px;
+ ">
+
+ <h2 style="color:white;margin:0;">
+ 📊 STATISTIK & ANALISIS OPERASI
+ </h2>
+
+ <p>SJAM Kawasan Kelantan Utara</p>
+
+ </div>
+
+ <label>Jenis Laporan</label>
+
+ <select id="jenisLaporanStatistikSJAM">
+ <option value="bulanan">Laporan Bulanan</option>
+ <option value="tahunan">Laporan Tahunan</option>
+ </select>
+
+ <label>Pilih Tahun</label>
+
+ <select id="tahunStatistikSJAM">
+${Array.from({
+length:Math.max(1,new Date().getFullYear()-2020+1)
+},(_,i)=>{
+
+const tahun = 2020+i;
+
+return '<option value="'+tahun+'" '+
+(tahun===new Date().getFullYear()?'selected':'')+
+'>'+tahun+'</option>';
+
+}).join("")}
+</select>
+ <label>Pilih Bulan</label>
+
+ <select id="bulanStatistikSJAM">
+ ${[
+ "Januari","Februari","Mac","April",
+ "Mei","Jun","Julai","Ogos",
+ "September","Oktober","November","Disember"
+ ].map((nama,i)=>
+ '<option value="'+(i+1)+'" '+
+ (i===new Date().getMonth()?'selected':'')+
+ '>'+nama+'</option>'
+ ).join("")}
+ </select>
+
+ <button
+type="button"
+style="background:#ef6c00;"
+onclick="paparStatistikOperasi()">
+
+🔄 Papar Statistik
+
+</button>
+ <div style="
+ background:#fff3e0;
+ border:2px solid #ef6c00;
+ border-radius:15px;
+ padding:20px;
+ text-align:center;
+ margin-top:15px;
+ ">
+
+ <b>JUMLAH KESELURUHAN KES</b>
+
+ <h1 id="statJumlahKes" style="color:#ef6c00;">—</h1>
+
+ <small>Berdasarkan nombor resit unik</small>
+
+ </div>
+
+ <div style="
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:10px;
+ margin-top:15px;
+ ">
+
+ <div style="background:#e3f2fd;padding:15px;border-radius:12px;text-align:center;">
+ 🛏️ DISCAJ WAD
+ <h1 id="statDiscaj" style="color:#1565c0;">—</h1>
+ </div>
+
+ <div style="background:#f3e5f5;padding:15px;border-radius:12px;text-align:center;">
+ 🚑 PINDAH HOSPITAL
+ <h1 id="statPindah" style="color:#7b1fa2;">—</h1>
+ </div>
+
+ <div style="background:#e8f5e9;padding:15px;border-radius:12px;text-align:center;">
+ 📅 TEMUJANJI (TCA)
+ <h1 id="statTCA" style="color:#2e7d32;">—</h1>
+ </div>
+
+ <div style="background:#fff3e0;padding:15px;border-radius:12px;text-align:center;">
+ 🏥 MASUK WAD
+ <h1 id="statMasukWad" style="color:#ef6c00;">—</h1>
+ </div>
+
+ </div>
+
+ <h3>📊 Graf Statistik Operasi</h3>
+
+ <div id="statGraf" class="settingBox">
+Menunggu sambungan data statistik.
+</div>
+
+ <h3>📈 Analisis Operasi</h3>
+
+ <div id="statAnalisis" class="settingBox">
+Analisis akan dijana berdasarkan rekod sebenar.
+</div>
+
+<button
+type="button"
+id="btnCetakStatistikSJAM"
+onclick="cetakStatistikSJAM()"
+style="
+background:#1565c0;
+color:white;
+width:100%;
+padding:14px;
+border:none;
+border-radius:10px;
+margin-top:15px;
+font-weight:bold;
+">
+
+🖨️ Cetak / Simpan Laporan PDF
+
+</button>
+ <button
+ type="button"
+ class="back"
+ onclick="bukaDashboardAdmin()">
+
+ ⬅️ Kembali Dashboard
+
+ </button>
+
+ </div>
+
+ `;
+
+ kawasan.scrollIntoView({
+ behavior:"smooth",
+ block:"start"
+ });
+
+}
+
+// TAMAT HALAMAN STATISTIK OPERASI SJAM
 // ==========================================
 // HALAMAN KHAS STATUS KREW ESOK
 // ==========================================
@@ -2920,6 +3113,562 @@ function bukaStatusKrewEsokSJAM(){
   kemasKiniStatusKrewEsokSJAM();
 
 }
+
+// ============================================
+// SAMBUNGAN STATISTIK OPERASI SJAM
+// ============================================
+
+async function paparStatistikOperasi(){
+
+window.laporanStatistikSJAM = null;
+
+  const token = sessionStorage.getItem("tokenAdminSJAM");
+
+  if(!token){
+    alert("Sesi admin tamat. Sila login semula.");
+    return;
+  }
+
+  const jenisLaporan = document.getElementById(
+    "jenisLaporanStatistikSJAM"
+  ).value;
+
+  const tahun = Number(document.getElementById(
+    "tahunStatistikSJAM"
+  ).value);
+
+  const bulan = Number(document.getElementById(
+    "bulanStatistikSJAM"
+  ).value);
+
+  const graf = document.getElementById("statGraf");
+  const analisis = document.getElementById("statAnalisis");
+
+  const ids = [
+    "statJumlahKes",
+    "statDiscaj",
+    "statPindah",
+    "statTCA",
+    "statMasukWad"
+  ];
+
+  ids.forEach(id => {
+    document.getElementById(id).textContent = "—";
+  });
+
+  graf.textContent = "⏳ Sedang mengambil data statistik...";
+  analisis.textContent = "Sedang menjana analisis operasi...";
+
+  try{
+
+    const response = await fetch(SCRIPT_URL,{
+
+      method:"POST",
+
+      body:JSON.stringify({
+
+        action:"statistikOperasiSJAM",
+        tokenAdmin:token,
+        jenisLaporan:jenisLaporan,
+        tahun:tahun,
+        bulan:bulan
+
+      })
+
+    });
+
+    const res = await response.json();
+
+    if(!res.success){
+      throw new Error(
+        res.message || "Gagal mengambil statistik."
+      );
+    }
+
+    document.getElementById("statJumlahKes")
+      .textContent = res.jumlahKes;
+
+    document.getElementById("statDiscaj")
+      .textContent = res.discaj;
+
+    document.getElementById("statPindah")
+      .textContent = res.pindah;
+
+    document.getElementById("statTCA")
+      .textContent = res.tca;
+
+    document.getElementById("statMasukWad")
+      .textContent = res.masuk;
+
+    paparGrafStatistikSJAM(res);
+
+    paparAnalisisStatistikSJAM(res);
+window.laporanStatistikSJAM = res;
+  }catch(error){
+
+    graf.textContent = "❌ Gagal mengambil statistik.";
+    analisis.textContent = error.message;
+
+    alert(error.message);
+
+  }
+
+}
+
+// TAMAT SAMBUNGAN STATISTIK OPERASI
+
+// ============================================
+// GRAF STATISTIK OPERASI SJAM
+// ============================================
+
+function paparGrafStatistikSJAM(res){
+
+  const graf = document.getElementById("statGraf");
+
+  const jumlah = Number(res.jumlahKes) || 0;
+
+  const kategori = [
+    ["Discaj Wad", res.discaj, "#1565c0"],
+    ["Pindah Hospital", res.pindah, "#7b1fa2"],
+    ["Temujanji (TCA)", res.tca, "#2e7d32"],
+    ["Masuk Wad", res.masuk, "#ef6c00"],
+    ["Lain-lain", res.lain, "#607d8b"],
+    ["Konflik Kategori", res.konflik, "#c62828"]
+  ];
+
+  let html = "";
+
+  kategori.forEach(function(item){
+
+    const bilangan = Number(item[1]) || 0;
+
+    const peratus = jumlah > 0
+      ? (bilangan / jumlah * 100).toFixed(1)
+      : "0.0";
+
+    html += `
+      <div style="margin-bottom:18px;text-align:left;">
+
+        <div style="
+          display:flex;
+          justify-content:space-between;
+          font-size:13px;
+          margin-bottom:6px;
+        ">
+          <b>${item[0]}</b>
+          <b>${bilangan} (${peratus}%)</b>
+        </div>
+
+        <div style="
+          background:#eeeeee;
+          height:18px;
+          border-radius:8px;
+          overflow:hidden;
+        ">
+
+          <div style="
+            width:${peratus}%;
+            height:100%;
+            background:${item[2]};
+            border-radius:8px;
+          "></div>
+
+        </div>
+
+      </div>
+    `;
+
+  });
+
+  if(res.jenisLaporan === "tahunan"){
+
+    const namaBulan = [
+      "Jan","Feb","Mac","Apr",
+      "Mei","Jun","Jul","Ogos",
+      "Sep","Okt","Nov","Dis"
+    ];
+
+    const trend = Array.isArray(res.trendBulanan)
+      ? res.trendBulanan : Array(12).fill(0);
+
+    const maksimum = Math.max(1,...trend);
+
+    html += `
+      <hr>
+      <h3>📈 Trend Operasi Tahunan</h3>
+    `;
+
+    namaBulan.forEach(function(nama,i){
+
+      const nilai = Number(trend[i]) || 0;
+      const lebar = nilai / maksimum * 100;
+
+      html += `
+        <div style="
+          display:flex;
+          align-items:center;
+          gap:8px;
+          margin:10px 0;
+          font-size:12px;
+        ">
+
+          <b style="width:35px;">${nama}</b>
+
+          <div style="
+            flex:1;
+            background:#eeeeee;
+            border-radius:6px;
+            height:16px;
+            overflow:hidden;
+          ">
+
+            <div style="
+              background:#ef6c00;
+              width:${lebar}%;
+              height:100%;
+            "></div>
+
+          </div>
+
+          <b>${nilai}</b>
+
+        </div>
+      `;
+
+    });
+
+  }
+
+  graf.innerHTML = html;
+
+}
+
+// TAMAT GRAF STATISTIK OPERASI
+
+// ============================================
+// ANALISIS AUTOMATIK OPERASI SJAM
+// ============================================
+
+function paparAnalisisStatistikSJAM(res){
+
+  const analisis = document.getElementById(
+    "statAnalisis"
+  );
+
+  const jumlah = Number(res.jumlahKes) || 0;
+
+  const namaBulan = [
+    "Januari","Februari","Mac","April",
+    "Mei","Jun","Julai","Ogos",
+    "September","Oktober","November","Disember"
+  ];
+
+  const kategori = [
+    ["Discaj Wad", Number(res.discaj) || 0],
+    ["Pindah Hospital", Number(res.pindah) || 0],
+    ["Temujanji (TCA)", Number(res.tca) || 0],
+    ["Masuk Wad", Number(res.masuk) || 0]
+  ];
+
+  const tempoh = res.jenisLaporan === "tahunan"
+    ? "Tahun " + Number(res.tahun)
+    : namaBulan[Number(res.bulan)-1] + " " +
+      Number(res.tahun);
+
+  let html = `
+    <div style="text-align:left;line-height:1.7;">
+
+    <h3>📋 Ringkasan Laporan</h3>
+
+    <b>Tempoh:</b> ${tempoh}<br>
+
+    <b>Jumlah operasi:</b> ${jumlah} kes<br>
+
+    <b>Jumlah rekod tuntutan:</b>
+    ${Number(res.jumlahRekod) || 0}<br>
+
+    <b>Rekod berulang ditapis:</b>
+    ${Number(res.pendua) || 0}<br>
+
+    <hr>
+  `;
+
+  if(jumlah === 0){
+
+    html += `
+      <p>Tiada kes dengan nombor resit sah
+      direkodkan bagi tempoh yang dipilih.</p>
+    `;
+
+  }else{
+
+    const tertinggi = Math.max(
+      ...kategori.map(item => item[1])
+    );
+
+    if(tertinggi > 0){
+
+      const namaTertinggi = kategori
+        .filter(item => item[1] === tertinggi)
+        .map(item => item[0])
+        .join(", ");
+
+      const peratus = (
+        tertinggi / jumlah * 100
+      ).toFixed(1);
+
+      html += `
+        <h3>🏆 Kategori Kes Tertinggi</h3>
+
+        <b>${namaTertinggi}</b><br>
+
+        ${tertinggi} kes bagi setiap kategori
+        tertinggi (${peratus}% setiap kategori).
+
+        <hr>
+      `;
+
+    }
+
+    html += `<h3>📊 Pecahan Operasi</h3>`;
+
+    kategori.forEach(function(item){
+
+      const peratus = (
+        item[1] / jumlah * 100
+      ).toFixed(1);
+
+      html += `
+        ${item[0]}:
+        <b>${item[1]} kes (${peratus}%)</b><br>
+      `;
+
+    });
+
+    if(res.jenisLaporan === "tahunan"){
+
+      const trend = Array.isArray(res.trendBulanan)
+        ? res.trendBulanan.map(v => Number(v) || 0)
+        : [];
+
+      const maksimum = Math.max(0,...trend);
+
+      if(maksimum > 0){
+
+        const bulanAktif = namaBulan
+          .filter((nama,i) => trend[i] === maksimum)
+          .join(", ");
+
+        html += `
+          <hr>
+
+          <h3>📈 Bulan Paling Aktif</h3>
+
+          <b>${bulanAktif}</b><br>
+
+          ${maksimum} kes bagi setiap bulan tersebut.
+        `;
+
+      }
+
+    }
+
+  }
+
+  html += `
+    <hr>
+
+    <h3>🔍 Semakan Kualiti Data</h3>
+
+    Rekod tanpa nombor resit:
+    <b>${Number(res.resitKosong) || 0}</b><br>
+
+    Kes lain-lain:
+    <b>${Number(res.lain) || 0}</b><br>
+
+    Kes konflik kategori:
+    <b>${Number(res.konflik) || 0}</b><br>
+
+    Rekod tarikh tidak sah (seluruh sheet):
+    <b>${Number(res.tarikhTidakSah) || 0}</b><br>
+
+    <hr>
+
+    <small>
+      Statistik dijana berdasarkan nombor resit
+      dan tarikh operasi yang unik.
+      Tuntutan krew berulang bagi resit dan
+      tarikh yang sama dikira sebagai satu kes.
+    </small>
+
+    </div>
+  `;
+
+  analisis.innerHTML = html;
+
+}
+
+// TAMAT ANALISIS AUTOMATIK OPERASI
+
+// ============================================
+// CETAK LAPORAN STATISTIK OPERASI SJAM
+// ============================================
+
+function cetakStatistikSJAM(){
+
+  const res = window.laporanStatistikSJAM;
+
+  if(!res || !res.success){
+    alert("Sila papar statistik terlebih dahulu.");
+    return;
+  }
+
+  const jenis = document.getElementById(
+    "jenisLaporanStatistikSJAM"
+  ).value;
+
+  const tahun = Number(document.getElementById(
+    "tahunStatistikSJAM"
+  ).value);
+
+  const bulan = Number(document.getElementById(
+    "bulanStatistikSJAM"
+  ).value);
+
+  if(res.jenisLaporan !== jenis ||
+     res.tahun !== tahun ||
+     (jenis === "bulanan" && res.bulan !== bulan)){
+    alert("Pilihan laporan telah berubah. Sila papar statistik semula.");
+    return;
+  }
+
+  const namaBulan = [
+    "Januari","Februari","Mac","April",
+    "Mei","Jun","Julai","Ogos",
+    "September","Oktober","November","Disember"
+  ];
+
+  const tempoh = res.jenisLaporan === "tahunan"
+    ? String(res.tahun)
+    : namaBulan[res.bulan-1] + " " + res.tahun;
+
+  const graf = document.getElementById("statGraf");
+  const analisis = document.getElementById("statAnalisis");
+
+  const laporan = window.open("", "_blank");
+
+  if(!laporan){
+    alert("Sila benarkan pop-up untuk mencetak laporan.");
+    return;
+  }
+
+  laporan.document.write(`
+    <!DOCTYPE html>
+    <html lang="ms">
+    <head>
+    <meta charset="UTF-8">
+    <title>Laporan Operasi SJAM ${tempoh}</title>
+
+    <style>
+      @page{
+        size:A4;
+        margin:15mm;
+      }
+
+      body{
+        font-family:Arial,sans-serif;
+        color:#222;
+        padding:15px;
+        font-size:13px;
+        -webkit-print-color-adjust:exact;
+        print-color-adjust:exact;
+      }
+
+      h1,h2,h3{
+        text-align:center;
+      }
+
+      table{
+        width:100%;
+        border-collapse:collapse;
+        margin:20px 0;
+      }
+
+      th,td{
+        border:1px solid #ccc;
+        padding:10px;
+      }
+
+      th{
+        background:#EF6C00;
+        color:white;
+      }
+
+      .jumlah{
+        background:#FFF3E0;
+        font-weight:bold;
+      }
+
+      .footer{
+        margin-top:30px;
+        font-size:11px;
+        color:#666;
+        text-align:center;
+      }
+    </style>
+    </head>
+
+    <body>
+
+    <h2>ST. JOHN AMBULANCE OF MALAYSIA</h2>
+    <h3>KAWASAN KELANTAN UTARA</h3>
+
+    <hr>
+
+    <h2>STATISTIK & ANALISIS OPERASI AMBULANS</h2>
+
+    <h3>${tempoh}</h3>
+
+    <table>
+      <tr>
+        <th>Kategori Operasi</th>
+        <th>Jumlah Kes</th>
+      </tr>
+      <tr><td>Discaj Wad</td><td>${res.discaj}</td></tr>
+      <tr><td>Pindah Hospital</td><td>${res.pindah}</td></tr>
+      <tr><td>Temujanji (TCA)</td><td>${res.tca}</td></tr>
+      <tr><td>Masuk Wad</td><td>${res.masuk}</td></tr>
+      <tr><td>Lain-lain</td><td>${res.lain}</td></tr>
+      <tr><td>Konflik Kategori</td><td>${res.konflik}</td></tr>
+      <tr class="jumlah">
+        <td>JUMLAH KESELURUHAN</td>
+        <td>${res.jumlahKes}</td>
+      </tr>
+    </table>
+
+    ${graf.innerHTML}
+
+    ${analisis.innerHTML}
+
+    <div class="footer">
+      Dijana secara automatik melalui Sistem E-Tuntutan SJAM.
+      <br>
+      Tarikh cetakan: ${new Date().toLocaleDateString("ms-MY")}
+      <br>
+      Satu nombor resit pada tarikh yang sama dikira sebagai satu operasi.
+    </div>
+
+    </body>
+    </html>
+  `);
+
+  laporan.document.close();
+  laporan.focus();
+  laporan.print();
+
+}
+
+// TAMAT CETAK LAPORAN STATISTIK SJAM
 
 // ==============================
 // PUSAT RESIT RASMI SJAM
