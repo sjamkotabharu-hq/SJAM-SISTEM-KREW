@@ -2148,71 +2148,86 @@ ${jenis}
 `;
 
 
+
 kategori[jenis].forEach(x=>{
 
+  html+=`
 
-html+=`
+  <div class="sejarahItem">
 
-<div class="sejarahItem">
+    <b>📅 Tarikh:</b>
+    ${selamatAtributTuntutan(formatTarikh(x.tarikh))}
 
+    <br>
 
-📅 Tarikh:
-${formatTarikh(x.tarikh)}
+    <b>🧾 No Resit:</b>
+    ${selamatAtributTuntutan(x.resit || "-")}
 
-<br>
+    <br>
 
-🧾 No Resit:
-${x.resit || "-"}
+    ${x.jumlah !== "" && x.jumlah !== null ?
+      "💰 RM " + selamatAtributTuntutan(x.jumlah)
+      : ""
+    }
 
-<br>
+    ${x.destinasi ? `
+      <br>
+      🗺️ Destinasi:
+      ${selamatAtributTuntutan(x.destinasi)}
+    ` : ""}
 
+    ${x.pemandu ? `
+      <br>
+      🚑 Pemandu:
+      ${selamatAtributTuntutan(x.pemandu)}
+    ` : ""}
 
-${x.jumlah ?
+    ${paparMaklumatResitSJAM(x)}
 
-"💰 RM "+x.jumlah
+    <div style="
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:7px;
+      margin-top:15px;
+    ">
 
-:
+      <button
+        type="button"
+        style="background:#1565c0;margin:0;padding:11px 3px;font-size:13px;"
+        data-id="${selamatAtributTuntutan(x.idTuntutan)}"
+        onclick="viewSejarahKrew(this)">
 
-""
+        👁️ VIEW
 
-}
+      </button>
 
+      <button
+        type="button"
+        style="background:#ef6c00;margin:0;padding:11px 3px;font-size:13px;"
+        data-id="${selamatAtributTuntutan(x.idTuntutan)}"
+        onclick="editSejarahKrew(this)">
 
-${x.destinasi ?
+        ✏️ EDIT
 
-`
-<br>
-🗺️ Destinasi:
-${x.destinasi}
-`
+      </button>
 
-:
+      <button
+        type="button"
+        class="red"
+        style="margin:0;padding:11px 3px;font-size:13px;"
+        data-id="${selamatAtributTuntutan(x.idTuntutan)}"
+        data-bulan="${selamatAtributTuntutan(x.bulan || bulanDipilih)}"
+        onclick="padamSejarahKrew(this)">
 
-""
+        🗑️ PADAM
 
-}
+      </button>
 
+    </div>
 
-${x.pemandu ?
+  </div>
 
-`
-<br>
-🚑 Pemandu:
-${x.pemandu}
-`
-
-:
-
-""
-
-}
-
-${paparMaklumatResitSJAM(x)}
-
-</div>
-
-`;
-
+  `;
 
 });
 
@@ -12782,6 +12797,647 @@ function cetakLaporanTahunanSJAM(){
 // ======================================================
 // TAMAT LAPORAN TAHUNAN SJAM
 // ======================================================
+
+
+// ==================================================
+// SEJARAH SAYA - VIEW EDIT PADAM
+// ==================================================
+
+
+// ==================================================
+// 1. VIEW REKOD TUNTUTAN KREW
+// ==================================================
+
+async function viewSejarahKrew(button){
+
+  const id = button.dataset.id;
+
+  if(!currentUser || !id){
+    alert("Sesi krew atau ID rekod tidak sah.");
+    return;
+  }
+
+  try{
+
+    const response = await fetch(SCRIPT_URL,{
+
+      method:"POST",
+
+      body:JSON.stringify({
+
+        action:"viewTuntutanKrew",
+
+        idTuntutan:id,
+
+        idKrew:currentUser.id
+
+      })
+
+    });
+
+    const res = await response.json();
+
+    if(!res.success){
+      throw new Error(res.message);
+    }
+
+    const x = res.data;
+
+    document.getElementById(
+      "modalSejarahKrewSJAM"
+    )?.remove();
+
+    const modal = document.createElement("div");
+
+    modal.id = "modalSejarahKrewSJAM";
+
+    modal.style.cssText = `
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.65);
+      z-index:99999;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:15px;
+    `;
+
+    const kad = document.createElement("div");
+
+    kad.style.cssText = `
+      background:white;
+      width:100%;
+      max-width:450px;
+      max-height:85vh;
+      overflow-y:auto;
+      padding:20px;
+      border-radius:18px;
+    `;
+
+    const tajuk = document.createElement("h2");
+
+    tajuk.textContent = "👁️ BUTIRAN TUNTUTAN";
+    tajuk.style.color = "#1565c0";
+
+    const butiran = document.createElement("div");
+
+    butiran.style.cssText = `
+      white-space:pre-line;
+      line-height:1.8;
+      overflow-wrap:anywhere;
+      background:#f5f9ff;
+      padding:15px;
+      border-radius:12px;
+    `;
+
+    const tarikh = x.tarikh
+      ? x.tarikh.split("-").reverse().join("/")
+      : "-";
+
+    butiran.textContent =
+
+      "Jenis: " + x.jenis + "\n\n" +
+
+      "Tarikh: " + tarikh + "\n\n" +
+
+      "No Resit: " + (x.resit || "-") + "\n\n" +
+
+      "Jumlah: " +
+      (x.jumlah !== "" ? "RM " + x.jumlah : "-") + "\n\n" +
+
+      "Destinasi: " + (x.destinasi || "-") + "\n\n" +
+
+      "Pemandu: " + (x.pemandu || "-") + "\n\n" +
+
+      "Diterima Oleh: " + (x.diterimaDari || "-") + "\n\n" +
+
+      "Wang Perkataan: " + (x.wangPerkataan || "-") + "\n\n" +
+
+      "Dari: " + (x.dari || "-") + "\n\n" +
+
+      "Ke: " + (x.ke || "-") + "\n\n" +
+
+      "Tujuan: " + (x.tujuan || "-");
+
+    const tutup = document.createElement("button");
+
+    tutup.textContent = "⬅️ TUTUP";
+    tutup.className = "back";
+    tutup.onclick = ()=>modal.remove();
+
+    kad.appendChild(tajuk);
+    kad.appendChild(butiran);
+    kad.appendChild(tutup);
+
+    modal.appendChild(kad);
+
+    modal.onclick = e=>{
+      if(e.target === modal){
+        modal.remove();
+      }
+    };
+
+    document.body.appendChild(modal);
+
+  }catch(error){
+
+    console.error(error);
+
+    alert("❌ Gagal melihat rekod: " + error.message);
+
+  }
+
+}
+
+
+// ==================================================
+// 2. EDIT REKOD TUNTUTAN KREW
+// ==================================================
+
+async function editSejarahKrew(button){
+
+  const id = button.dataset.id;
+
+  if(!currentUser || !id){
+    alert("Sesi krew atau ID rekod tidak sah.");
+    return;
+  }
+
+  try{
+
+    const response = await fetch(SCRIPT_URL,{
+
+      method:"POST",
+
+      body:JSON.stringify({
+
+        action:"viewTuntutanKrew",
+
+        idTuntutan:id,
+
+        idKrew:currentUser.id
+
+      })
+
+    });
+
+    const res = await response.json();
+
+    if(!res.success){
+      throw new Error(res.message);
+    }
+
+    const x = res.data;
+
+    document.getElementById(
+      "modalEditSejarahKrewSJAM"
+    )?.remove();
+
+    const modal = document.createElement("div");
+
+    modal.id = "modalEditSejarahKrewSJAM";
+
+    modal.style.cssText = `
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.7);
+      z-index:99999;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:12px;
+    `;
+
+    const jenisAsal = String(x.jenis || "");
+
+    const pilihanJenis = [
+      "Hari Biasa",
+      "Malam Jumaat/Sabtu",
+      "Cuti Umum",
+      "Keluar Negeri"
+    ].map(jenis=>({
+
+      value:jenis === "Keluar Negeri"
+        ? jenis
+        : paparJenis(jenis),
+
+      label:jenis === "Keluar Negeri"
+        ? jenis
+        : paparJenis(jenis)
+
+    }));
+
+    if(!pilihanJenis.some(p=>p.value === jenisAsal)){
+
+      pilihanJenis.push({
+        value:jenisAsal,
+        label:jenisAsal
+      });
+
+    }
+
+    const esc = selamatAtributTuntutan;
+
+    modal.innerHTML = `
+
+      <div style="
+        background:white;
+        width:100%;
+        max-width:450px;
+        max-height:90vh;
+        overflow-y:auto;
+        padding:20px;
+        border-radius:18px;
+      ">
+
+        <h2 style="color:#ef6c00;text-align:center;">
+          ✏️ EDIT TUNTUTAN
+        </h2>
+
+        <div class="settingBox">
+          ID Rekod:
+          <br>
+          <b>${esc(x.idTuntutan)}</b>
+        </div>
+
+        <label>Jenis Tuntutan</label>
+
+        <select id="editJenisKrewSJAM">
+
+          ${pilihanJenis.map(p=>`
+
+            <option
+              value="${esc(p.value)}"
+              ${p.value === jenisAsal ? "selected" : ""}>
+              ${esc(p.label)}
+            </option>
+
+          `).join("")}
+
+        </select>
+
+        <label>Tarikh</label>
+
+        <input
+          type="date"
+          id="editTarikhKrewSJAM"
+          value="${esc(x.tarikh)}"
+        >
+
+        <label>No Resit</label>
+
+        <input
+          id="editResitKrewSJAM"
+          value="${esc(x.resit || "")}"
+        >
+
+        <label>Jumlah RM</label>
+
+        <input
+          type="number"
+          min="0"
+          step="0.01"
+          id="editJumlahKrewSJAM"
+          value="${esc(x.jumlah)}"
+          oninput="kemasKiniWangEditKrewSJAM()"
+        >
+
+        <label>Destinasi</label>
+
+        <input
+          id="editDestinasiKrewSJAM"
+          value="${esc(x.destinasi || "")}"
+        >
+
+        <label>Pemandu</label>
+
+        <select id="editPemanduKrewSJAM">
+
+          <option value="">Pilih Pemandu</option>
+
+          <option value="YA" ${x.pemandu === "YA" ? "selected" : ""}>
+            YA
+          </option>
+
+          <option value="TIDAK" ${x.pemandu === "TIDAK" ? "selected" : ""}>
+            TIDAK
+          </option>
+
+        </select>
+
+        <hr>
+
+        <h3>🧾 Maklumat Resit Rasmi</h3>
+
+        <label>Diterima Oleh</label>
+
+        <input
+          id="editDiterimaKrewSJAM"
+          value="${esc(x.diterimaDari || "")}"
+        >
+
+        <label>Wang Dalam Perkataan</label>
+
+        <input
+          id="editWangKrewSJAM"
+          value="${esc(x.wangPerkataan || "")}"
+        >
+
+        <label>Dari</label>
+
+        <input
+          id="editDariKrewSJAM"
+          value="${esc(x.dari || "")}"
+        >
+
+        <label>Ke</label>
+
+        <input
+          id="editKeKrewSJAM"
+          value="${esc(x.ke || "")}"
+        >
+
+        <label>Tujuan</label>
+
+        <input
+          id="editTujuanKrewSJAM"
+          value="${esc(x.tujuan || "")}"
+        >
+
+        <button
+          type="button"
+          class="green"
+          id="btnSimpanEditSejarahSJAM"
+          onclick="simpanEditSejarahKrew('${esc(x.idTuntutan)}')">
+
+          💾 SIMPAN PERUBAHAN
+
+        </button>
+
+        <button
+          type="button"
+          class="back"
+          onclick="document.getElementById('modalEditSejarahKrewSJAM').remove()">
+
+          ❌ BATAL
+
+        </button>
+
+      </div>
+
+    `;
+
+    document.body.appendChild(modal);
+
+  }catch(error){
+
+    console.error(error);
+
+    alert("❌ Gagal membuka edit: " + error.message);
+
+  }
+
+}
+
+
+// ==================================================
+// KEMASKINI WANG PERKATAAN KETIKA EDIT
+// ==================================================
+
+function kemasKiniWangEditKrewSJAM(){
+
+  const jumlah = document.getElementById(
+    "editJumlahKrewSJAM"
+  )?.value;
+
+  const wang = document.getElementById(
+    "editWangKrewSJAM"
+  );
+
+  if(wang){
+
+    wang.value =
+      nomborKePerkataanSJAM(jumlah).toUpperCase();
+
+  }
+
+}
+
+
+// ==================================================
+// SIMPAN PERUBAHAN TUNTUTAN
+// ==================================================
+
+async function simpanEditSejarahKrew(id){
+
+  if(!currentUser){
+    alert("Sesi krew tidak sah.");
+    return;
+  }
+
+  const ambil = id=>
+    document.getElementById(id)?.value.trim() || "";
+
+  const data = {
+
+    idTuntutan:id,
+
+    jenis:ambil("editJenisKrewSJAM"),
+
+    tarikh:ambil("editTarikhKrewSJAM"),
+
+    resit:ambil("editResitKrewSJAM"),
+
+    jumlah:ambil("editJumlahKrewSJAM"),
+
+    destinasi:ambil("editDestinasiKrewSJAM"),
+
+    pemandu:ambil("editPemanduKrewSJAM"),
+
+    diterimaDari:ambil("editDiterimaKrewSJAM"),
+
+    wangPerkataan:ambil("editWangKrewSJAM"),
+
+    dari:ambil("editDariKrewSJAM"),
+
+    ke:ambil("editKeKrewSJAM"),
+
+    tujuan:ambil("editTujuanKrewSJAM")
+
+  };
+
+  if(!data.tarikh || !data.jenis){
+
+    alert("❌ Sila lengkapkan tarikh dan jenis tuntutan.");
+    return;
+
+  }
+
+  if(data.jenis !== "Keluar Negeri"){
+
+    if(
+      !data.jumlah ||
+      !data.diterimaDari ||
+      !data.dari ||
+      !data.ke ||
+      !data.tujuan
+    ){
+
+      alert("❌ Sila lengkapkan semua maklumat tuntutan dan resit.");
+      return;
+
+    }
+
+    data.wangPerkataan =
+      nomborKePerkataanSJAM(data.jumlah).toUpperCase();
+
+  }else{
+
+    data.jumlah = "";
+
+  }
+
+  if(!confirm("Simpan perubahan rekod tuntutan ini?")){
+    return;
+  }
+
+  const butang = document.getElementById(
+    "btnSimpanEditSejarahSJAM"
+  );
+
+  if(butang){
+    butang.disabled = true;
+    butang.textContent = "⏳ MENYIMPAN...";
+  }
+
+  try{
+
+    const response = await fetch(SCRIPT_URL,{
+
+      method:"POST",
+
+      body:JSON.stringify({
+
+        action:"editTuntutanKrew",
+
+        idKrew:currentUser.id,
+
+        data:data
+
+      })
+
+    });
+
+    const res = await response.json();
+
+    if(!res.success){
+      throw new Error(res.message);
+    }
+
+    alert("✅ Rekod berjaya dikemaskini!");
+
+    document.getElementById(
+      "modalEditSejarahKrewSJAM"
+    )?.remove();
+
+    lihatSejarah();
+
+  }catch(error){
+
+    console.error(error);
+
+    alert("❌ Gagal mengemaskini: " + error.message);
+
+    if(butang){
+      butang.disabled = false;
+      butang.textContent = "💾 SIMPAN PERUBAHAN";
+    }
+
+  }
+
+}
+
+
+// ==================================================
+// 3. PADAM REKOD TUNTUTAN KREW
+// ==================================================
+
+async function padamSejarahKrew(button){
+
+  const id = button.dataset.id;
+
+  const bulan = button.dataset.bulan;
+
+  if(!currentUser || !id){
+    alert("Sesi krew atau ID rekod tidak sah.");
+    return;
+  }
+
+  if(!confirm(
+
+    "⚠️ PADAM REKOD TUNTUTAN INI?\n\n" +
+
+    "Rekod akan dipadam daripada:\n" +
+
+    "1. Sejarah Saya\n" +
+
+    "2. Google Sheet TUNTUTAN\n\n" +
+
+    "Tindakan ini tidak boleh dibatalkan."
+
+  )){
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = "⏳ Memadam...";
+
+  try{
+
+    const response = await fetch(SCRIPT_URL,{
+
+      method:"POST",
+
+      body:JSON.stringify({
+
+        action:"padamTuntutanKrew",
+
+        idTuntutan:id,
+
+        idKrew:currentUser.id
+
+      })
+
+    });
+
+    const res = await response.json();
+
+    if(!res.success){
+      throw new Error(res.message);
+    }
+
+    alert("✅ Rekod berjaya dipadam daripada Google Sheet!");
+
+    lihatSejarah(bulan);
+
+  }catch(error){
+
+    console.error(error);
+
+    alert("❌ Gagal memadam rekod: " + error.message);
+
+    button.disabled = false;
+    button.textContent = "🗑️ PADAM";
+
+  }
+
+}
+
+
+// ==================================================
+// TAMAT VIEW EDIT PADAM SEJARAH KREW
+// ==================================================
+
 
 </script>
 
