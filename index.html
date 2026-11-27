@@ -124,6 +124,67 @@ background:#555;
 display:none;
 }
 
+
+/* ==========================================
+   PAPARAN HALAMAN ADMIN PENUH
+   NAVIGASI SUBHALAMAN SJAM
+   ========================================== */
+
+#adminArea:not(:empty){
+
+    position:fixed;
+
+    inset:0;
+
+    z-index:99999;
+
+    width:auto;
+
+    height:100vh;
+    height:100dvh;
+
+    overflow-y:auto;
+    overflow-x:hidden;
+
+    background:#eef5ff;
+
+    padding:16px;
+
+    box-sizing:border-box;
+
+    overscroll-behavior:contain;
+
+    -webkit-overflow-scrolling:touch;
+
+}
+
+/* KAD HALAMAN ADMIN */
+
+#adminArea:not(:empty) > .card{
+
+    width:100%;
+
+    max-width:1100px;
+
+    margin:0 auto 20px;
+
+    box-sizing:border-box;
+
+}
+
+/* BANNER SUBHALAMAN */
+
+#adminArea:not(:empty) > .banner{
+
+    max-width:1100px;
+
+    margin:0 auto 15px;
+
+}
+
+/* TAMAT PAPARAN HALAMAN PENUH */
+
+
 .menu{
 display:grid;
 grid-template-columns:1fr 1fr;
@@ -2845,6 +2906,23 @@ onclick="simpanBulanAktif()">
 <button onclick="paparSenaraiKrew()">
 
 👥 Pilih Nama Krew
+
+</button>
+
+<!-- RINGKASAN TUNTUTAN SEMUA KREW -->
+
+<button
+ type="button"
+ style="
+   background:linear-gradient(135deg,#176b36,#2e7d32);
+   color:white;
+   font-weight:bold;
+   padding:16px;
+   border-radius:15px;
+ "
+ onclick="laporanSemuaKrew()">
+
+ 📊 RINGKASAN TUNTUTAN SEMUA KREW
 
 </button>
 
@@ -6469,6 +6547,650 @@ alert(
 });
 
 }
+
+
+// ==================================================
+// RINGKASAN TUNTUTAN SEMUA KREW
+// PAPARAN ADMIN SJAM
+// ==================================================
+
+async function laporanSemuaKrew(){
+
+    const kawasan =
+        document.getElementById("adminArea");
+
+    if(!kawasan){
+        alert("Halaman Admin tidak dijumpai.");
+        return;
+    }
+
+    kawasan.innerHTML = `
+        <div class="card">
+            <h2 style="color:#176b36;">
+                📊 Ringkasan Tuntutan Semua Krew
+            </h2>
+
+            <div class="settingBox">
+                ⏳ Sedang mengambil data tuntutan...
+                <br>
+                Sila tunggu sebentar.
+            </div>
+        </div>
+    `;
+
+    try{
+
+        const response = await fetch(SCRIPT_URL,{
+
+            method:"POST",
+
+            body:JSON.stringify({
+
+                action:"ringkasanTuntutanSemuaKrew"
+
+            })
+
+        });
+
+        if(!response.ok){
+            throw new Error("Sambungan GS gagal.");
+        }
+
+        const res = await response.json();
+
+        if(!res.success){
+            throw new Error(
+                res.message || "Gagal mendapatkan ringkasan."
+            );
+        }
+
+        const wang = nilai => {
+
+            return "RM " + (
+                Number(nilai) || 0
+            ).toLocaleString("en-MY",{
+                minimumFractionDigits:2,
+                maximumFractionDigits:2
+            });
+
+        };
+
+        const bulan = selamatAtributTuntutan(
+            res.bulan || "-"
+        );
+
+        let html = `
+
+        <div class="card" id="ringkasanSemuaKrewSJAM">
+
+            <div style="
+                background:linear-gradient(135deg,#176b36,#2e7d32);
+                color:white;
+                padding:22px 12px;
+                border-radius:15px;
+                text-align:center;
+                margin-bottom:18px;
+            ">
+
+                <h2 style="color:white;margin:0;">
+                    RINGKASAN JUMLAH TUNTUTAN PENDAPATAN
+                </h2>
+
+                <h2 style="color:white;margin:5px 0;">
+                    SEMUA KREW
+                </h2>
+
+                <b>BULAN: ${bulan}</b>
+
+            </div>
+
+            <div style="
+                background:#e8f5e9;
+                padding:12px;
+                border-radius:12px;
+                text-align:center;
+                margin-bottom:15px;
+            ">
+
+                <b>JUMLAH KREW</b>
+
+                <h2 style="color:#176b36;margin:5px;">
+                    ${res.jumlahKrew}
+                </h2>
+
+            </div>
+
+            <h3 style="color:#176b36;">
+                RINGKASAN TUNTUTAN CREW
+            </h3>
+
+            <div style="
+                width:100%;
+                overflow-x:auto;
+            ">
+
+                <table style="
+                    width:100%;
+                    min-width:850px;
+                    border-collapse:collapse;
+                    font-size:12px;
+                    text-align:center;
+                ">
+
+                    <thead>
+                        <tr style="color:#222;">
+
+                            <th style="background:#dcebdd;padding:10px;border:1px solid #999;">
+                                BIL
+                            </th>
+
+                            <th style="background:#dcebdd;padding:10px;border:1px solid #999;">
+                                NAMA CREW/PEGAWAI
+                            </th>
+
+                            <th style="background:#f5e9c9;padding:10px;border:1px solid #999;">
+                                HARI BIASA
+                            </th>
+
+                            <th style="background:#d6eaf8;padding:10px;border:1px solid #999;">
+                                MLM, JUMAAT & SABTU
+                            </th>
+
+                            <th style="background:#e8e6a8;padding:10px;border:1px solid #999;">
+                                CUTI UMUM
+                            </th>
+
+                            <th style="background:#ddecce;padding:10px;border:1px solid #999;">
+                                KELUAR NEGERI
+                            </th>
+
+                            <th style="background:#f5dcdc;padding:10px;border:1px solid #999;">
+                                JUMLAH BESAR
+                            </th>
+
+                        </tr>
+                    </thead>
+
+                    <tbody>
+        `;
+
+        if(res.data && res.data.length){
+
+            res.data.forEach((k,i)=>{
+
+                html += `
+
+                    <tr style="
+                        background:${i%2===0?"#ffffff":"#f5f5f5"};
+                    ">
+
+                        <td style="padding:9px;border:1px solid #bbb;">
+                            ${i+1}
+                        </td>
+
+                        <td style="
+                            padding:9px;
+                            border:1px solid #bbb;
+                            text-align:left;
+                            font-weight:bold;
+                        ">
+                            ${selamatAtributTuntutan(k.nama)}
+                        </td>
+
+                        <td style="padding:9px;border:1px solid #bbb;">
+                            ${wang(k.hariBiasa)}
+                        </td>
+
+                        <td style="padding:9px;border:1px solid #bbb;">
+                            ${wang(k.malam)}
+                        </td>
+
+                        <td style="padding:9px;border:1px solid #bbb;">
+                            ${wang(k.cutiUmum)}
+                        </td>
+
+                        <td style="padding:9px;border:1px solid #bbb;">
+                            ${Number(k.keluarNegeri)||0} Rekod
+                        </td>
+
+                        <td style="
+                            padding:9px;
+                            border:1px solid #bbb;
+                            font-weight:bold;
+                        ">
+                            ${wang(k.jumlahBesar)}
+                        </td>
+
+                    </tr>
+
+                `;
+
+            });
+
+        }else{
+
+            html += `
+                <tr>
+                    <td colspan="7" style="padding:15px;">
+                        Tiada rekod krew.
+                    </td>
+                </tr>
+            `;
+
+        }
+
+        const jumlah = res.jumlahKeseluruhan || {};
+
+        html += `
+
+                    </tbody>
+
+                    <tfoot>
+
+                        <tr style="
+                            background:#dcebdd;
+                            font-weight:bold;
+                        ">
+
+                            <td colspan="2" style="
+                                padding:12px;
+                                border:1px solid #999;
+                            ">
+                                JUMLAH
+                            </td>
+
+                            <td style="padding:10px;border:1px solid #999;">
+                                ${wang(jumlah.hariBiasa)}
+                            </td>
+
+                            <td style="padding:10px;border:1px solid #999;">
+                                ${wang(jumlah.malam)}
+                            </td>
+
+                            <td style="padding:10px;border:1px solid #999;">
+                                ${wang(jumlah.cutiUmum)}
+                            </td>
+
+                            <td style="padding:10px;border:1px solid #999;">
+                                ${Number(jumlah.keluarNegeri)||0} Rekod
+                            </td>
+
+                            <td style="
+                                padding:10px;
+                                background:#176b36;
+                                color:white;
+                                border:1px solid #999;
+                            ">
+                                ${wang(jumlah.jumlahBesar)}
+                            </td>
+
+                        </tr>
+
+                    </tfoot>
+
+                </table>
+
+            </div>
+
+            <div style="
+                background:#176b36;
+                color:white;
+                padding:18px;
+                margin-top:20px;
+                border-radius:12px;
+                text-align:center;
+            ">
+
+                <b>JUMLAH KESELURUHAN PENDAPATAN</b>
+
+                <h2 style="
+                    color:white;
+                    margin:8px 0 0;
+                ">
+                    ${wang(jumlah.jumlahBesar)}
+                </h2>
+
+            </div>
+
+            <button
+                type="button"
+                class="green noPrint"
+                onclick="cetakRingkasanSemuaKrew()">
+
+                🖨️ CETAK / SIMPAN PDF
+
+            </button>
+
+            <button
+                type="button"
+                class="back noPrint"
+                onclick="bukaDashboardAdmin()">
+
+                ⬅️ Kembali Dashboard
+
+            </button>
+
+        </div>
+
+        `;
+
+        kawasan.innerHTML = html;
+
+        kawasan.scrollIntoView({
+            behavior:"smooth",
+            block:"start"
+        });
+
+        // Simpan data untuk cetakan PDF
+        window.dataRingkasanSemuaKrewSJAM = res;
+
+    }catch(error){
+
+        console.error(error);
+
+        kawasan.innerHTML = `
+
+            <div class="card">
+
+                <h2 style="color:#c62828;">
+                    ❌ Gagal Membuka Ringkasan
+                </h2>
+
+                <div class="settingBox">
+                    ${selamatAtributTuntutan(error.message)}
+                </div>
+
+                <button
+                    onclick="laporanSemuaKrew()">
+                    🔄 Cuba Semula
+                </button>
+
+                <button
+                    class="back"
+                    onclick="bukaDashboardAdmin()">
+                    ⬅️ Dashboard
+                </button>
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+// ==================================================
+// CETAK / SIMPAN PDF RINGKASAN SEMUA KREW
+// ==================================================
+
+function cetakRingkasanSemuaKrew(){
+
+    const res = window.dataRingkasanSemuaKrewSJAM;
+
+    if(!res || !res.success){
+        alert("Sila buka ringkasan dahulu.");
+        return;
+    }
+
+    const laporan = window.open(
+        "",
+        "_blank",
+        "width=1200,height=850"
+    );
+
+    if(!laporan){
+        alert(
+            "Sila benarkan pop-up untuk mencetak PDF."
+        );
+        return;
+    }
+
+    const wang = nilai => {
+
+        return "RM " + (
+            Number(nilai)||0
+        ).toLocaleString("en-MY",{
+            minimumFractionDigits:2,
+            maximumFractionDigits:2
+        });
+
+    };
+
+    const jumlah = res.jumlahKeseluruhan || {};
+
+    let baris = "";
+
+    (res.data || []).forEach((k,i)=>{
+
+        baris += `
+
+            <tr>
+
+                <td>${i+1}</td>
+
+                <td style="text-align:left;">
+                    ${selamatAtributTuntutan(k.nama)}
+                </td>
+
+                <td>${wang(k.hariBiasa)}</td>
+
+                <td>${wang(k.malam)}</td>
+
+                <td>${wang(k.cutiUmum)}</td>
+
+                <td>${Number(k.keluarNegeri)||0} Rekod</td>
+
+                <td><b>${wang(k.jumlahBesar)}</b></td>
+
+            </tr>
+
+        `;
+
+    });
+
+    laporan.document.open();
+
+    laporan.document.write(`
+
+        <!DOCTYPE html>
+
+        <html lang="ms">
+
+        <head>
+
+            <meta charset="UTF-8">
+
+            <title>Ringkasan Tuntutan Semua Krew SJAM</title>
+
+            <style>
+
+                @page{
+                    size:A4 landscape;
+                    margin:10mm;
+                }
+
+                *{
+                    box-sizing:border-box;
+                }
+
+                body{
+                    font-family:Arial,sans-serif;
+                    color:#222;
+                    margin:0;
+                    padding:15px;
+                    -webkit-print-color-adjust:exact;
+                    print-color-adjust:exact;
+                }
+
+                .tajuk{
+                    background:#176b36;
+                    color:white;
+                    text-align:center;
+                    padding:18px;
+                    border-radius:8px;
+                }
+
+                .tajuk h2{
+                    color:white;
+                    margin:5px;
+                    font-size:19px;
+                }
+
+                table{
+                    width:100%;
+                    border-collapse:collapse;
+                    margin-top:20px;
+                    font-size:10px;
+                }
+
+                th,td{
+                    border:1px solid #999;
+                    padding:9px 5px;
+                    text-align:center;
+                }
+
+                th{
+                    background:#dcebdd;
+                }
+
+                .jumlah{
+                    background:#dcebdd;
+                    font-weight:bold;
+                }
+
+                .akhir{
+                    background:#176b36;
+                    color:white;
+                    font-weight:bold;
+                }
+
+                .jumlahAkhir{
+                    margin-top:20px;
+                    padding:15px;
+                    background:#176b36;
+                    color:white;
+                    text-align:center;
+                    border-radius:8px;
+                }
+
+                .jumlahAkhir h2{
+                    margin:8px;
+                    color:white;
+                }
+
+                @media print{
+                    body{
+                        padding:0;
+                    }
+                }
+
+            </style>
+
+        </head>
+
+        <body>
+
+            <div class="tajuk">
+
+                <h2>
+                    RINGKASAN JUMLAH TUNTUTAN PENDAPATAN
+                </h2>
+
+                <h2>SEMUA KREW</h2>
+
+                <b>BULAN: ${selamatAtributTuntutan(res.bulan)}</b>
+
+            </div>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>BIL</th>
+
+                        <th>NAMA CREW/PEGAWAI</th>
+
+                        <th>HARI BIASA</th>
+
+                        <th>MLM, JUMAAT & SABTU</th>
+
+                        <th>CUTI UMUM</th>
+
+                        <th>KELUAR NEGERI</th>
+
+                        <th>JUMLAH BESAR</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    ${baris}
+
+                </tbody>
+
+                <tfoot>
+
+                    <tr class="jumlah">
+
+                        <td colspan="2">JUMLAH</td>
+
+                        <td>${wang(jumlah.hariBiasa)}</td>
+
+                        <td>${wang(jumlah.malam)}</td>
+
+                        <td>${wang(jumlah.cutiUmum)}</td>
+
+                        <td>${Number(jumlah.keluarNegeri)||0} Rekod</td>
+
+                        <td class="akhir">
+                            ${wang(jumlah.jumlahBesar)}
+                        </td>
+
+                    </tr>
+
+                </tfoot>
+
+            </table>
+
+            <div class="jumlahAkhir">
+
+                <b>JUMLAH KESELURUHAN PENDAPATAN</b>
+
+                <h2>${wang(jumlah.jumlahBesar)}</h2>
+
+            </div>
+
+            <p style="
+                text-align:center;
+                font-size:10px;
+                margin-top:20px;
+            ">
+                Dijana secara automatik melalui Sistem E-Tuntutan SJAM.
+            </p>
+
+        </body>
+
+        </html>
+
+    `);
+
+    laporan.document.close();
+
+    laporan.focus();
+
+    laporan.print();
+
+}
+
+// ==================================================
+// TAMAT RINGKASAN TUNTUTAN SEMUA KREW
+// ==================================================
+
 
 // ==============================
 // BAHAGIAN 9/10
